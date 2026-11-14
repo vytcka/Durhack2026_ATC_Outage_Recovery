@@ -1,4 +1,4 @@
-const ICON_SIZE = 22;
+const ICON_SIZE = 16;
 
 // Label offset from the marker for each side.
 const LABEL_OFFSET = {

@@ -1,19 +1,36 @@
-import { useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { pointer } from 'd3-selection';
 import { AIRPORTS } from '../data/airports.js';
+import { timeZoneAt } from '../data/timeZones.js';
 import { WIDTH, HEIGHT, projection, paths } from './geography.js';
 import { useZoom } from './useZoom.js';
 import AirportMarker from './AirportMarker.jsx';
+import AnalyticsPanel from './AnalyticsPanel.jsx';
 
 const MAX_ZOOM = 60;
 const SHOW_NAMES_AT_ZOOM = 6;
 const FOCUS_ZOOM = 14;
+const SIM_SPEED = 60; // simulated seconds per real second (1 real second = 1 simulated minute)
 
 export default function AirspaceMap() {
   const svgRef = useRef(null);
   const { transform, zoomIn, zoomOut, reset, focus } = useZoom(svgRef, MAX_ZOOM);
   const [selected, setSelected] = useState(null);
   const [cursor, setCursor] = useState(null); // [lon, lat] under the mouse
+  const [analyticsOpen, setAnalyticsOpen] = useState(true);
+
+  // TODO: replace with real values once the simulation is connected.
+  const [simStartedAt] = useState(() => Date.now());
+  const airborne = 0;
+  const disruptionIndex = 0;
+
+  // The clock follows whatever is in the middle of the screen. The viewBox centre is also the
+  // screen centre (the SVG scales uniformly), so undo the zoom transform, then the projection,
+  // to get the [lon, lat] being looked at.
+  const timeZone = useMemo(() => {
+    const viewCenter = projection.invert(transform.invert([WIDTH / 2, HEIGHT / 2]));
+    return timeZoneAt(viewCenter);
+  }, [transform]);
 
   const selectAirport = (airport) => {
     setSelected(airport);
@@ -60,10 +77,32 @@ export default function AirspaceMap() {
         </g>
       </svg>
 
-      <header className="panel title">
-        <h1>US Airspace</h1>
-        <p>{AIRPORTS.length} airports · all 48 contiguous states</p>
-      </header>
+      <aside className="sidebar">
+        <header className="panel title">
+          <div>
+            <h1>US Airspace</h1>
+            <p>{AIRPORTS.length} airports · all 48 contiguous states</p>
+          </div>
+          <button
+            className={analyticsOpen ? 'drawer-toggle open' : 'drawer-toggle'}
+            onClick={() => setAnalyticsOpen((open) => !open)}
+            aria-expanded={analyticsOpen}
+            aria-controls="analytics"
+            aria-label={analyticsOpen ? 'Hide analytics' : 'Show analytics'}
+          >
+            ▾
+          </button>
+        </header>
+
+        <AnalyticsPanel
+          open={analyticsOpen}
+          timeZone={timeZone}
+          startedAt={simStartedAt}
+          speed={SIM_SPEED}
+          airborne={airborne}
+          disruptionIndex={disruptionIndex}
+        />
+      </aside>
 
       <div className="zoom-buttons">
         <button onClick={zoomIn} aria-label="Zoom in">+</button>

@@ -65,11 +65,46 @@ body {
 .muted { color: var(--muted); }
 .mono  { font-family: var(--mono); }
 
-.title { top: 16px; left: 16px; padding: 10px 14px; }
+/* Left column: title + collapsible analytics, both the same width. */
+.sidebar {
+  position: absolute; top: 16px; left: 16px; width: 270px;
+  display: flex; flex-direction: column; gap: 8px;
+}
+.sidebar .panel { position: relative; }
+
+.title { padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
 .title h1 { margin: 0; font-size: 16px; }
 .title p  { margin: 2px 0 0; font-size: 12px; color: var(--muted); }
 
-.zoom-buttons { position: absolute; top: 84px; left: 16px; display: flex; flex-direction: column; gap: 4px; }
+.drawer-toggle {
+  width: 26px; height: 26px; flex-shrink: 0;
+  border: 1px solid var(--panel-border); border-radius: 6px;
+  background: transparent; color: var(--muted);
+  font-size: 14px; line-height: 1; cursor: pointer;
+  transform: rotate(-90deg);
+  transition: transform 0.2s, color 0.15s, border-color 0.15s;
+}
+.drawer-toggle.open { transform: rotate(0deg); }
+.drawer-toggle:hover { border-color: var(--accent); color: var(--accent); }
+
+/*
+ * Animating to/from `height: auto` isn't possible directly, so the drawer is a one-row grid
+ * whose row goes 0fr -> 1fr. The child needs `min-height: 0` + `overflow: hidden` to shrink.
+ */
+.analytics-drawer {
+  display: grid; grid-template-rows: 0fr;
+  opacity: 0; visibility: hidden;
+  transition: grid-template-rows 0.25s ease, opacity 0.2s, visibility 0.25s;
+}
+.analytics-drawer.open { grid-template-rows: 1fr; opacity: 1; visibility: visible; }
+.analytics { min-height: 0; overflow: hidden; }
+
+.stats { margin: 0; padding: 12px 14px; display: flex; flex-direction: column; gap: 10px; }
+.stat dt { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+.stat dd { margin: 2px 0 0; font-size: 18px; font-weight: 700; }
+.stat dd .muted { font-size: 12px; font-weight: 400; }
+
+.zoom-buttons { position: absolute; top: 16px; right: 16px; display: flex; flex-direction: column; gap: 4px; }
 .zoom-buttons button {
   width: 34px; height: 34px;
   border: 1px solid var(--panel-border); border-radius: 6px;
