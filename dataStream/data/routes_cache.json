@@ -1,0 +1,4846 @@
+{
+  "72193": null,
+  "AAL10": {
+    "origin": "LAX",
+    "destination": "JFK",
+    "flight_number": "AA10"
+  },
+  "AAL102": {
+    "origin": "HNL",
+    "destination": "DFW",
+    "flight_number": "AA102"
+  },
+  "AAL1020": {
+    "origin": "DTW",
+    "destination": "MIA",
+    "flight_number": "AA1020"
+  },
+  "AAL1042": {
+    "origin": "DFW",
+    "destination": "MIA",
+    "flight_number": "AA1042"
+  },
+  "AAL1108": {
+    "origin": "DTW",
+    "destination": "DFW",
+    "flight_number": "AA1108"
+  },
+  "AAL1119": {
+    "origin": "SLP",
+    "destination": "DFW",
+    "flight_number": "AA1119"
+  },
+  "AAL1150": {
+    "origin": "EWR",
+    "destination": "DFW",
+    "flight_number": "AA1150"
+  },
+  "AAL116": {
+    "origin": "OGG",
+    "destination": "DFW",
+    "flight_number": "AA116"
+  },
+  "AAL1178": {
+    "origin": "DCA",
+    "destination": "MIA",
+    "flight_number": "AA1178"
+  },
+  "AAL1189": {
+    "origin": "ORD",
+    "destination": "PHL",
+    "flight_number": "AA1189"
+  },
+  "AAL1196": {
+    "origin": "EWR",
+    "destination": "MIA",
+    "flight_number": "AA1196"
+  },
+  "AAL1226": {
+    "origin": "MIA",
+    "destination": "DFW",
+    "flight_number": "AA1226"
+  },
+  "AAL1265": {
+    "origin": "PHL",
+    "destination": "LAX",
+    "flight_number": "AA1265"
+  },
+  "AAL1471": {
+    "origin": "PHX",
+    "destination": "TPA",
+    "flight_number": "AA1471"
+  },
+  "AAL1495": {
+    "origin": "DFW",
+    "destination": "LIR",
+    "flight_number": "AA1495"
+  },
+  "AAL1532": {
+    "origin": "PVD",
+    "destination": "DCA",
+    "flight_number": "AA1532"
+  },
+  "AAL1561": {
+    "origin": "EWR",
+    "destination": "DFW",
+    "flight_number": "AA1561"
+  },
+  "AAL1586": {
+    "origin": "CHS",
+    "destination": "CLT",
+    "flight_number": "AA1586"
+  },
+  "AAL1604": {
+    "origin": "SAT",
+    "destination": "MIA",
+    "flight_number": "AA1604"
+  },
+  "AAL1690": {
+    "origin": "BDL",
+    "destination": "CLT",
+    "flight_number": "AA1690"
+  },
+  "AAL1694": {
+    "origin": "TPA",
+    "destination": "DFW",
+    "flight_number": "AA1694"
+  },
+  "AAL1703": {
+    "origin": "PVD",
+    "destination": "CLT",
+    "flight_number": "AA1703"
+  },
+  "AAL171": {
+    "origin": "JFK",
+    "destination": "LAX",
+    "flight_number": "AA171"
+  },
+  "AAL1718": {
+    "origin": "ATL",
+    "destination": "CLT",
+    "flight_number": "AA1718"
+  },
+  "AAL1783": {
+    "origin": "CLT",
+    "destination": "SFO",
+    "flight_number": "AA1783"
+  },
+  "AAL1784": {
+    "origin": "ORD",
+    "destination": "CLT",
+    "flight_number": "AA1784"
+  },
+  "AAL1789": {
+    "origin": "EWR",
+    "destination": "PHX",
+    "flight_number": "AA1789"
+  },
+  "AAL1896": {
+    "origin": "MCO",
+    "destination": "CLT",
+    "flight_number": "AA1896"
+  },
+  "AAL1911": {
+    "origin": "CLT",
+    "destination": "PHX",
+    "flight_number": "AA1911"
+  },
+  "AAL1958": {
+    "origin": "MIA",
+    "destination": "SFO",
+    "flight_number": "AA1958"
+  },
+  "AAL1973": {
+    "origin": "DFW",
+    "destination": "SFO",
+    "flight_number": "AA1973"
+  },
+  "AAL1982": {
+    "origin": "BOS",
+    "destination": "MIA",
+    "flight_number": "AA1982"
+  },
+  "AAL1984": {
+    "origin": "SJC",
+    "destination": "CLT",
+    "flight_number": "AA1984"
+  },
+  "AAL2001": {
+    "origin": "SEA",
+    "destination": "PHL",
+    "flight_number": "AA2001"
+  },
+  "AAL2003": {
+    "origin": "DCA",
+    "destination": "LGA",
+    "flight_number": "AA2003"
+  },
+  "AAL2026": {
+    "origin": "MIA",
+    "destination": "JFK",
+    "flight_number": "AA2026"
+  },
+  "AAL2159": {
+    "origin": "BOS",
+    "destination": "DCA",
+    "flight_number": "AA2159"
+  },
+  "AAL2237": {
+    "origin": "JFK",
+    "destination": "SJD",
+    "flight_number": "AA2237"
+  },
+  "AAL2265": {
+    "origin": "BOS",
+    "destination": "ORD",
+    "flight_number": "AA2265"
+  },
+  "AAL2266": {
+    "origin": "PHX",
+    "destination": "PHL",
+    "flight_number": "AA2266"
+  },
+  "AAL2324": {
+    "origin": "PHL",
+    "destination": "ORD",
+    "flight_number": "AA2324"
+  },
+  "AAL2340": {
+    "origin": "PHL",
+    "destination": "DFW",
+    "flight_number": "AA2340"
+  },
+  "AAL2341": {
+    "origin": "ORD",
+    "destination": "MIA",
+    "flight_number": "AA2341"
+  },
+  "AAL2435": {
+    "origin": "SAV",
+    "destination": "DFW",
+    "flight_number": "AA2435"
+  },
+  "AAL2455": {
+    "origin": "BOS",
+    "destination": "LAX",
+    "flight_number": "AA2455"
+  },
+  "AAL2527": {
+    "origin": "BOS",
+    "destination": "DFW",
+    "flight_number": "AA2527"
+  },
+  "AAL2563": {
+    "origin": "AUS",
+    "destination": "DFW",
+    "flight_number": "AA2563"
+  },
+  "AAL2604": {
+    "origin": "GRR",
+    "destination": "PHX",
+    "flight_number": "AA2604"
+  },
+  "AAL2605": {
+    "origin": "RDU",
+    "destination": "DFW",
+    "flight_number": "AA2605"
+  },
+  "AAL2618": {
+    "origin": "GRR",
+    "destination": "CLT",
+    "flight_number": "AA2618"
+  },
+  "AAL2632": {
+    "origin": "EWR",
+    "destination": "ORD",
+    "flight_number": "AA2632"
+  },
+  "AAL2643": {
+    "origin": "JFK",
+    "destination": "CLT",
+    "flight_number": "AA2643"
+  },
+  "AAL2666": {
+    "origin": "EWR",
+    "destination": "CLT",
+    "flight_number": "AA2666"
+  },
+  "AAL2677": {
+    "origin": "MCO",
+    "destination": "DFW",
+    "flight_number": "AA2677"
+  },
+  "AAL2717": {
+    "origin": "BOS",
+    "destination": "LAX",
+    "flight_number": "AA2717"
+  },
+  "AAL2742": {
+    "origin": "DCA",
+    "destination": "LGA",
+    "flight_number": "AA2742"
+  },
+  "AAL2751": {
+    "origin": "DFW",
+    "destination": "PHL",
+    "flight_number": "AA2751"
+  },
+  "AAL2755": {
+    "origin": "BOS",
+    "destination": "MIA",
+    "flight_number": "AA2755"
+  },
+  "AAL276": {
+    "origin": "SFO",
+    "destination": "JFK",
+    "flight_number": "AA276"
+  },
+  "AAL2770": {
+    "origin": "ATL",
+    "destination": "DFW",
+    "flight_number": "AA2770"
+  },
+  "AAL2782": {
+    "origin": "IND",
+    "destination": "DFW",
+    "flight_number": "AA2782"
+  },
+  "AAL2849": {
+    "origin": "RDU",
+    "destination": "ORD",
+    "flight_number": "AA2849"
+  },
+  "AAL2866": {
+    "origin": "DCA",
+    "destination": "DFW",
+    "flight_number": "AA2866"
+  },
+  "AAL2903": {
+    "origin": "DCA",
+    "destination": "ORD",
+    "flight_number": "AA2903"
+  },
+  "AAL2911": {
+    "origin": "LGA",
+    "destination": "ORD",
+    "flight_number": "AA2911"
+  },
+  "AAL2943": {
+    "origin": "DFW",
+    "destination": "CLT",
+    "flight_number": "AA2943"
+  },
+  "AAL309": {
+    "origin": "JFK",
+    "destination": "MIA",
+    "flight_number": "AA309"
+  },
+  "AAL328": {
+    "origin": "DFW",
+    "destination": "ORD",
+    "flight_number": "AA328"
+  },
+  "AAL340": {
+    "origin": "LAX",
+    "destination": "MIA",
+    "flight_number": "AA340"
+  },
+  "AAL373": {
+    "origin": "ORD",
+    "destination": "LIR",
+    "flight_number": "AA373"
+  },
+  "AAL399": {
+    "origin": "CLT",
+    "destination": "ORF",
+    "flight_number": "AA399"
+  },
+  "AAL418": {
+    "origin": "BOS",
+    "destination": "CLT",
+    "flight_number": "AA418"
+  },
+  "AAL430": {
+    "origin": "CLT",
+    "destination": "SFO",
+    "flight_number": "AA430"
+  },
+  "AAL442": {
+    "origin": "DTW",
+    "destination": "PHX",
+    "flight_number": "AA442"
+  },
+  "AAL491": {
+    "origin": "MIA",
+    "destination": "DCA",
+    "flight_number": "AA491"
+  },
+  "AAL496": {
+    "origin": "GUA",
+    "destination": "DFW",
+    "flight_number": "AA496"
+  },
+  "AAL498": {
+    "origin": "BOS",
+    "destination": "JFK",
+    "flight_number": "AA498"
+  },
+  "AAL499": {
+    "origin": "PHL",
+    "destination": "PHX",
+    "flight_number": "AA499"
+  },
+  "AAL506": {
+    "origin": "CLT",
+    "destination": "SEA",
+    "flight_number": "AA506"
+  },
+  "AAL530": {
+    "origin": "SYR",
+    "destination": "CLT",
+    "flight_number": "AA530"
+  },
+  "AAL538": {
+    "origin": "ORD",
+    "destination": "PIT",
+    "flight_number": "AA538"
+  },
+  "AAL547": {
+    "origin": "PHX",
+    "destination": "PHL",
+    "flight_number": "AA547"
+  },
+  "AAL563": {
+    "origin": "PHL",
+    "destination": "CLT",
+    "flight_number": "AA563"
+  },
+  "AAL569": {
+    "origin": "PHX",
+    "destination": "DFW",
+    "flight_number": "AA569"
+  },
+  "AAL582": {
+    "origin": "PHL",
+    "destination": "LAX",
+    "flight_number": "AA582"
+  },
+  "AAL586": {
+    "origin": "PHL",
+    "destination": "PVD",
+    "flight_number": "AA586"
+  },
+  "AAL6": {
+    "origin": "OGG",
+    "destination": "DFW",
+    "flight_number": "AA6"
+  },
+  "AAL600": {
+    "origin": "AUS",
+    "destination": "DFW",
+    "flight_number": "AA600"
+  },
+  "AAL628": {
+    "origin": "LGA",
+    "destination": "CLT",
+    "flight_number": "AA628"
+  },
+  "AAL640": {
+    "origin": "LGA",
+    "destination": "DCA",
+    "flight_number": "AA640"
+  },
+  "AAL647": {
+    "origin": "DTW",
+    "destination": "CLT",
+    "flight_number": "AA647"
+  },
+  "AAL696": {
+    "origin": "STL",
+    "destination": "BOS",
+    "flight_number": "AA696"
+  },
+  "AAL747": {
+    "origin": "BOS",
+    "destination": "MIA",
+    "flight_number": "AA747"
+  },
+  "AAL858": {
+    "origin": "DFW",
+    "destination": "SFO",
+    "flight_number": "AA858"
+  },
+  "AAL871": {
+    "origin": "MIA",
+    "destination": "RTB",
+    "flight_number": "AA871"
+  },
+  "AAL892": {
+    "origin": "PIT",
+    "destination": "DFW",
+    "flight_number": "AA892"
+  },
+  "AAL948": {
+    "origin": "GIG",
+    "destination": "MIA",
+    "flight_number": "AA948"
+  },
+  "AAR222": {
+    "origin": "ICN",
+    "destination": "JFK",
+    "flight_number": "OZ222"
+  },
+  "AAR247": {
+    "origin": "ATL",
+    "destination": "ANC",
+    "flight_number": "OZ247"
+  },
+  "AAY1082": {
+    "origin": "PIE",
+    "destination": "ELM",
+    "flight_number": "G41082"
+  },
+  "AAY4758": {
+    "origin": "CVG",
+    "destination": "BIS",
+    "flight_number": "G44758"
+  },
+  "ABIDE99": null,
+  "ABX2040": {
+    "origin": "CVG",
+    "destination": "DEN",
+    "flight_number": "GB2040"
+  },
+  "ABX2043": {
+    "origin": "GSO",
+    "destination": "CVG",
+    "flight_number": "GB2043"
+  },
+  "ABX3176": {
+    "origin": "SMF",
+    "destination": "ABE",
+    "flight_number": "GB3176"
+  },
+  "ABX505": {
+    "origin": "CVG",
+    "destination": "PHX",
+    "flight_number": "GB505"
+  },
+  "ABX552": {
+    "origin": "CVG",
+    "destination": "JFK",
+    "flight_number": "GB552"
+  },
+  "ABX583": {
+    "origin": "CVG",
+    "destination": "MIA",
+    "flight_number": "GB583"
+  },
+  "ABX7303": {
+    "origin": "DEN",
+    "destination": "CVG",
+    "flight_number": "GB7303"
+  },
+  "ABX7304": {
+    "origin": "DEN",
+    "destination": "CVG",
+    "flight_number": "GB7304"
+  },
+  "ABX7352": {
+    "origin": "PHX",
+    "destination": "CVG",
+    "flight_number": "GB7352"
+  },
+  "ABX845": {
+    "origin": "CVG",
+    "destination": "SJU",
+    "flight_number": "GB845"
+  },
+  "ACA128": {
+    "origin": "YVR",
+    "destination": "YYZ",
+    "flight_number": "AC128"
+  },
+  "ACA133": {
+    "origin": "YYZ",
+    "destination": "YYC",
+    "flight_number": "AC133"
+  },
+  "ACA156": {
+    "origin": "YYC",
+    "destination": "YYZ",
+    "flight_number": "AC156"
+  },
+  "ACA314": {
+    "origin": "YVR",
+    "destination": "YUL",
+    "flight_number": "AC314"
+  },
+  "ACA349": {
+    "origin": "YOW",
+    "destination": "YVR",
+    "flight_number": "AC349"
+  },
+  "ACA480": {
+    "origin": "YYZ",
+    "destination": "YUL",
+    "flight_number": "AC480"
+  },
+  "ACA481": {
+    "origin": "YUL",
+    "destination": "YYZ",
+    "flight_number": "AC481"
+  },
+  "ACA603": {
+    "origin": "YHZ",
+    "destination": "YYZ",
+    "flight_number": "AC603"
+  },
+  "ACA635": {
+    "origin": "YYG",
+    "destination": "YYZ",
+    "flight_number": "AC635"
+  },
+  "ACA661": {
+    "origin": "YHZ",
+    "destination": "YUL",
+    "flight_number": "AC661"
+  },
+  "AIC101": {
+    "origin": "DEL",
+    "destination": "JFK",
+    "flight_number": "AI101"
+  },
+  "AIP13": {
+    "origin": "FCA",
+    "destination": "BIL",
+    "flight_number": "5A13"
+  },
+  "AIP634": {
+    "origin": "DRT",
+    "destination": "YIP",
+    "flight_number": "5A634"
+  },
+  "AIR5": null,
+  "AJT507": {
+    "origin": "CVG",
+    "destination": "HRL",
+    "flight_number": "M6507"
+  },
+  "AJT521": {
+    "origin": "NBW",
+    "destination": "NGU",
+    "flight_number": "M6521"
+  },
+  "AMF1326": {
+    "origin": "AVP",
+    "destination": "ALB",
+    "flight_number": "AMF1326"
+  },
+  "ANA110": {
+    "origin": "HND",
+    "destination": "JFK",
+    "flight_number": "NH110"
+  },
+  "ANA174": {
+    "origin": "NRT",
+    "destination": "IAH",
+    "flight_number": "NH174"
+  },
+  "ANA179": {
+    "origin": "MEX",
+    "destination": "NRT",
+    "flight_number": "NH179"
+  },
+  "ANA2": {
+    "origin": "NRT",
+    "destination": "IAD",
+    "flight_number": "NH2"
+  },
+  "ANA8550": {
+    "origin": "NRT",
+    "destination": "ORD",
+    "flight_number": "NH8550"
+  },
+  "ANA9646": {
+    "origin": "HKG",
+    "destination": "NRT",
+    "flight_number": "NH9646"
+  },
+  "ANA9650": {
+    "origin": "HND",
+    "destination": "ORD",
+    "flight_number": "NH9650"
+  },
+  "ANA9900": null,
+  "ASA150": {
+    "origin": "ANC",
+    "destination": "LAX",
+    "flight_number": "AS150"
+  },
+  "ASH5772": {
+    "origin": "LAW",
+    "destination": "DFW",
+    "flight_number": "YV5772"
+  },
+  "ASH5888": {
+    "origin": "IAH",
+    "destination": "DFW",
+    "flight_number": "YV5888"
+  },
+  "ASH5915": {
+    "origin": "DRO",
+    "destination": "DFW",
+    "flight_number": "YV5915"
+  },
+  "ASH6036": {
+    "origin": "LGA",
+    "destination": "IAH",
+    "flight_number": "YV6036"
+  },
+  "ASH6075": {
+    "origin": "PHL",
+    "destination": "IAH",
+    "flight_number": "YV6075"
+  },
+  "ASH6102": {
+    "origin": "IAD",
+    "destination": "LGA",
+    "flight_number": "YV6102"
+  },
+  "ASH6104": {
+    "origin": "IAD",
+    "destination": "LGA",
+    "flight_number": "YV6104"
+  },
+  "ASH6114": {
+    "origin": "LGA",
+    "destination": "IAH",
+    "flight_number": "YV6114"
+  },
+  "ASH6161": {
+    "origin": "IAH",
+    "destination": "ABQ",
+    "flight_number": "YV6161"
+  },
+  "ASH6271": {
+    "origin": "IAD",
+    "destination": "BDL",
+    "flight_number": "YV6271"
+  },
+  "ASP820": {
+    "origin": "YLK",
+    "destination": "TEB",
+    "flight_number": "ASP820"
+  },
+  "ATN3233": {
+    "origin": "CVG",
+    "destination": "ONT",
+    "flight_number": "8C3233"
+  },
+  "ATN3331": {
+    "origin": "RFD",
+    "destination": "ABE",
+    "flight_number": "8C3331"
+  },
+  "ATN3478": {
+    "origin": "SEA",
+    "destination": "BWI",
+    "flight_number": "8C3478"
+  },
+  "ATN3493": {
+    "origin": "SBD",
+    "destination": "JFK",
+    "flight_number": "8C3493"
+  },
+  "ATN3534": {
+    "origin": "ABE",
+    "destination": "CVG",
+    "flight_number": "8C3534"
+  },
+  "ATN3535": {
+    "origin": "SBD",
+    "destination": "CVG",
+    "flight_number": "8C3535"
+  },
+  "ATN3536": {
+    "origin": "CVG",
+    "destination": "ONT",
+    "flight_number": "8C3536"
+  },
+  "ATN557": {
+    "origin": "CVG",
+    "destination": "BWI",
+    "flight_number": "8C557"
+  },
+  "ATN7503": {
+    "origin": "LAX",
+    "destination": "CVG",
+    "flight_number": "8C7503"
+  },
+  "ATN7504": {
+    "origin": "SFO",
+    "destination": "CVG",
+    "flight_number": "8C7504"
+  },
+  "ATN7510": {
+    "origin": "AUS",
+    "destination": "CVG",
+    "flight_number": "8C7510"
+  },
+  "AWI3725": {
+    "origin": "MSN",
+    "destination": "ORD",
+    "flight_number": "ZW3725"
+  },
+  "AWI3732": {
+    "origin": "IAD",
+    "destination": "PVD",
+    "flight_number": "ZW3732"
+  },
+  "AWI3764": {
+    "origin": "CAE",
+    "destination": "ORD",
+    "flight_number": "ZW3764"
+  },
+  "AWI3809": {
+    "origin": "CAE",
+    "destination": "IAD",
+    "flight_number": "ZW3809"
+  },
+  "AWI3824": {
+    "origin": "MSN",
+    "destination": "ORD",
+    "flight_number": "ZW3824"
+  },
+  "AZA9407": null,
+  "BOX303": {
+    "origin": "CVG",
+    "destination": "BAH",
+    "flight_number": "3S303"
+  },
+  "BTQ861": {
+    "origin": "MSS",
+    "destination": "BOS",
+    "flight_number": "4B861"
+  },
+  "BVN8366": null,
+  "BYA229": {
+    "origin": "TUS",
+    "destination": "HWD",
+    "flight_number": "BYA229"
+  },
+  "BYA235": null,
+  "BYA651": null,
+  "CE78": null,
+  "CES7177": {
+    "origin": "PVG",
+    "destination": "JFK",
+    "flight_number": "MU7177"
+  },
+  "CFKPX": {
+    "origin": "BGM",
+    "destination": "PHL",
+    "flight_number": "CFKPX"
+  },
+  "CFS8291": {
+    "origin": "AFW",
+    "destination": "MAF",
+    "flight_number": "EM8291"
+  },
+  "CGAGE": {
+    "origin": null,
+    "destination": "YKZ",
+    "flight_number": "CGAGE"
+  },
+  "CGCVS": null,
+  "CGSQP": null,
+  "CJT245": {
+    "origin": "EWR",
+    "destination": "BDA",
+    "flight_number": "W8245"
+  },
+  "CJT918": {
+    "origin": "YWG",
+    "destination": "YEG",
+    "flight_number": "W8918"
+  },
+  "CJT919": {
+    "origin": "CVG",
+    "destination": "YYC",
+    "flight_number": "W8919"
+  },
+  "CJT925": {
+    "origin": "GDL",
+    "destination": "QRO",
+    "flight_number": "W8925"
+  },
+  "CJT951": {
+    "origin": "MEX",
+    "destination": "CVG",
+    "flight_number": "W8951"
+  },
+  "CKS805": {
+    "origin": "CVG",
+    "destination": "BRU",
+    "flight_number": "K4805"
+  },
+  "CKS947": {
+    "origin": "CVG",
+    "destination": "ANC",
+    "flight_number": "K4947"
+  },
+  "CKS9713": {
+    "origin": "LGG",
+    "destination": "EWR",
+    "flight_number": "K49713"
+  },
+  "CKS977": {
+    "origin": "ANC",
+    "destination": "LAX",
+    "flight_number": "K4977"
+  },
+  "CMD7": {
+    "origin": null,
+    "destination": null,
+    "flight_number": "CMD7"
+  },
+  "CMD70": {
+    "origin": "UKI",
+    "destination": "MCC",
+    "flight_number": "CMD70"
+  },
+  "CMP173": {
+    "origin": "MIA",
+    "destination": "PTY",
+    "flight_number": "CM173"
+  },
+  "CMP833": {
+    "origin": "JFK",
+    "destination": "PTY",
+    "flight_number": "CM833"
+  },
+  "CPA072": {
+    "origin": "ANC",
+    "destination": "MIA",
+    "flight_number": "CX72"
+  },
+  "CRN711": null,
+  "CSB588": {
+    "origin": "CVG",
+    "destination": "BWI",
+    "flight_number": "2I588"
+  },
+  "CSB920": {
+    "origin": "CVG",
+    "destination": "MTY",
+    "flight_number": "2I920"
+  },
+  "CSS7001": {
+    "origin": "SZX",
+    "destination": "ANC",
+    "flight_number": "O37001"
+  },
+  "CTL10": null,
+  "CWG977": null,
+  "DAL1029": {
+    "origin": "DAY",
+    "destination": "ATL",
+    "flight_number": "DL1029"
+  },
+  "DAL1031": {
+    "origin": "ATL",
+    "destination": "CHS",
+    "flight_number": "DL1031"
+  },
+  "DAL104": {
+    "origin": "GRU",
+    "destination": "ATL",
+    "flight_number": "DL104"
+  },
+  "DAL1072": {
+    "origin": "JFK",
+    "destination": "DEN",
+    "flight_number": "DL1072"
+  },
+  "DAL1077": {
+    "origin": "FAY",
+    "destination": "ATL",
+    "flight_number": "DL1077"
+  },
+  "DAL1099": {
+    "origin": "MIA",
+    "destination": "LGA",
+    "flight_number": "DL1099"
+  },
+  "DAL1167": {
+    "origin": "LGA",
+    "destination": "DTW",
+    "flight_number": "DL1167"
+  },
+  "DAL1196": {
+    "origin": "RSW",
+    "destination": "ATL",
+    "flight_number": "DL1196"
+  },
+  "DAL1236": {
+    "origin": "JFK",
+    "destination": "FLL",
+    "flight_number": "DL1236"
+  },
+  "DAL1245": {
+    "origin": "BOS",
+    "destination": "MCO",
+    "flight_number": "DL1245"
+  },
+  "DAL1265": {
+    "origin": "IAH",
+    "destination": "SLC",
+    "flight_number": "DL1265"
+  },
+  "DAL1365": {
+    "origin": "PHL",
+    "destination": "DTW",
+    "flight_number": "DL1365"
+  },
+  "DAL1386": {
+    "origin": "BOS",
+    "destination": "JFK",
+    "flight_number": "DL1386"
+  },
+  "DAL1408": {
+    "origin": "SAT",
+    "destination": "ATL",
+    "flight_number": "DL1408"
+  },
+  "DAL1437": {
+    "origin": "BOS",
+    "destination": "ATL",
+    "flight_number": "DL1437"
+  },
+  "DAL1444": {
+    "origin": "PHL",
+    "destination": "ATL",
+    "flight_number": "DL1444"
+  },
+  "DAL1453": {
+    "origin": "MSP",
+    "destination": "SFO",
+    "flight_number": "DL1453"
+  },
+  "DAL146": {
+    "origin": "SCL",
+    "destination": "ATL",
+    "flight_number": "DL146"
+  },
+  "DAL1480": {
+    "origin": "ATL",
+    "destination": "BOS",
+    "flight_number": "DL1480"
+  },
+  "DAL1529": {
+    "origin": "TPA",
+    "destination": "DTW",
+    "flight_number": "DL1529"
+  },
+  "DAL1531": {
+    "origin": "IAH",
+    "destination": "LGA",
+    "flight_number": "DL1531"
+  },
+  "DAL1544": {
+    "origin": "ATL",
+    "destination": "PBI",
+    "flight_number": "DL1544"
+  },
+  "DAL1560": {
+    "origin": "PBI",
+    "destination": "LGA",
+    "flight_number": "DL1560"
+  },
+  "DAL1594": {
+    "origin": "ATL",
+    "destination": "TPA",
+    "flight_number": "DL1594"
+  },
+  "DAL1624": {
+    "origin": "SAN",
+    "destination": "MSP",
+    "flight_number": "DL1624"
+  },
+  "DAL1626": {
+    "origin": "MSP",
+    "destination": "MSY",
+    "flight_number": "DL1626"
+  },
+  "DAL1676": {
+    "origin": "SAT",
+    "destination": "ATL",
+    "flight_number": "DL1676"
+  },
+  "DAL1740": {
+    "origin": "LGA",
+    "destination": "TPA",
+    "flight_number": "DL1740"
+  },
+  "DAL1748": {
+    "origin": "BOS",
+    "destination": "DTW",
+    "flight_number": "DL1748"
+  },
+  "DAL2060": {
+    "origin": "EWR",
+    "destination": "ATL",
+    "flight_number": "DL2060"
+  },
+  "DAL2094": {
+    "origin": "PHL",
+    "destination": "MSP",
+    "flight_number": "DL2094"
+  },
+  "DAL2114": {
+    "origin": "MSY",
+    "destination": "ATL",
+    "flight_number": "DL2114"
+  },
+  "DAL2161": {
+    "origin": "TPA",
+    "destination": "JFK",
+    "flight_number": "DL2161"
+  },
+  "DAL2172": {
+    "origin": "JFK",
+    "destination": "MSP",
+    "flight_number": "DL2172"
+  },
+  "DAL2192": {
+    "origin": "ATL",
+    "destination": "BWI",
+    "flight_number": "DL2192"
+  },
+  "DAL2254": {
+    "origin": "BNA",
+    "destination": "BOS",
+    "flight_number": "DL2254"
+  },
+  "DAL2259": {
+    "origin": "JFK",
+    "destination": "JAX",
+    "flight_number": "DL2259"
+  },
+  "DAL2272": {
+    "origin": "SFO",
+    "destination": "LAX",
+    "flight_number": "DL2272"
+  },
+  "DAL2288": {
+    "origin": "DTW",
+    "destination": "MSP",
+    "flight_number": "DL2288"
+  },
+  "DAL2304": {
+    "origin": "BDL",
+    "destination": "MSP",
+    "flight_number": "DL2304"
+  },
+  "DAL2337": {
+    "origin": "DTW",
+    "destination": "PHL",
+    "flight_number": "DL2337"
+  },
+  "DAL2397": {
+    "origin": "ATL",
+    "destination": "ROC",
+    "flight_number": "DL2397"
+  },
+  "DAL2480": {
+    "origin": "BWI",
+    "destination": "DTW",
+    "flight_number": "DL2480"
+  },
+  "DAL2482": {
+    "origin": "BOS",
+    "destination": "CVG",
+    "flight_number": "DL2482"
+  },
+  "DAL2498": {
+    "origin": "LGA",
+    "destination": "DTW",
+    "flight_number": "DL2498"
+  },
+  "DAL2558": {
+    "origin": "SAN",
+    "destination": "SEA",
+    "flight_number": "DL2558"
+  },
+  "DAL2616": {
+    "origin": "ATL",
+    "destination": "TPA",
+    "flight_number": "DL2616"
+  },
+  "DAL2632": {
+    "origin": "ATL",
+    "destination": "OMA",
+    "flight_number": "DL2632"
+  },
+  "DAL2643": {
+    "origin": "FLL",
+    "destination": "LGA",
+    "flight_number": "DL2643"
+  },
+  "DAL2645": {
+    "origin": "MSP",
+    "destination": "EWR",
+    "flight_number": "DL2645"
+  },
+  "DAL2679": {
+    "origin": "ATL",
+    "destination": "BDL",
+    "flight_number": "DL2679"
+  },
+  "DAL2719": {
+    "origin": "TLH",
+    "destination": "ATL",
+    "flight_number": "DL2719"
+  },
+  "DAL2727": {
+    "origin": "ATL",
+    "destination": "EWR",
+    "flight_number": "DL2727"
+  },
+  "DAL2747": {
+    "origin": "BOS",
+    "destination": "DTW",
+    "flight_number": "DL2747"
+  },
+  "DAL2750": {
+    "origin": "MSP",
+    "destination": "CVG",
+    "flight_number": "DL2750"
+  },
+  "DAL2781": {
+    "origin": "ORF",
+    "destination": "ATL",
+    "flight_number": "DL2781"
+  },
+  "DAL2784": {
+    "origin": "ORD",
+    "destination": "LGA",
+    "flight_number": "DL2784"
+  },
+  "DAL2819": {
+    "origin": "ALB",
+    "destination": "ATL",
+    "flight_number": "DL2819"
+  },
+  "DAL2848": {
+    "origin": "FLL",
+    "destination": "DTW",
+    "flight_number": "DL2848"
+  },
+  "DAL2885": {
+    "origin": "LGA",
+    "destination": "SRQ",
+    "flight_number": "DL2885"
+  },
+  "DAL2935": {
+    "origin": "MSP",
+    "destination": "SAT",
+    "flight_number": "DL2935"
+  },
+  "DAL2938": {
+    "origin": "SJC",
+    "destination": "SLC",
+    "flight_number": "DL2938"
+  },
+  "DAL304": {
+    "origin": "SNA",
+    "destination": "DTW",
+    "flight_number": "DL304"
+  },
+  "DAL347": {
+    "origin": "HNL",
+    "destination": "SLC",
+    "flight_number": "DL347"
+  },
+  "DAL376": {
+    "origin": "BOS",
+    "destination": "ATL",
+    "flight_number": "DL376"
+  },
+  "DAL379": {
+    "origin": "ATL",
+    "destination": "LGA",
+    "flight_number": "DL379"
+  },
+  "DAL403": {
+    "origin": "ATL",
+    "destination": "RDU",
+    "flight_number": "DL403"
+  },
+  "DAL437": {
+    "origin": "SFO",
+    "destination": "ATL",
+    "flight_number": "DL437"
+  },
+  "DAL447": {
+    "origin": "LGA",
+    "destination": "ATL",
+    "flight_number": "DL447"
+  },
+  "DAL448": {
+    "origin": "OGG",
+    "destination": "LAX",
+    "flight_number": "DL448"
+  },
+  "DAL528": {
+    "origin": "ATL",
+    "destination": "LGA",
+    "flight_number": "DL528"
+  },
+  "DAL545": {
+    "origin": "LAX",
+    "destination": "SFO",
+    "flight_number": "DL545"
+  },
+  "DAL554": {
+    "origin": "LAX",
+    "destination": "JFK",
+    "flight_number": "DL554"
+  },
+  "DAL650": {
+    "origin": "JFK",
+    "destination": "ATL",
+    "flight_number": "DL650"
+  },
+  "DAL755": {
+    "origin": "LAS",
+    "destination": "ATL",
+    "flight_number": "DL755"
+  },
+  "DAL825": {
+    "origin": "LGA",
+    "destination": "MSP",
+    "flight_number": "DL825"
+  },
+  "DAL826": {
+    "origin": "BOS",
+    "destination": "DTW",
+    "flight_number": "DL826"
+  },
+  "DAL845": {
+    "origin": "SLC",
+    "destination": "JFK",
+    "flight_number": "DL845"
+  },
+  "DAL847": {
+    "origin": "PHX",
+    "destination": "JFK",
+    "flight_number": "DL847"
+  },
+  "DAL862": {
+    "origin": "TPA",
+    "destination": "LGA",
+    "flight_number": "DL862"
+  },
+  "DAL886": {
+    "origin": "CVG",
+    "destination": "SEA",
+    "flight_number": "DL886"
+  },
+  "DAL963": {
+    "origin": "BOS",
+    "destination": "MSP",
+    "flight_number": "DL963"
+  },
+  "DCM164": null,
+  "DHK912": {
+    "origin": "EMA",
+    "destination": "MIA",
+    "flight_number": "D0912"
+  },
+  "DL201": {
+    "origin": "JNB",
+    "destination": "ATL",
+    "flight_number": "DL201"
+  },
+  "EDV4658": {
+    "origin": "STL",
+    "destination": "LGA",
+    "flight_number": "9E4658"
+  },
+  "EDV4661": {
+    "origin": "LGA",
+    "destination": "RDU",
+    "flight_number": "9E4661"
+  },
+  "EDV4732": {
+    "origin": "MDW",
+    "destination": "MSP",
+    "flight_number": "9E4732"
+  },
+  "EDV4765": {
+    "origin": "ILM",
+    "destination": "LGA",
+    "flight_number": "9E4765"
+  },
+  "EDV4779": {
+    "origin": "GRR",
+    "destination": "LGA",
+    "flight_number": "9E4779"
+  },
+  "EDV4808": {
+    "origin": "JFK",
+    "destination": "MSP",
+    "flight_number": "9E4808"
+  },
+  "EDV4827": {
+    "origin": "ROC",
+    "destination": "JFK",
+    "flight_number": "9E4827"
+  },
+  "EDV4830": {
+    "origin": "ATL",
+    "destination": "HPN",
+    "flight_number": "9E4830"
+  },
+  "EDV4831": {
+    "origin": "CVG",
+    "destination": "LGA",
+    "flight_number": "9E4831"
+  },
+  "EDV4844": {
+    "origin": "JFK",
+    "destination": "IAD",
+    "flight_number": "9E4844"
+  },
+  "EDV4859": {
+    "origin": "CVG",
+    "destination": "DTW",
+    "flight_number": "9E4859"
+  },
+  "EDV4887": {
+    "origin": "CMH",
+    "destination": "LGA",
+    "flight_number": "9E4887"
+  },
+  "EDV4895": {
+    "origin": "ATL",
+    "destination": "SGF",
+    "flight_number": "9E4895"
+  },
+  "EDV4899": {
+    "origin": "JFK",
+    "destination": "CHS",
+    "flight_number": "9E4899"
+  },
+  "EDV4924": {
+    "origin": "CLT",
+    "destination": "LGA",
+    "flight_number": "9E4924"
+  },
+  "EDV4943": {
+    "origin": "LGA",
+    "destination": "CLT",
+    "flight_number": "9E4943"
+  },
+  "EDV4966": {
+    "origin": "LGA",
+    "destination": "MKE",
+    "flight_number": "9E4966"
+  },
+  "EDV4983": {
+    "origin": "AGS",
+    "destination": "ATL",
+    "flight_number": "9E4983"
+  },
+  "EDV5005": {
+    "origin": "JAX",
+    "destination": "LGA",
+    "flight_number": "9E5005"
+  },
+  "EDV5027": {
+    "origin": "CVG",
+    "destination": "DTW",
+    "flight_number": "9E5027"
+  },
+  "EDV5048": {
+    "origin": "LGA",
+    "destination": "CLT",
+    "flight_number": "9E5048"
+  },
+  "EDV5059": {
+    "origin": "GTR",
+    "destination": "ATL",
+    "flight_number": "9E5059"
+  },
+  "EDV5075": {
+    "origin": "LGA",
+    "destination": "GSP",
+    "flight_number": "9E5075"
+  },
+  "EDV5098": {
+    "origin": "YYZ",
+    "destination": "JFK",
+    "flight_number": "9E5098"
+  },
+  "EDV5119": {
+    "origin": "CVG",
+    "destination": "DCA",
+    "flight_number": "9E5119"
+  },
+  "EDV5160": {
+    "origin": "CVG",
+    "destination": "MSP",
+    "flight_number": "9E5160"
+  },
+  "EDV5169": {
+    "origin": "MEM",
+    "destination": "LGA",
+    "flight_number": "9E5169"
+  },
+  "EDV5198": {
+    "origin": "DTW",
+    "destination": "YUL",
+    "flight_number": "9E5198"
+  },
+  "EDV5308": {
+    "origin": "JFK",
+    "destination": "CLT",
+    "flight_number": "9E5308"
+  },
+  "EDV5314": {
+    "origin": "BWI",
+    "destination": "BOS",
+    "flight_number": "9E5314"
+  },
+  "EDV5318": {
+    "origin": "LGA",
+    "destination": "ILM",
+    "flight_number": "9E5318"
+  },
+  "EDV5366": {
+    "origin": "BNA",
+    "destination": "LGA",
+    "flight_number": "9E5366"
+  },
+  "EDV5429": {
+    "origin": "BUF",
+    "destination": "LGA",
+    "flight_number": "9E5429"
+  },
+  "EDV5440": {
+    "origin": "MCI",
+    "destination": "JFK",
+    "flight_number": "9E5440"
+  },
+  "EJA344": {
+    "origin": "MMU",
+    "destination": "IAD",
+    "flight_number": "1I344"
+  },
+  "EJA353": {
+    "origin": "PBI",
+    "destination": "APA",
+    "flight_number": "1I353"
+  },
+  "EJA521": {
+    "origin": "CMH",
+    "destination": "YFJ",
+    "flight_number": "1I521"
+  },
+  "EJA567": {
+    "origin": "SFO",
+    "destination": "PWK",
+    "flight_number": "1I567"
+  },
+  "EJA582": {
+    "origin": "PDX",
+    "destination": "PSP",
+    "flight_number": "1I582"
+  },
+  "EJA612": {
+    "origin": "YQT",
+    "destination": "YXZ",
+    "flight_number": "1I612"
+  },
+  "EJM378": null,
+  "EJM53": null,
+  "EMD1": null,
+  "ENY3555": {
+    "origin": "CVG",
+    "destination": "BOS",
+    "flight_number": "3555"
+  },
+  "ENY3684": {
+    "origin": "DFW",
+    "destination": "BHM",
+    "flight_number": "3684"
+  },
+  "ENY3694": {
+    "origin": "ORD",
+    "destination": "CMI",
+    "flight_number": "3694"
+  },
+  "ENY3727": {
+    "origin": "CMH",
+    "destination": "BOS",
+    "flight_number": "3727"
+  },
+  "ENY3770": {
+    "origin": "ORD",
+    "destination": "ATW",
+    "flight_number": "3770"
+  },
+  "ENY3819": {
+    "origin": "MSY",
+    "destination": "AUS",
+    "flight_number": "3819"
+  },
+  "ENY3825": {
+    "origin": "STL",
+    "destination": "BOS",
+    "flight_number": "3825"
+  },
+  "ENY3865": {
+    "origin": "MAF",
+    "destination": "DFW",
+    "flight_number": "3865"
+  },
+  "ENY3942": {
+    "origin": "PHX",
+    "destination": "STS",
+    "flight_number": "3942"
+  },
+  "ENY3957": {
+    "origin": "DCA",
+    "destination": "XNA",
+    "flight_number": "3957"
+  },
+  "ENY3964": {
+    "origin": "SAV",
+    "destination": "DFW",
+    "flight_number": "3964"
+  },
+  "ENY4023": {
+    "origin": "CLT",
+    "destination": "ORD",
+    "flight_number": "4023"
+  },
+  "ENY4036": {
+    "origin": "ORD",
+    "destination": "JAX",
+    "flight_number": "4036"
+  },
+  "ENY4041": {
+    "origin": "ROC",
+    "destination": "DCA",
+    "flight_number": "4041"
+  },
+  "ENY4069": {
+    "origin": "IND",
+    "destination": "AUS",
+    "flight_number": "4069"
+  },
+  "ENY4077": {
+    "origin": "DFW",
+    "destination": "CRP",
+    "flight_number": "4077"
+  },
+  "ENY4123": {
+    "origin": "DCA",
+    "destination": "VPS",
+    "flight_number": "4123"
+  },
+  "ENY4148": {
+    "origin": "DCA",
+    "destination": "ROC",
+    "flight_number": "4148"
+  },
+  "ENY4151": {
+    "origin": "AVL",
+    "destination": "DFW",
+    "flight_number": "4151"
+  },
+  "ENY4269": {
+    "origin": "JAX",
+    "destination": "ORD",
+    "flight_number": "4269"
+  },
+  "ENY4337": {
+    "origin": "GSP",
+    "destination": "ORD",
+    "flight_number": "4337"
+  },
+  "ENY4352": {
+    "origin": "GSO",
+    "destination": "ORD",
+    "flight_number": "4352"
+  },
+  "ENY4399": {
+    "origin": "IND",
+    "destination": "ORD",
+    "flight_number": "4399"
+  },
+  "ENY4403": {
+    "origin": "CLE",
+    "destination": "ORD",
+    "flight_number": "4403"
+  },
+  "ENY4425": {
+    "origin": "LAN",
+    "destination": "ORD",
+    "flight_number": "4425"
+  },
+  "ENY4476": {
+    "origin": "CMH",
+    "destination": "ORD",
+    "flight_number": "4476"
+  },
+  "ENY4487": {
+    "origin": "ABI",
+    "destination": "DFW",
+    "flight_number": "4487"
+  },
+  "ERU306": null,
+  "ERU309": null,
+  "ERU416": null,
+  "ERU429": null,
+  "ERU435": null,
+  "ERU436": null,
+  "ERU453": null,
+  "ERU454": null,
+  "ERU460": null,
+  "ERU464": null,
+  "ERU468": null,
+  "ERU479": null,
+  "ERU491": null,
+  "ERU495": null,
+  "ERU821": null,
+  "ERU832": null,
+  "ERU839": null,
+  "ERU869": null,
+  "ESF1711": {
+    "origin": "MID",
+    "destination": "CUN",
+    "flight_number": "E71711"
+  },
+  "ETH500": {
+    "origin": "DUB",
+    "destination": "IAD",
+    "flight_number": "ET500"
+  },
+  "ETH574": {
+    "origin": "DUB",
+    "destination": "ORD",
+    "flight_number": "ET574"
+  },
+  "EVA650": {
+    "origin": "TPE",
+    "destination": "ATL",
+    "flight_number": "BR650"
+  },
+  "EVAL18": null,
+  "FDX104": {
+    "origin": "MEM",
+    "destination": "EWR",
+    "flight_number": "FX104"
+  },
+  "FDX1062": {
+    "origin": "GSO",
+    "destination": "TPA",
+    "flight_number": "FX1062"
+  },
+  "FDX1151": {
+    "origin": "AFW",
+    "destination": "LAX",
+    "flight_number": "FX1151"
+  },
+  "FDX1166": {
+    "origin": "SLC",
+    "destination": "OAK",
+    "flight_number": "FX1166"
+  },
+  "FDX1167": {
+    "origin": "AFW",
+    "destination": "OAK",
+    "flight_number": "FX1167"
+  },
+  "FDX1168": {
+    "origin": "AFW",
+    "destination": "IAH",
+    "flight_number": "FX1168"
+  },
+  "FDX120": {
+    "origin": "MEM",
+    "destination": "YEG",
+    "flight_number": "FX120"
+  },
+  "FDX130": {
+    "origin": "MEM",
+    "destination": "YMX",
+    "flight_number": "FX130"
+  },
+  "FDX134": {
+    "origin": "MEM",
+    "destination": "YWG",
+    "flight_number": "FX134"
+  },
+  "FDX136": {
+    "origin": "MEM",
+    "destination": "YYZ",
+    "flight_number": "FX136"
+  },
+  "FDX140": {
+    "origin": "MEM",
+    "destination": "YYC",
+    "flight_number": "FX140"
+  },
+  "FDX1400": {
+    "origin": "MEM",
+    "destination": "FLL",
+    "flight_number": "FX1400"
+  },
+  "FDX1403": {
+    "origin": "MEM",
+    "destination": "PHX",
+    "flight_number": "FX1403"
+  },
+  "FDX1404": {
+    "origin": "MEM",
+    "destination": "LAX",
+    "flight_number": "FX1404"
+  },
+  "FDX1405": {
+    "origin": "MEM",
+    "destination": "ORD",
+    "flight_number": "FX1405"
+  },
+  "FDX1406": {
+    "origin": "MEM",
+    "destination": "BOS",
+    "flight_number": "FX1406"
+  },
+  "FDX1407": {
+    "origin": "MEM",
+    "destination": "MSP",
+    "flight_number": "FX1407"
+  },
+  "FDX1408": {
+    "origin": "MEM",
+    "destination": "CPR",
+    "flight_number": "FX1408"
+  },
+  "FDX1411": {
+    "origin": "MEM",
+    "destination": "IAH",
+    "flight_number": "FX1411"
+  },
+  "FDX1412": {
+    "origin": "MEM",
+    "destination": "MHT",
+    "flight_number": "FX1412"
+  },
+  "FDX1413": {
+    "origin": "MEM",
+    "destination": "HNL",
+    "flight_number": "FX1413"
+  },
+  "FDX1414": {
+    "origin": "MEM",
+    "destination": "TUS",
+    "flight_number": "FX1414"
+  },
+  "FDX1415": {
+    "origin": "MEM",
+    "destination": "PDX",
+    "flight_number": "FX1415"
+  },
+  "FDX1417": {
+    "origin": "MEM",
+    "destination": "BUR",
+    "flight_number": "FX1417"
+  },
+  "FDX1419": {
+    "origin": "MEM",
+    "destination": "OAK",
+    "flight_number": "FX1419"
+  },
+  "FDX142": {
+    "origin": "MEM",
+    "destination": "YVR",
+    "flight_number": "FX142"
+  },
+  "FDX1420": {
+    "origin": "MEM",
+    "destination": "DEN",
+    "flight_number": "FX1420"
+  },
+  "FDX1422": {
+    "origin": "MEM",
+    "destination": "SAN",
+    "flight_number": "FX1422"
+  },
+  "FDX1423": {
+    "origin": "MEM",
+    "destination": "SEA",
+    "flight_number": "FX1423"
+  },
+  "FDX1429": {
+    "origin": "MEM",
+    "destination": "SMF",
+    "flight_number": "FX1429"
+  },
+  "FDX1430": {
+    "origin": "MEM",
+    "destination": "SLC",
+    "flight_number": "FX1430"
+  },
+  "FDX1433": {
+    "origin": "MEM",
+    "destination": "RDU",
+    "flight_number": "FX1433"
+  },
+  "FDX1435": {
+    "origin": "MEM",
+    "destination": "BDL",
+    "flight_number": "FX1435"
+  },
+  "FDX1437": {
+    "origin": "MEM",
+    "destination": "MKE",
+    "flight_number": "FX1437"
+  },
+  "FDX1439": {
+    "origin": "MEM",
+    "destination": "PHL",
+    "flight_number": "FX1439"
+  },
+  "FDX1440": {
+    "origin": "MEM",
+    "destination": "LAS",
+    "flight_number": "FX1440"
+  },
+  "FDX1442": {
+    "origin": "MEM",
+    "destination": "SYR",
+    "flight_number": "FX1442"
+  },
+  "FDX1445": {
+    "origin": "MEM",
+    "destination": "CAE",
+    "flight_number": "FX1445"
+  },
+  "FDX1449": {
+    "origin": "MEM",
+    "destination": "RDU",
+    "flight_number": "FX1449"
+  },
+  "FDX1451": {
+    "origin": "MEM",
+    "destination": "ROA",
+    "flight_number": "FX1451"
+  },
+  "FDX1454": {
+    "origin": "MEM",
+    "destination": "PVD",
+    "flight_number": "FX1454"
+  },
+  "FDX1455": {
+    "origin": "MEM",
+    "destination": "JAX",
+    "flight_number": "FX1455"
+  },
+  "FDX1459": {
+    "origin": "MEM",
+    "destination": "LBB",
+    "flight_number": "FX1459"
+  },
+  "FDX1461": {
+    "origin": "MEM",
+    "destination": "MIA",
+    "flight_number": "FX1461"
+  },
+  "FDX1464": {
+    "origin": "MEM",
+    "destination": "CID",
+    "flight_number": "FX1464"
+  },
+  "FDX1468": {
+    "origin": "MEM",
+    "destination": "OAK",
+    "flight_number": "FX1468"
+  },
+  "FDX1469": {
+    "origin": "MEM",
+    "destination": "FNT",
+    "flight_number": "FX1469"
+  },
+  "FDX1472": {
+    "origin": "MEM",
+    "destination": "OKC",
+    "flight_number": "FX1472"
+  },
+  "FDX1473": {
+    "origin": "MEM",
+    "destination": "BOS",
+    "flight_number": "FX1473"
+  },
+  "FDX1474": {
+    "origin": "MEM",
+    "destination": "DAY",
+    "flight_number": "FX1474"
+  },
+  "FDX1475": {
+    "origin": "MEM",
+    "destination": "OMA",
+    "flight_number": "FX1475"
+  },
+  "FDX1476": {
+    "origin": "MEM",
+    "destination": "GEG",
+    "flight_number": "FX1476"
+  },
+  "FDX148": {
+    "origin": "MEM",
+    "destination": "YYZ",
+    "flight_number": "FX148"
+  },
+  "FDX1483": {
+    "origin": "MEM",
+    "destination": "JFK",
+    "flight_number": "FX1483"
+  },
+  "FDX1487": {
+    "origin": "MEM",
+    "destination": "COS",
+    "flight_number": "FX1487"
+  },
+  "FDX1489": {
+    "origin": "MEM",
+    "destination": "PBI",
+    "flight_number": "FX1489"
+  },
+  "FDX1490": {
+    "origin": "MEM",
+    "destination": "RNO",
+    "flight_number": "FX1490"
+  },
+  "FDX1491": {
+    "origin": "MEM",
+    "destination": "PWM",
+    "flight_number": "FX1491"
+  },
+  "FDX1493": {
+    "origin": "MEM",
+    "destination": "RST",
+    "flight_number": "FX1493"
+  },
+  "FDX1495": {
+    "origin": "MEM",
+    "destination": "BOI",
+    "flight_number": "FX1495"
+  },
+  "FDX1497": {
+    "origin": "MEM",
+    "destination": "ABE",
+    "flight_number": "FX1497"
+  },
+  "FDX1499": {
+    "origin": "MEM",
+    "destination": "ELP",
+    "flight_number": "FX1499"
+  },
+  "FDX1500": {
+    "origin": "CID",
+    "destination": "DSM",
+    "flight_number": "FX1500"
+  },
+  "FDX1506": {
+    "origin": "MEM",
+    "destination": "GSP",
+    "flight_number": "FX1506"
+  },
+  "FDX1508": {
+    "origin": "MEM",
+    "destination": "LAX",
+    "flight_number": "FX1508"
+  },
+  "FDX1512": {
+    "origin": "MEM",
+    "destination": "BMI",
+    "flight_number": "FX1512"
+  },
+  "FDX1514": {
+    "origin": "MEM",
+    "destination": "EWR",
+    "flight_number": "FX1514"
+  },
+  "FDX1517": {
+    "origin": "MEM",
+    "destination": "LRD",
+    "flight_number": "FX1517"
+  },
+  "FDX152": {
+    "origin": "BUF",
+    "destination": "YOW",
+    "flight_number": "FX152"
+  },
+  "FDX1527": {
+    "origin": "ICT",
+    "destination": "OMA",
+    "flight_number": "FX1527"
+  },
+  "FDX1528": {
+    "origin": "MEM",
+    "destination": "ROC",
+    "flight_number": "FX1528"
+  },
+  "FDX1537": {
+    "origin": "MEM",
+    "destination": "HRL",
+    "flight_number": "FX1537"
+  },
+  "FDX1539": {
+    "origin": "MEM",
+    "destination": "SAV",
+    "flight_number": "FX1539"
+  },
+  "FDX1540": {
+    "origin": "MEM",
+    "destination": "IAD",
+    "flight_number": "FX1540"
+  },
+  "FDX1542": {
+    "origin": "MEM",
+    "destination": "RIC",
+    "flight_number": "FX1542"
+  },
+  "FDX1543": {
+    "origin": "MEM",
+    "destination": "FSD",
+    "flight_number": "FX1543"
+  },
+  "FDX1544": {
+    "origin": "MEM",
+    "destination": "GFK",
+    "flight_number": "FX1544"
+  },
+  "FDX1545": {
+    "origin": "MEM",
+    "destination": "SFO",
+    "flight_number": "FX1545"
+  },
+  "FDX1548": {
+    "origin": "MEM",
+    "destination": "GTF",
+    "flight_number": "FX1548"
+  },
+  "FDX1552": {
+    "origin": "MEM",
+    "destination": "CLE",
+    "flight_number": "FX1552"
+  },
+  "FDX1558": {
+    "origin": "MEM",
+    "destination": "CHS",
+    "flight_number": "FX1558"
+  },
+  "FDX1564": {
+    "origin": "MEM",
+    "destination": "SWF",
+    "flight_number": "FX1564"
+  },
+  "FDX1570": {
+    "origin": "MEM",
+    "destination": "ALB",
+    "flight_number": "FX1570"
+  },
+  "FDX1571": {
+    "origin": "MEM",
+    "destination": "MDT",
+    "flight_number": "FX1571"
+  },
+  "FDX1573": {
+    "origin": "ICT",
+    "destination": "FAT",
+    "flight_number": "FX1573"
+  },
+  "FDX1578": {
+    "origin": "MEM",
+    "destination": "BUF",
+    "flight_number": "FX1578"
+  },
+  "FDX1580": {
+    "origin": "MEM",
+    "destination": "LAX",
+    "flight_number": "FX1580"
+  },
+  "FDX1583": {
+    "origin": "MEM",
+    "destination": "ABQ",
+    "flight_number": "FX1583"
+  },
+  "FDX1585": {
+    "origin": "MEM",
+    "destination": "DFW",
+    "flight_number": "FX1585"
+  },
+  "FDX169": {
+    "origin": "ANC",
+    "destination": "NRT",
+    "flight_number": "FX169"
+  },
+  "FDX1702": {
+    "origin": "IND",
+    "destination": "ATL",
+    "flight_number": "FX1702"
+  },
+  "FDX1705": {
+    "origin": "IND",
+    "destination": "OAK",
+    "flight_number": "FX1705"
+  },
+  "FDX1715": {
+    "origin": "IND",
+    "destination": "BNA",
+    "flight_number": "FX1715"
+  },
+  "FDX1717": {
+    "origin": "IND",
+    "destination": "SEA",
+    "flight_number": "FX1717"
+  },
+  "FDX1728": {
+    "origin": "IND",
+    "destination": "DEN",
+    "flight_number": "FX1728"
+  },
+  "FDX1732": {
+    "origin": "IND",
+    "destination": "IAH",
+    "flight_number": "FX1732"
+  },
+  "FDX1742": {
+    "origin": "IND",
+    "destination": "LAX",
+    "flight_number": "FX1742"
+  },
+  "FDX1746": {
+    "origin": "IND",
+    "destination": "TYS",
+    "flight_number": "FX1746"
+  },
+  "FDX1754": {
+    "origin": "IND",
+    "destination": "ONT",
+    "flight_number": "FX1754"
+  },
+  "FDX1770": {
+    "origin": "IND",
+    "destination": "SMF",
+    "flight_number": "FX1770"
+  },
+  "FDX1779": {
+    "origin": "IND",
+    "destination": "PDX",
+    "flight_number": "FX1779"
+  },
+  "FDX1857": {
+    "origin": "OAK",
+    "destination": "PDX",
+    "flight_number": "FX1857"
+  },
+  "FDX1865": {
+    "origin": "OAK",
+    "destination": "PHX",
+    "flight_number": "FX1865"
+  },
+  "FDX1869": {
+    "origin": "OAK",
+    "destination": "LAX",
+    "flight_number": "FX1869"
+  },
+  "FDX1879": {
+    "origin": "OAK",
+    "destination": "SLC",
+    "flight_number": "FX1879"
+  },
+  "FDX1885": {
+    "origin": "OAK",
+    "destination": "SEA",
+    "flight_number": "FX1885"
+  },
+  "FDX19": {
+    "origin": "MEM",
+    "destination": "KIX",
+    "flight_number": "FX19"
+  },
+  "FDX195": {
+    "origin": "MEM",
+    "destination": "NRT",
+    "flight_number": "FX195"
+  },
+  "FDX1989": {
+    "origin": "BOS",
+    "destination": "MDT",
+    "flight_number": "FX1989"
+  },
+  "FDX2": {
+    "origin": "MEM",
+    "destination": "STN",
+    "flight_number": "FX2"
+  },
+  "FDX30": {
+    "origin": "IND",
+    "destination": "CDG",
+    "flight_number": "FX30"
+  },
+  "FDX32": {
+    "origin": "MEM",
+    "destination": "CGN",
+    "flight_number": "FX32"
+  },
+  "FDX36": {
+    "origin": "IND",
+    "destination": "STN",
+    "flight_number": "FX36"
+  },
+  "FDX457": {
+    "origin": "EWR",
+    "destination": "MEM",
+    "flight_number": "FX457"
+  },
+  "FDX51": {
+    "origin": "MEM",
+    "destination": "SJU",
+    "flight_number": "FX51"
+  },
+  "FDX5124": {
+    "origin": "MEM",
+    "destination": "CDG",
+    "flight_number": "FX5124"
+  },
+  "FDX5285": null,
+  "FDX53": {
+    "origin": "MEM",
+    "destination": "TLC",
+    "flight_number": "FX53"
+  },
+  "FDX65": {
+    "origin": "MEM",
+    "destination": "GDL",
+    "flight_number": "FX65"
+  },
+  "FDX67": {
+    "origin": "MEM",
+    "destination": "MTY",
+    "flight_number": "FX67"
+  },
+  "FDX8": {
+    "origin": "MEM",
+    "destination": "DXB",
+    "flight_number": "FX8"
+  },
+  "FDX85": {
+    "origin": "OAK",
+    "destination": "ANC",
+    "flight_number": "FX85"
+  },
+  "FDX89": {
+    "origin": "MEM",
+    "destination": "QRO",
+    "flight_number": "FX89"
+  },
+  "FDY181": {
+    "origin": "MGW",
+    "destination": "IAD",
+    "flight_number": "9X181"
+  },
+  "FFT1010": {
+    "origin": "PDX",
+    "destination": "LAS",
+    "flight_number": "F91010"
+  },
+  "FFT1090": {
+    "origin": "MCO",
+    "destination": "IND",
+    "flight_number": "F91090"
+  },
+  "FFT1096": {
+    "origin": "CVG",
+    "destination": "MIA",
+    "flight_number": "F91096"
+  },
+  "FFT1163": {
+    "origin": "PHL",
+    "destination": "MCO",
+    "flight_number": "F91163"
+  },
+  "FFT1190": {
+    "origin": "MCO",
+    "destination": "RDU",
+    "flight_number": "F91190"
+  },
+  "FFT1214": {
+    "origin": "MCO",
+    "destination": "SYR",
+    "flight_number": "F91214"
+  },
+  "FFT1238": {
+    "origin": "MCO",
+    "destination": "BOS",
+    "flight_number": "F91238"
+  },
+  "FFT144": {
+    "origin": "CUN",
+    "destination": "SJU",
+    "flight_number": "F9144"
+  },
+  "FFT2000": {
+    "origin": "LAS",
+    "destination": "ATL",
+    "flight_number": "F92000"
+  },
+  "FFT2014": {
+    "origin": "LAS",
+    "destination": "CLE",
+    "flight_number": "F92014"
+  },
+  "FFT2022": {
+    "origin": "LAS",
+    "destination": "CVG",
+    "flight_number": "F92022"
+  },
+  "FFT2094": {
+    "origin": "LAS",
+    "destination": "STL",
+    "flight_number": "F92094"
+  },
+  "FFT2355": {
+    "origin": "PHL",
+    "destination": "RSW",
+    "flight_number": "F92355"
+  },
+  "FFT2374": {
+    "origin": "TPA",
+    "destination": "PHL",
+    "flight_number": "F92374"
+  },
+  "FFT43": {
+    "origin": "SXM",
+    "destination": "ATL",
+    "flight_number": "F943"
+  },
+  "FFT678": {
+    "origin": "MCO",
+    "destination": "TTN",
+    "flight_number": "F9678"
+  },
+  "FLE157": {
+    "origin": "YYZ",
+    "destination": "YQR",
+    "flight_number": "157"
+  },
+  "FLE309": {
+    "origin": "YYZ",
+    "destination": "YYG",
+    "flight_number": "309"
+  },
+  "FLE403": {
+    "origin": "YHZ",
+    "destination": "YKF",
+    "flight_number": "403"
+  },
+  "FTH955": {
+    "origin": "CMH",
+    "destination": "APC",
+    "flight_number": "FTH955"
+  },
+  "FWK913": {
+    "origin": "PDK",
+    "destination": null,
+    "flight_number": "FWK913"
+  },
+  "GEC8225": {
+    "origin": "GDL",
+    "destination": "FRA",
+    "flight_number": "LH8225"
+  },
+  "GJS4383": {
+    "origin": "STL",
+    "destination": "ORD",
+    "flight_number": "G74383"
+  },
+  "GJS4400": {
+    "origin": "IAD",
+    "destination": "LGA",
+    "flight_number": "G74400"
+  },
+  "GJS4438": {
+    "origin": "DCA",
+    "destination": "EWR",
+    "flight_number": "G74438"
+  },
+  "GTI3829": {
+    "origin": "STL",
+    "destination": "SBD",
+    "flight_number": "5Y3829"
+  },
+  "GTI4749": {
+    "origin": "SBD",
+    "destination": "AUS",
+    "flight_number": "5Y4749"
+  },
+  "GTI8761": {
+    "origin": "ANC",
+    "destination": "LAX",
+    "flight_number": "5Y8761"
+  },
+  "GTI9527": {
+    "origin": "MIA",
+    "destination": "ICN",
+    "flight_number": "5Y9527"
+  },
+  "HAL86": {
+    "origin": "HNL",
+    "destination": "MCO",
+    "flight_number": "HA86"
+  },
+  "HRT556": null,
+  "IFL511": {
+    "origin": "LRD",
+    "destination": "OAK",
+    "flight_number": "IFL511"
+  },
+  "JAL10": {
+    "origin": "NRT",
+    "destination": "ORD",
+    "flight_number": "JL10"
+  },
+  "JAL8012": {
+    "origin": "NRT",
+    "destination": "DFW",
+    "flight_number": "JL8012"
+  },
+  "JBU1": {
+    "origin": "JFK",
+    "destination": "FLL",
+    "flight_number": "B61"
+  },
+  "JBU100": {
+    "origin": "LAX",
+    "destination": "FLL",
+    "flight_number": "B6100"
+  },
+  "JBU1009": {
+    "origin": "BOS",
+    "destination": "JFK",
+    "flight_number": "B61009"
+  },
+  "JBU1017": {
+    "origin": "BOS",
+    "destination": "JFK",
+    "flight_number": "B61017"
+  },
+  "JBU1063": {
+    "origin": "JFK",
+    "destination": "FLL",
+    "flight_number": "B61063"
+  },
+  "JBU1099": {
+    "origin": "BOS",
+    "destination": "JFK",
+    "flight_number": "B61099"
+  },
+  "JBU110": {
+    "origin": "SDQ",
+    "destination": "JFK",
+    "flight_number": "B6110"
+  },
+  "JBU1125": {
+    "origin": "JFK",
+    "destination": "TPA",
+    "flight_number": "B61125"
+  },
+  "JBU1145": {
+    "origin": "RIC",
+    "destination": "FLL",
+    "flight_number": "B61145"
+  },
+  "JBU116": {
+    "origin": "JFK",
+    "destination": "SYR",
+    "flight_number": "B6116"
+  },
+  "JBU121": {
+    "origin": "JFK",
+    "destination": "NAS",
+    "flight_number": "B6121"
+  },
+  "JBU133": {
+    "origin": "BOS",
+    "destination": "SFO",
+    "flight_number": "B6133"
+  },
+  "JBU1359": {
+    "origin": "JFK",
+    "destination": "KIN",
+    "flight_number": "B61359"
+  },
+  "JBU136": {
+    "origin": "PHX",
+    "destination": "JFK",
+    "flight_number": "B6136"
+  },
+  "JBU137": {
+    "origin": "JFK",
+    "destination": "STI",
+    "flight_number": "B6137"
+  },
+  "JBU1424": {
+    "origin": "PBI",
+    "destination": "DCA",
+    "flight_number": "B61424"
+  },
+  "JBU1502": {
+    "origin": "FLL",
+    "destination": "JFK",
+    "flight_number": "B61502"
+  },
+  "JBU1505": {
+    "origin": "EWR",
+    "destination": "FLL",
+    "flight_number": "B61505"
+  },
+  "JBU1574": {
+    "origin": "LAX",
+    "destination": "EWR",
+    "flight_number": "B61574"
+  },
+  "JBU1589": {
+    "origin": "EWR",
+    "destination": "SJU",
+    "flight_number": "B61589"
+  },
+  "JBU162": {
+    "origin": "SMF",
+    "destination": "JFK",
+    "flight_number": "B6162"
+  },
+  "JBU166": {
+    "origin": "PDX",
+    "destination": "JFK",
+    "flight_number": "B6166"
+  },
+  "JBU1830": {
+    "origin": "SDQ",
+    "destination": "BOS",
+    "flight_number": "B61830"
+  },
+  "JBU2082": {
+    "origin": "RIC",
+    "destination": "BOS",
+    "flight_number": "B62082"
+  },
+  "JBU2206": {
+    "origin": "FLL",
+    "destination": "EWR",
+    "flight_number": "B62206"
+  },
+  "JBU2348": {
+    "origin": "LAS",
+    "destination": "JFK",
+    "flight_number": "B62348"
+  },
+  "JBU24": {
+    "origin": "LAX",
+    "destination": "JFK",
+    "flight_number": "B624"
+  },
+  "JBU2512": {
+    "origin": "MCO",
+    "destination": "EWR",
+    "flight_number": "B62512"
+  },
+  "JBU278": {
+    "origin": "SFO",
+    "destination": "FLL",
+    "flight_number": "B6278"
+  },
+  "JBU2818": {
+    "origin": "JFK",
+    "destination": "BOS",
+    "flight_number": "B62818"
+  },
+  "JBU2844": {
+    "origin": "SFO",
+    "destination": "BDL",
+    "flight_number": "B62844"
+  },
+  "JBU287": {
+    "origin": "BOS",
+    "destination": "LAX",
+    "flight_number": "B6287"
+  },
+  "JBU2952": {
+    "origin": "MCO",
+    "destination": "BOS",
+    "flight_number": "B62952"
+  },
+  "JBU327": {
+    "origin": "BDL",
+    "destination": "FLL",
+    "flight_number": "B6327"
+  },
+  "JBU329": {
+    "origin": "JFK",
+    "destination": "RSW",
+    "flight_number": "B6329"
+  },
+  "JBU34": {
+    "origin": "SFO",
+    "destination": "BOS",
+    "flight_number": "B634"
+  },
+  "JBU354": {
+    "origin": "ONT",
+    "destination": "JFK",
+    "flight_number": "B6354"
+  },
+  "JBU358": {
+    "origin": "BUR",
+    "destination": "JFK",
+    "flight_number": "B6358"
+  },
+  "JBU371": {
+    "origin": "LGA",
+    "destination": "FLL",
+    "flight_number": "B6371"
+  },
+  "JBU375": {
+    "origin": "PVD",
+    "destination": "MCO",
+    "flight_number": "B6375"
+  },
+  "JBU569": {
+    "origin": "BOS",
+    "destination": "FLL",
+    "flight_number": "B6569"
+  },
+  "JBU657": {
+    "origin": "FLL",
+    "destination": "PHX",
+    "flight_number": "B6657"
+  },
+  "JBU80": {
+    "origin": "RNO",
+    "destination": "JFK",
+    "flight_number": "B680"
+  },
+  "JBU806": {
+    "origin": "LAX",
+    "destination": "SEA",
+    "flight_number": "B6806"
+  },
+  "JBU839": {
+    "origin": "JFK",
+    "destination": "BQN",
+    "flight_number": "B6839"
+  },
+  "JBU959": {
+    "origin": "BDL",
+    "destination": "FLL",
+    "flight_number": "B6959"
+  },
+  "JED172": null,
+  "JIA5031": {
+    "origin": "GSP",
+    "destination": "DCA",
+    "flight_number": "US5031"
+  },
+  "JIA5032": {
+    "origin": "PHL",
+    "destination": "BTV",
+    "flight_number": "US5032"
+  },
+  "JIA5035": {
+    "origin": "PHL",
+    "destination": "SYR",
+    "flight_number": "US5035"
+  },
+  "JIA5068": {
+    "origin": "PHL",
+    "destination": "STL",
+    "flight_number": "US5068"
+  },
+  "JIA5079": {
+    "origin": "DCA",
+    "destination": "CHS",
+    "flight_number": "US5079"
+  },
+  "JIA5084": {
+    "origin": "BDL",
+    "destination": "PHL",
+    "flight_number": "US5084"
+  },
+  "JIA5097": {
+    "origin": "HPN",
+    "destination": "CLT",
+    "flight_number": "US5097"
+  },
+  "JIA5133": {
+    "origin": "OAJ",
+    "destination": "CLT",
+    "flight_number": "US5133"
+  },
+  "JIA5139": {
+    "origin": "PIT",
+    "destination": "PHL",
+    "flight_number": "US5139"
+  },
+  "JIA5145": {
+    "origin": "PHL",
+    "destination": "PVD",
+    "flight_number": "US5145"
+  },
+  "JIA5154": {
+    "origin": "BTV",
+    "destination": "CLT",
+    "flight_number": "US5154"
+  },
+  "JIA5205": {
+    "origin": "PHL",
+    "destination": "IND",
+    "flight_number": "US5205"
+  },
+  "JIA5234": {
+    "origin": "DAY",
+    "destination": "CLT",
+    "flight_number": "US5234"
+  },
+  "JIA5255": {
+    "origin": "PHL",
+    "destination": "ILM",
+    "flight_number": "US5255"
+  },
+  "JIA5256": {
+    "origin": "DTW",
+    "destination": "PHL",
+    "flight_number": "US5256"
+  },
+  "JIA5261": {
+    "origin": "DAY",
+    "destination": "DCA",
+    "flight_number": "US5261"
+  },
+  "JIA5353": {
+    "origin": "PNS",
+    "destination": "CLT",
+    "flight_number": "US5353"
+  },
+  "JIA5359": {
+    "origin": "JAN",
+    "destination": "DCA",
+    "flight_number": "US5359"
+  },
+  "JIA5386": {
+    "origin": "MLB",
+    "destination": "CLT",
+    "flight_number": "US5386"
+  },
+  "JIA5399": {
+    "origin": "SBN",
+    "destination": "CLT",
+    "flight_number": "US5399"
+  },
+  "JIA5409": {
+    "origin": "DCA",
+    "destination": "BTV",
+    "flight_number": "US5409"
+  },
+  "JIA5413": {
+    "origin": "CLE",
+    "destination": "DCA",
+    "flight_number": "US5413"
+  },
+  "JIA5417": {
+    "origin": "LEX",
+    "destination": "CLT",
+    "flight_number": "US5417"
+  },
+  "JIA5474": {
+    "origin": "MHT",
+    "destination": "CLT",
+    "flight_number": "US5474"
+  },
+  "JIA5546": {
+    "origin": "ORF",
+    "destination": "PHL",
+    "flight_number": "US5546"
+  },
+  "JIA5559": {
+    "origin": "BUF",
+    "destination": "PHL",
+    "flight_number": "US5559"
+  },
+  "JIA5584": {
+    "origin": "PHL",
+    "destination": "ORF",
+    "flight_number": "US5584"
+  },
+  "JIA5591": {
+    "origin": "ICT",
+    "destination": "DCA",
+    "flight_number": "US5591"
+  },
+  "JIA5602": {
+    "origin": "ALB",
+    "destination": "DCA",
+    "flight_number": "US5602"
+  },
+  "JIA5622": {
+    "origin": "CLT",
+    "destination": "ORF",
+    "flight_number": "US5622"
+  },
+  "JIA5638": {
+    "origin": "PHL",
+    "destination": "SYR",
+    "flight_number": "US5638"
+  },
+  "JIA5642": {
+    "origin": "PIT",
+    "destination": "DCA",
+    "flight_number": "US5642"
+  },
+  "JIA5681": {
+    "origin": "JAX",
+    "destination": "PHL",
+    "flight_number": "US5681"
+  },
+  "JIT177": {
+    "origin": "PNE",
+    "destination": "CAE",
+    "flight_number": "JIT177"
+  },
+  "JSL21": {
+    "origin": "MSN",
+    "destination": "TVC",
+    "flight_number": "JSL21"
+  },
+  "JTL61": {
+    "origin": "TEB",
+    "destination": "TCL",
+    "flight_number": "61"
+  },
+  "JZA329": {
+    "origin": "YYG",
+    "destination": "YYZ",
+    "flight_number": "QK329"
+  },
+  "JZA7487": {
+    "origin": "LGA",
+    "destination": "YYZ",
+    "flight_number": "QK7487"
+  },
+  "JZA7563": {
+    "origin": "YOW",
+    "destination": "YYZ",
+    "flight_number": "QK7563"
+  },
+  "JZA7589": {
+    "origin": "EWR",
+    "destination": "YUL",
+    "flight_number": "QK7589"
+  },
+  "JZA7647": {
+    "origin": "EWR",
+    "destination": "YYZ",
+    "flight_number": "QK7647"
+  },
+  "JZA7705": {
+    "origin": "YOW",
+    "destination": "YTZ",
+    "flight_number": "QK7705"
+  },
+  "JZA7932": {
+    "origin": "YUL",
+    "destination": "YQB",
+    "flight_number": "QK7932"
+  },
+  "JZA866": {
+    "origin": "DCA",
+    "destination": "YOW",
+    "flight_number": "QK866"
+  },
+  "JZA939": {
+    "origin": "EWR",
+    "destination": "YUL",
+    "flight_number": "QK939"
+  },
+  "JZA970": {
+    "origin": "STL",
+    "destination": "YYZ",
+    "flight_number": "QK970"
+  },
+  "KAL035": null,
+  "KAL233": {
+    "origin": "ANC",
+    "destination": "ORD",
+    "flight_number": "KE233"
+  },
+  "KAL9055": {
+    "origin": "ICN",
+    "destination": "LCK",
+    "flight_number": "KE9055"
+  },
+  "KAP1911": {
+    "origin": "ACK",
+    "destination": "BOS",
+    "flight_number": "9K1911"
+  },
+  "KAP624": {
+    "origin": "BHB",
+    "destination": "BOS",
+    "flight_number": "9K624"
+  },
+  "LAK282": {
+    "origin": "MMU",
+    "destination": "LEX",
+    "flight_number": "LAK282"
+  },
+  "LAN530": {
+    "origin": "SCL",
+    "destination": "LIM",
+    "flight_number": "LA530"
+  },
+  "LAN532": {
+    "origin": "SCL",
+    "destination": "JFK",
+    "flight_number": "LA532"
+  },
+  "LBQ611": null,
+  "LBQ651": {
+    "origin": "MNZ",
+    "destination": "RDG",
+    "flight_number": "LBQ651"
+  },
+  "LBQ875": null,
+  "LJY44": null,
+  "LJY623": null,
+  "LN80LJ": {
+    "origin": "NAS",
+    "destination": "FLL",
+    "flight_number": "LN80LJ"
+  },
+  "LTA500": null,
+  "LTA72": null,
+  "LTA74": null,
+  "LTA82": null,
+  "LXJ590": {
+    "origin": "SFO",
+    "destination": "SAN",
+    "flight_number": "LXJ590"
+  },
+  "MAL7051": {
+    "origin": "YYZ",
+    "destination": "YWG",
+    "flight_number": "MAL7051"
+  },
+  "MAL8060": {
+    "origin": "YWG",
+    "destination": "YQT",
+    "flight_number": "MAL8060"
+  },
+  "MJR933": null,
+  "MRA630": null,
+  "MRA662": null,
+  "MRA697": null,
+  "MRA700": null,
+  "MTN8325": null,
+  "MTN8327": null,
+  "MTN8359": null,
+  "MTN8375": null,
+  "N240VU": null,
+  "N664LF": null,
+  "NCA5106": {
+    "origin": "NRT",
+    "destination": "LAX",
+    "flight_number": "KZ5106"
+  },
+  "NKS106": {
+    "origin": "BOS",
+    "destination": "FLL",
+    "flight_number": "NK106"
+  },
+  "NKS1095": {
+    "origin": "PHL",
+    "destination": "MCO",
+    "flight_number": "NK1095"
+  },
+  "NKS1127": {
+    "origin": "TPA",
+    "destination": "LAS",
+    "flight_number": "NK1127"
+  },
+  "NKS1200": {
+    "origin": "LAX",
+    "destination": "DFW",
+    "flight_number": "NK1200"
+  },
+  "NKS1250": {
+    "origin": "EWR",
+    "destination": "MCO",
+    "flight_number": "NK1250"
+  },
+  "NKS1292": {
+    "origin": "LAS",
+    "destination": "IAH",
+    "flight_number": "NK1292"
+  },
+  "NKS171": {
+    "origin": "LGA",
+    "destination": "FLL",
+    "flight_number": "NK171"
+  },
+  "NKS1877": {
+    "origin": "ATL",
+    "destination": "FLL",
+    "flight_number": "NK1877"
+  },
+  "NKS1967": {
+    "origin": "DFW",
+    "destination": "FLL",
+    "flight_number": "NK1967"
+  },
+  "NKS2": {
+    "origin": "ORD",
+    "destination": "FLL",
+    "flight_number": "NK2"
+  },
+  "NKS203": {
+    "origin": "LAX",
+    "destination": "CLT",
+    "flight_number": "NK203"
+  },
+  "NKS233": {
+    "origin": "OAK",
+    "destination": "SNA",
+    "flight_number": "NK233"
+  },
+  "NKS2352": {
+    "origin": "LAX",
+    "destination": "ATL",
+    "flight_number": "NK2352"
+  },
+  "NKS2879": {
+    "origin": "PDX",
+    "destination": "BUR",
+    "flight_number": "NK2879"
+  },
+  "NKS2932": {
+    "origin": "BNA",
+    "destination": "MCO",
+    "flight_number": "NK2932"
+  },
+  "NKS316": {
+    "origin": "DTW",
+    "destination": "LGA",
+    "flight_number": "NK316"
+  },
+  "NKS320": {
+    "origin": "MCO",
+    "destination": "CMH",
+    "flight_number": "NK320"
+  },
+  "NKS3330": {
+    "origin": "LGA",
+    "destination": "DFW",
+    "flight_number": "NK3330"
+  },
+  "NKS336": {
+    "origin": "MCO",
+    "destination": "DTW",
+    "flight_number": "NK336"
+  },
+  "NKS395": {
+    "origin": "PHL",
+    "destination": "LAS",
+    "flight_number": "NK395"
+  },
+  "NKS417": {
+    "origin": "DTW",
+    "destination": "FLL",
+    "flight_number": "NK417"
+  },
+  "NKS420": {
+    "origin": "BWI",
+    "destination": "FLL",
+    "flight_number": "NK420"
+  },
+  "NKS44": {
+    "origin": "IND",
+    "destination": "MCO",
+    "flight_number": "NK44"
+  },
+  "NKS559": {
+    "origin": "MCO",
+    "destination": "CLT",
+    "flight_number": "NK559"
+  },
+  "NKS577": {
+    "origin": "CMH",
+    "destination": "FLL",
+    "flight_number": "NK577"
+  },
+  "NKS609": {
+    "origin": "BOS",
+    "destination": "FLL",
+    "flight_number": "NK609"
+  },
+  "NKS726": {
+    "origin": "OAK",
+    "destination": "EWR",
+    "flight_number": "NK726"
+  },
+  "NKS735": {
+    "origin": "DTW",
+    "destination": "ATL",
+    "flight_number": "NK735"
+  },
+  "NKS736": {
+    "origin": "ATL",
+    "destination": "BWI",
+    "flight_number": "NK736"
+  },
+  "NKS740": {
+    "origin": "FLL",
+    "destination": "ATL",
+    "flight_number": "NK740"
+  },
+  "NKS755": {
+    "origin": "FLL",
+    "destination": "SJO",
+    "flight_number": "NK755"
+  },
+  "NKS893": {
+    "origin": "SJU",
+    "destination": "MCO",
+    "flight_number": "NK893"
+  },
+  "NKS954": {
+    "origin": "LAS",
+    "destination": "FLL",
+    "flight_number": "NK954"
+  },
+  "NKS957": {
+    "origin": "IAH",
+    "destination": "FLL",
+    "flight_number": "NK957"
+  },
+  "NKS98": {
+    "origin": "EWR",
+    "destination": "ATL",
+    "flight_number": "NK98"
+  },
+  "NKS99": {
+    "origin": "ATL",
+    "destination": "EWR",
+    "flight_number": "NK99"
+  },
+  "PDT6003": {
+    "origin": "PHL",
+    "destination": "ROC",
+    "flight_number": "PI6003"
+  },
+  "PDT6058": {
+    "origin": "MDT",
+    "destination": "PHL",
+    "flight_number": "PI6058"
+  },
+  "PDT6060": {
+    "origin": "PHL",
+    "destination": "GSO",
+    "flight_number": "PI6060"
+  },
+  "PDT6061": {
+    "origin": "PHL",
+    "destination": "ROA",
+    "flight_number": "PI6061"
+  },
+  "PDT6068": {
+    "origin": "DTW",
+    "destination": "PHL",
+    "flight_number": "PI6068"
+  },
+  "PDT6080": {
+    "origin": "PHL",
+    "destination": "GSO",
+    "flight_number": "PI6080"
+  },
+  "PDT6093": {
+    "origin": "CLT",
+    "destination": "LYH",
+    "flight_number": "PI6093"
+  },
+  "PDT6115": {
+    "origin": "ISP",
+    "destination": "PHL",
+    "flight_number": "PI6115"
+  },
+  "PDT6127": {
+    "origin": "PHF",
+    "destination": "CLT",
+    "flight_number": "PI6127"
+  },
+  "PDT6156": {
+    "origin": "LSE",
+    "destination": "ORD",
+    "flight_number": "PI6156"
+  },
+  "PDT6180": {
+    "origin": "MHT",
+    "destination": "PHL",
+    "flight_number": "PI6180"
+  },
+  "PDT6188": {
+    "origin": "CHA",
+    "destination": "CLT",
+    "flight_number": "PI6188"
+  },
+  "PDT6189": {
+    "origin": "PHL",
+    "destination": "DAY",
+    "flight_number": "PI6189"
+  },
+  "PDT6229": {
+    "origin": "PHL",
+    "destination": "MDT",
+    "flight_number": "PI6229"
+  },
+  "PDT6230": {
+    "origin": "BUF",
+    "destination": "PHL",
+    "flight_number": "PI6230"
+  },
+  "PDT6239": {
+    "origin": "ORD",
+    "destination": "DAY",
+    "flight_number": "PI6239"
+  },
+  "PRY05": null,
+  "PSCAT": {
+    "origin": "MIA",
+    "destination": "TEB",
+    "flight_number": "PSCAT"
+  },
+  "PVL1902": {
+    "origin": "YZV",
+    "destination": "YWK",
+    "flight_number": "1902"
+  },
+  "QTR709": {
+    "origin": "DOH",
+    "destination": "IAD",
+    "flight_number": "QR709"
+  },
+  "RAX716": {
+    "origin": "BWI",
+    "destination": "PDK",
+    "flight_number": "RAX716"
+  },
+  "RCH141": {
+    "origin": "TCM",
+    "destination": "FFO",
+    "flight_number": "MC141"
+  },
+  "RCH286": {
+    "origin": "HUA",
+    "destination": "CHS",
+    "flight_number": "MC286"
+  },
+  "REH05": {
+    "origin": null,
+    "destination": "RDD",
+    "flight_number": "REH05"
+  },
+  "REH43": null,
+  "RPA3432": {
+    "origin": "BUF",
+    "destination": "EWR",
+    "flight_number": "RW3432"
+  },
+  "RPA3441": {
+    "origin": "EWR",
+    "destination": "GSP",
+    "flight_number": "RW3441"
+  },
+  "RPA3455": {
+    "origin": "CMH",
+    "destination": "EWR",
+    "flight_number": "RW3455"
+  },
+  "RPA3464": {
+    "origin": "BUF",
+    "destination": "EWR",
+    "flight_number": "RW3464"
+  },
+  "RPA3486": {
+    "origin": "EWR",
+    "destination": "DCA",
+    "flight_number": "RW3486"
+  },
+  "RPA3516": {
+    "origin": "CVG",
+    "destination": "EWR",
+    "flight_number": "RW3516"
+  },
+  "RPA3633": {
+    "origin": "EWR",
+    "destination": "MKE",
+    "flight_number": "RW3633"
+  },
+  "RPA3642": {
+    "origin": "PWM",
+    "destination": "ORD",
+    "flight_number": "RW3642"
+  },
+  "RPA4536": {
+    "origin": "PHL",
+    "destination": "PIT",
+    "flight_number": "RW4536"
+  },
+  "RPA4537": {
+    "origin": "RIC",
+    "destination": "LGA",
+    "flight_number": "RW4537"
+  },
+  "RPA4541": {
+    "origin": "DCA",
+    "destination": "MHT",
+    "flight_number": "RW4541"
+  },
+  "RPA4603": {
+    "origin": "ORD",
+    "destination": "SDF",
+    "flight_number": "RW4603"
+  },
+  "RPA4604": {
+    "origin": "CMH",
+    "destination": "LGA",
+    "flight_number": "RW4604"
+  },
+  "RPA4617": {
+    "origin": "SDF",
+    "destination": "PHL",
+    "flight_number": "RW4617"
+  },
+  "RPA4683": {
+    "origin": "LGA",
+    "destination": "CHO",
+    "flight_number": "RW4683"
+  },
+  "RPA4692": {
+    "origin": "BNA",
+    "destination": "PHL",
+    "flight_number": "RW4692"
+  },
+  "RPA4718": {
+    "origin": "DCA",
+    "destination": "LGA",
+    "flight_number": "RW4718"
+  },
+  "RPA4720": {
+    "origin": "MCI",
+    "destination": "LGA",
+    "flight_number": "RW4720"
+  },
+  "RPA4747": {
+    "origin": "IND",
+    "destination": "LGA",
+    "flight_number": "RW4747"
+  },
+  "RPA4756": {
+    "origin": "SDF",
+    "destination": "BOS",
+    "flight_number": "RW4756"
+  },
+  "RPA4779": {
+    "origin": "LGA",
+    "destination": "MEM",
+    "flight_number": "RW4779"
+  },
+  "RPA4821": {
+    "origin": "DTW",
+    "destination": "DCA",
+    "flight_number": "RW4821"
+  },
+  "RPA4825": {
+    "origin": "DCA",
+    "destination": "MVY",
+    "flight_number": "RW4825"
+  },
+  "RPA4842": {
+    "origin": "BNA",
+    "destination": "LGA",
+    "flight_number": "RW4842"
+  },
+  "RPA4856": {
+    "origin": "HHH",
+    "destination": "DCA",
+    "flight_number": "RW4856"
+  },
+  "RPA4868": {
+    "origin": "SDF",
+    "destination": "CLT",
+    "flight_number": "RW4868"
+  },
+  "RPA4957": {
+    "origin": "PHL",
+    "destination": "RDU",
+    "flight_number": "RW4957"
+  },
+  "RPA4975": {
+    "origin": "LGA",
+    "destination": "STL",
+    "flight_number": "RW4975"
+  },
+  "RPA5002": {
+    "origin": "BNA",
+    "destination": "PHL",
+    "flight_number": "RW5002"
+  },
+  "RPA5010": {
+    "origin": "DCA",
+    "destination": "ALB",
+    "flight_number": "RW5010"
+  },
+  "RPA5015": {
+    "origin": "DTW",
+    "destination": "DCA",
+    "flight_number": "RW5015"
+  },
+  "RPA5598": {
+    "origin": "CMH",
+    "destination": "LGA",
+    "flight_number": "RW5598"
+  },
+  "RPA5639": {
+    "origin": "JFK",
+    "destination": "CMH",
+    "flight_number": "RW5639"
+  },
+  "RPA5650": {
+    "origin": "DCA",
+    "destination": "MSN",
+    "flight_number": "RW5650"
+  },
+  "RPA5661": {
+    "origin": "BOS",
+    "destination": "LGA",
+    "flight_number": "RW5661"
+  },
+  "RPA5688": {
+    "origin": "SDF",
+    "destination": "LGA",
+    "flight_number": "RW5688"
+  },
+  "RPA5690": {
+    "origin": "PIT",
+    "destination": "BOS",
+    "flight_number": "RW5690"
+  },
+  "RPA5698": {
+    "origin": "CLT",
+    "destination": "LGA",
+    "flight_number": "RW5698"
+  },
+  "RPA5716": {
+    "origin": "BOS",
+    "destination": "JFK",
+    "flight_number": "RW5716"
+  },
+  "RPA5729": {
+    "origin": "JAX",
+    "destination": "LGA",
+    "flight_number": "RW5729"
+  },
+  "RPA5753": {
+    "origin": "JFK",
+    "destination": "CLE",
+    "flight_number": "RW5753"
+  },
+  "RPA5758": {
+    "origin": "CMH",
+    "destination": "LGA",
+    "flight_number": "RW5758"
+  },
+  "RPA5783": {
+    "origin": "BOS",
+    "destination": "JAX",
+    "flight_number": "RW5783"
+  },
+  "RPA5786": {
+    "origin": "IND",
+    "destination": "LGA",
+    "flight_number": "RW5786"
+  },
+  "RPA5790": {
+    "origin": "JFK",
+    "destination": "DCA",
+    "flight_number": "RW5790"
+  },
+  "RPA5796": {
+    "origin": "LGA",
+    "destination": "DCA",
+    "flight_number": "RW5796"
+  },
+  "RPA5797": {
+    "origin": "JAX",
+    "destination": "BOS",
+    "flight_number": "RW5797"
+  },
+  "RPA5802": {
+    "origin": "JFK",
+    "destination": "IAD",
+    "flight_number": "RW5802"
+  },
+  "SCX3038": {
+    "origin": "RIC",
+    "destination": "LAL",
+    "flight_number": "SY3038"
+  },
+  "SCX3044": {
+    "origin": "LAL",
+    "destination": "TOL",
+    "flight_number": "SY3044"
+  },
+  "SDU145": null,
+  "SIA24": {
+    "origin": "SIN",
+    "destination": "JFK",
+    "flight_number": "SQ24"
+  },
+  "SJA19": null,
+  "SJA563": null,
+  "SKQ31": null,
+  "SKQ53": {
+    "origin": "MMU",
+    "destination": null,
+    "flight_number": "SKQ53"
+  },
+  "SKW196T": {
+    "origin": "PLN",
+    "destination": "DTW",
+    "flight_number": "OO196T"
+  },
+  "SKW2979": {
+    "origin": "TVC",
+    "destination": "ORD",
+    "flight_number": "OO2979"
+  },
+  "SKW3006": {
+    "origin": "SEA",
+    "destination": "SFO",
+    "flight_number": "OO3006"
+  },
+  "SKW3036": {
+    "origin": "LAX",
+    "destination": "SFO",
+    "flight_number": "OO3036"
+  },
+  "SKW3040": {
+    "origin": "PHX",
+    "destination": "STS",
+    "flight_number": "OO3040"
+  },
+  "SKW3061": {
+    "origin": "LAX",
+    "destination": "SJC",
+    "flight_number": "OO3061"
+  },
+  "SKW3069": {
+    "origin": "PHX",
+    "destination": "SAN",
+    "flight_number": "OO3069"
+  },
+  "SKW3110": {
+    "origin": "LAX",
+    "destination": "SJC",
+    "flight_number": "OO3110"
+  },
+  "SKW3399": {
+    "origin": "SEA",
+    "destination": "SFO",
+    "flight_number": "OO3399"
+  },
+  "SKW3517": {
+    "origin": "MFE",
+    "destination": "AUS",
+    "flight_number": "OO3517"
+  },
+  "SKW3526": {
+    "origin": "YWG",
+    "destination": "MSP",
+    "flight_number": "OO3526"
+  },
+  "SKW3596": {
+    "origin": "ATL",
+    "destination": "LFT",
+    "flight_number": "OO3596"
+  },
+  "SKW3645": {
+    "origin": "DTW",
+    "destination": "HSV",
+    "flight_number": "OO3645"
+  },
+  "SKW3727": {
+    "origin": "SLC",
+    "destination": "RDM",
+    "flight_number": "OO3727"
+  },
+  "SKW3731": {
+    "origin": "SEA",
+    "destination": "SJC",
+    "flight_number": "OO3731"
+  },
+  "SKW3776": {
+    "origin": "SJC",
+    "destination": "SEA",
+    "flight_number": "OO3776"
+  },
+  "SKW3867": {
+    "origin": "MDW",
+    "destination": "DTW",
+    "flight_number": "OO3867"
+  },
+  "SKW4090": {
+    "origin": "MOT",
+    "destination": "MSP",
+    "flight_number": "OO4090"
+  },
+  "SKW4254": {
+    "origin": "RHI",
+    "destination": "MSP",
+    "flight_number": "OO4254"
+  },
+  "SKW4261": {
+    "origin": "XWA",
+    "destination": "MSP",
+    "flight_number": "OO4261"
+  },
+  "SKW4330": {
+    "origin": "MSP",
+    "destination": "INL",
+    "flight_number": "OO4330"
+  },
+  "SKW5043": {
+    "origin": "LAF",
+    "destination": "ORD",
+    "flight_number": "OO5043"
+  },
+  "SKW5217": {
+    "origin": "SFO",
+    "destination": "TUS",
+    "flight_number": "OO5217"
+  },
+  "SKW5434": {
+    "origin": "FWA",
+    "destination": "ORD",
+    "flight_number": "OO5434"
+  },
+  "SKW5701": {
+    "origin": "SYR",
+    "destination": "ORD",
+    "flight_number": "OO5701"
+  },
+  "SKW5768": {
+    "origin": "SBN",
+    "destination": "ORD",
+    "flight_number": "OO5768"
+  },
+  "SLW3274": null,
+  "SNC1470": {
+    "origin": "TVC",
+    "destination": "MKE",
+    "flight_number": "2Q1470"
+  },
+  "SOO752": null,
+  "SVA7202": null,
+  "SWA1075": {
+    "origin": "DEN",
+    "destination": "MCO",
+    "flight_number": "WN1075"
+  },
+  "SWA1334": {
+    "origin": "BNA",
+    "destination": "MDW",
+    "flight_number": "WN1334"
+  },
+  "SWA1649": {
+    "origin": "MCO",
+    "destination": "ALB",
+    "flight_number": "WN1649"
+  },
+  "SWA1918": {
+    "origin": "MCI",
+    "destination": "DAL",
+    "flight_number": "WN1918"
+  },
+  "SWA2473": {
+    "origin": "SJC",
+    "destination": "LAX",
+    "flight_number": "WN2473"
+  },
+  "SWA2647": {
+    "origin": "OGG",
+    "destination": "SJC",
+    "flight_number": "WN2647"
+  },
+  "SWA2663": {
+    "origin": "MDW",
+    "destination": "ALB",
+    "flight_number": "WN2663"
+  },
+  "SWA2743": {
+    "origin": "STL",
+    "destination": "MDW",
+    "flight_number": "WN2743"
+  },
+  "SWA2777": {
+    "origin": "BOI",
+    "destination": "SJC",
+    "flight_number": "WN2777"
+  },
+  "SWA2871": {
+    "origin": "SEA",
+    "destination": "OAK",
+    "flight_number": "WN2871"
+  },
+  "SWA2901": {
+    "origin": "RDU",
+    "destination": "TPA",
+    "flight_number": "WN2901"
+  },
+  "SWA2913": {
+    "origin": "DAL",
+    "destination": "ATL",
+    "flight_number": "WN2913"
+  },
+  "SWA2981": {
+    "origin": "ISP",
+    "destination": "BWI",
+    "flight_number": "WN2981"
+  },
+  "SWA3005": {
+    "origin": "OMA",
+    "destination": "LAS",
+    "flight_number": "WN3005"
+  },
+  "SWA3025": {
+    "origin": "SAN",
+    "destination": "AUS",
+    "flight_number": "WN3025"
+  },
+  "SWA3047": {
+    "origin": "ONT",
+    "destination": "SJC",
+    "flight_number": "WN3047"
+  },
+  "SWA3063": {
+    "origin": "SNA",
+    "destination": "OAK",
+    "flight_number": "WN3063"
+  },
+  "SWA3162": {
+    "origin": "RSW",
+    "destination": "MDW",
+    "flight_number": "WN3162"
+  },
+  "SWA3177": {
+    "origin": "LAS",
+    "destination": "OAK",
+    "flight_number": "WN3177"
+  },
+  "SWA3185": {
+    "origin": "RIC",
+    "destination": "MDW",
+    "flight_number": "WN3185"
+  },
+  "SWA3220": {
+    "origin": "DEN",
+    "destination": "SNA",
+    "flight_number": "WN3220"
+  },
+  "SWA3245": {
+    "origin": "OAK",
+    "destination": "DAL",
+    "flight_number": "WN3245"
+  },
+  "SWA3273": {
+    "origin": "OAK",
+    "destination": "LAS",
+    "flight_number": "WN3273"
+  },
+  "SWA3299": {
+    "origin": "MDW",
+    "destination": "SJU",
+    "flight_number": "WN3299"
+  },
+  "SWA3327": {
+    "origin": "STL",
+    "destination": "LGA",
+    "flight_number": "WN3327"
+  },
+  "SWA3344": {
+    "origin": "SNA",
+    "destination": "SJC",
+    "flight_number": "WN3344"
+  },
+  "SWA3380": {
+    "origin": "OAK",
+    "destination": "EUG",
+    "flight_number": "WN3380"
+  },
+  "SWA3471": {
+    "origin": "DEN",
+    "destination": "SAN",
+    "flight_number": "WN3471"
+  },
+  "SWA3505": {
+    "origin": "RNO",
+    "destination": "LAS",
+    "flight_number": "WN3505"
+  },
+  "SWA3586": {
+    "origin": "BWI",
+    "destination": "PWM",
+    "flight_number": "WN3586"
+  },
+  "SWA3686": {
+    "origin": "PHX",
+    "destination": "CMH",
+    "flight_number": "WN3686"
+  },
+  "SWA3696": {
+    "origin": "LAX",
+    "destination": "SJC",
+    "flight_number": "WN3696"
+  },
+  "SWA3738": {
+    "origin": "LAX",
+    "destination": "OAK",
+    "flight_number": "WN3738"
+  },
+  "SWA3816": {
+    "origin": "LAS",
+    "destination": "AUS",
+    "flight_number": "WN3816"
+  },
+  "SWA3897": {
+    "origin": "DEN",
+    "destination": "ABQ",
+    "flight_number": "WN3897"
+  },
+  "SWA3981": {
+    "origin": "BNA",
+    "destination": "CHS",
+    "flight_number": "WN3981"
+  },
+  "SWA4049": {
+    "origin": "DEN",
+    "destination": "MCO",
+    "flight_number": "WN4049"
+  },
+  "SWA4062": {
+    "origin": "MCI",
+    "destination": "DEN",
+    "flight_number": "WN4062"
+  },
+  "SWA4125": {
+    "origin": "BWI",
+    "destination": "CVG",
+    "flight_number": "WN4125"
+  },
+  "SWA4146": {
+    "origin": "CHS",
+    "destination": "DEN",
+    "flight_number": "WN4146"
+  },
+  "SWA4198": {
+    "origin": "SJC",
+    "destination": "SNA",
+    "flight_number": "WN4198"
+  },
+  "SWA4270": {
+    "origin": "LAS",
+    "destination": "SMF",
+    "flight_number": "WN4270"
+  },
+  "SWA4312": {
+    "origin": "SJC",
+    "destination": "SEA",
+    "flight_number": "WN4312"
+  },
+  "SWA4344": {
+    "origin": "LAS",
+    "destination": "SFO",
+    "flight_number": "WN4344"
+  },
+  "SWA4348": {
+    "origin": "SRQ",
+    "destination": "ATL",
+    "flight_number": "WN4348"
+  },
+  "SWA436": {
+    "origin": "BWI",
+    "destination": "ATL",
+    "flight_number": "WN436"
+  },
+  "SWA4372": {
+    "origin": "PHX",
+    "destination": "SMF",
+    "flight_number": "WN4372"
+  },
+  "SWA4470": {
+    "origin": "DAL",
+    "destination": "SJC",
+    "flight_number": "WN4470"
+  },
+  "SWA4537": {
+    "origin": "ORF",
+    "destination": "DAL",
+    "flight_number": "WN4537"
+  },
+  "SWA4872": {
+    "origin": "BUR",
+    "destination": "PHX",
+    "flight_number": "WN4872"
+  },
+  "SWA4887": {
+    "origin": "RNO",
+    "destination": "SJC",
+    "flight_number": "WN4887"
+  },
+  "SWA5082": {
+    "origin": "STL",
+    "destination": "BWI",
+    "flight_number": "WN5082"
+  },
+  "SWA5090": {
+    "origin": "GSP",
+    "destination": "ATL",
+    "flight_number": "WN5090"
+  },
+  "SWA5183": {
+    "origin": "BNA",
+    "destination": "AUS",
+    "flight_number": "WN5183"
+  },
+  "SWA5384": {
+    "origin": "LAS",
+    "destination": "BNA",
+    "flight_number": "WN5384"
+  },
+  "SWA5393": {
+    "origin": "STL",
+    "destination": "DCA",
+    "flight_number": "WN5393"
+  },
+  "SWA5511": {
+    "origin": "DEN",
+    "destination": "BUR",
+    "flight_number": "WN5511"
+  },
+  "SWA5546": {
+    "origin": "SJC",
+    "destination": "BUR",
+    "flight_number": "WN5546"
+  },
+  "SWA5617": {
+    "origin": "CVG",
+    "destination": "BWI",
+    "flight_number": "WN5617"
+  },
+  "SWA5630": {
+    "origin": "PHX",
+    "destination": "ATL",
+    "flight_number": "WN5630"
+  },
+  "SWA5729": {
+    "origin": "DAL",
+    "destination": "PHX",
+    "flight_number": "WN5729"
+  },
+  "SWA5993": {
+    "origin": "CMH",
+    "destination": "MDW",
+    "flight_number": "WN5993"
+  },
+  "SWA6113": {
+    "origin": "RIC",
+    "destination": "BNA",
+    "flight_number": "WN6113"
+  },
+  "SWA6139": {
+    "origin": "BWI",
+    "destination": "MDW",
+    "flight_number": "WN6139"
+  },
+  "SWA6141": {
+    "origin": "DCA",
+    "destination": "MDW",
+    "flight_number": "WN6141"
+  },
+  "SWA6160": {
+    "origin": "MIA",
+    "destination": "MDW",
+    "flight_number": "WN6160"
+  },
+  "SWA6193": {
+    "origin": "DAL",
+    "destination": "DEN",
+    "flight_number": "WN6193"
+  },
+  "SWA6357": {
+    "origin": "BWI",
+    "destination": "PVD",
+    "flight_number": "WN6357"
+  },
+  "SWA6364": {
+    "origin": "SNA",
+    "destination": "SMF",
+    "flight_number": "WN6364"
+  },
+  "SWA6380": {
+    "origin": "SBA",
+    "destination": "DEN",
+    "flight_number": "WN6380"
+  },
+  "SWA647": {
+    "origin": "LAX",
+    "destination": "OAK",
+    "flight_number": "WN647"
+  },
+  "SWA663": {
+    "origin": "MDW",
+    "destination": "OMA",
+    "flight_number": "WN663"
+  },
+  "SWA681": {
+    "origin": "SAN",
+    "destination": "SJC",
+    "flight_number": "WN681"
+  },
+  "SWA8618": {
+    "origin": "BWI",
+    "destination": "IAD",
+    "flight_number": "WN8618"
+  },
+  "SWA888": {
+    "origin": "ATL",
+    "destination": "MSY",
+    "flight_number": "WN888"
+  },
+  "SWA957": {
+    "origin": "OAK",
+    "destination": "PDX",
+    "flight_number": "WN957"
+  },
+  "SWA985": {
+    "origin": "DAL",
+    "destination": "SJC",
+    "flight_number": "WN985"
+  },
+  "SWQ597": {
+    "origin": "CVG",
+    "destination": "SLC",
+    "flight_number": "Q7597"
+  },
+  "THY6012": {
+    "origin": "BOM",
+    "destination": "HKG",
+    "flight_number": "TK6012"
+  },
+  "THY6557": {
+    "origin": "IST",
+    "destination": "ORD",
+    "flight_number": "TK6557"
+  },
+  "TNO303": {
+    "origin": "LAX",
+    "destination": "MEX",
+    "flight_number": "303"
+  },
+  "TSU1016": {
+    "origin": "SDF",
+    "destination": "TVF",
+    "flight_number": "1016"
+  },
+  "UAE213": {
+    "origin": "DXB",
+    "destination": "MIA",
+    "flight_number": "EK213"
+  },
+  "UAE231": {
+    "origin": "DXB",
+    "destination": "IAD",
+    "flight_number": "EK231"
+  },
+  "UAL1040": {
+    "origin": "EWR",
+    "destination": "AUA",
+    "flight_number": "UA1040"
+  },
+  "UAL1061": {
+    "origin": "SEA",
+    "destination": "SFO",
+    "flight_number": "UA1061"
+  },
+  "UAL1071": {
+    "origin": "EWR",
+    "destination": "ORD",
+    "flight_number": "UA1071"
+  },
+  "UAL1140": {
+    "origin": "LAX",
+    "destination": "IAD",
+    "flight_number": "UA1140"
+  },
+  "UAL1145": {
+    "origin": "SFO",
+    "destination": "CUN",
+    "flight_number": "UA1145"
+  },
+  "UAL1216": {
+    "origin": "EWR",
+    "destination": "ATL",
+    "flight_number": "UA1216"
+  },
+  "UAL1411": {
+    "origin": "SFO",
+    "destination": "EWR",
+    "flight_number": "UA1411"
+  },
+  "UAL1430": {
+    "origin": "OGG",
+    "destination": "DEN",
+    "flight_number": "UA1430"
+  },
+  "UAL1461": {
+    "origin": "EWR",
+    "destination": "SEA",
+    "flight_number": "UA1461"
+  },
+  "UAL148": {
+    "origin": "GRU",
+    "destination": "EWR",
+    "flight_number": "UA148"
+  },
+  "UAL1685": {
+    "origin": "LIH",
+    "destination": "DEN",
+    "flight_number": "UA1685"
+  },
+  "UAL1695": {
+    "origin": "EWR",
+    "destination": "MCO",
+    "flight_number": "UA1695"
+  },
+  "UAL1699": {
+    "origin": "SLC",
+    "destination": "SFO",
+    "flight_number": "UA1699"
+  },
+  "UAL1701": {
+    "origin": "PHX",
+    "destination": "EWR",
+    "flight_number": "UA1701"
+  },
+  "UAL1707": {
+    "origin": "SXM",
+    "destination": "ORD",
+    "flight_number": "UA1707"
+  },
+  "UAL1731": {
+    "origin": "KOA",
+    "destination": "DEN",
+    "flight_number": "UA1731"
+  },
+  "UAL1814": {
+    "origin": "EWR",
+    "destination": "DFW",
+    "flight_number": "UA1814"
+  },
+  "UAL1859": {
+    "origin": "IAD",
+    "destination": "BTV",
+    "flight_number": "UA1859"
+  },
+  "UAL1949": {
+    "origin": "ORD",
+    "destination": "DCA",
+    "flight_number": "UA1949"
+  },
+  "UAL1959": {
+    "origin": "ANC",
+    "destination": "DEN",
+    "flight_number": "UA1959"
+  },
+  "UAL2006": {
+    "origin": "ORD",
+    "destination": "GUA",
+    "flight_number": "UA2006"
+  },
+  "UAL2133": {
+    "origin": "EWR",
+    "destination": "RSW",
+    "flight_number": "UA2133"
+  },
+  "UAL215": {
+    "origin": "IAD",
+    "destination": "SFO",
+    "flight_number": "UA215"
+  },
+  "UAL2185": {
+    "origin": "MSY",
+    "destination": "SFO",
+    "flight_number": "UA2185"
+  },
+  "UAL2277": {
+    "origin": "ORD",
+    "destination": "SAT",
+    "flight_number": "UA2277"
+  },
+  "UAL235": {
+    "origin": "IAH",
+    "destination": "LGA",
+    "flight_number": "UA235"
+  },
+  "UAL2387": {
+    "origin": "MCO",
+    "destination": "EWR",
+    "flight_number": "UA2387"
+  },
+  "UAL2388": {
+    "origin": "LAS",
+    "destination": "EWR",
+    "flight_number": "UA2388"
+  },
+  "UAL2402": {
+    "origin": "LAX",
+    "destination": "BOS",
+    "flight_number": "UA2402"
+  },
+  "UAL2409": {
+    "origin": "PHL",
+    "destination": "ORD",
+    "flight_number": "UA2409"
+  },
+  "UAL2423": {
+    "origin": "YVR",
+    "destination": "SFO",
+    "flight_number": "UA2423"
+  },
+  "UAL244": {
+    "origin": "PVR",
+    "destination": "LAX",
+    "flight_number": "UA244"
+  },
+  "UAL250": {
+    "origin": "BOS",
+    "destination": "IAH",
+    "flight_number": "UA250"
+  },
+  "UAL252": {
+    "origin": "HNL",
+    "destination": "IAH",
+    "flight_number": "UA252"
+  },
+  "UAL2653": {
+    "origin": "RSW",
+    "destination": "EWR",
+    "flight_number": "UA2653"
+  },
+  "UAL287": {
+    "origin": "EWR",
+    "destination": "BOS",
+    "flight_number": "UA287"
+  },
+  "UAL292": {
+    "origin": "EWR",
+    "destination": "SEA",
+    "flight_number": "UA292"
+  },
+  "UAL342": {
+    "origin": "CLE",
+    "destination": "IAH",
+    "flight_number": "UA342"
+  },
+  "UAL362": {
+    "origin": "HNL",
+    "destination": "EWR",
+    "flight_number": "UA362"
+  },
+  "UAL383": {
+    "origin": "HNL",
+    "destination": "DEN",
+    "flight_number": "UA383"
+  },
+  "UAL391": {
+    "origin": "BOS",
+    "destination": "EWR",
+    "flight_number": "UA391"
+  },
+  "UAL415": {
+    "origin": "DEN",
+    "destination": "LGA",
+    "flight_number": "UA415"
+  },
+  "UAL444": {
+    "origin": "BNA",
+    "destination": "IAD",
+    "flight_number": "UA444"
+  },
+  "UAL445": {
+    "origin": "CHS",
+    "destination": "EWR",
+    "flight_number": "UA445"
+  },
+  "UAL476": {
+    "origin": "SFO",
+    "destination": "ORD",
+    "flight_number": "UA476"
+  },
+  "UAL492": {
+    "origin": "EWR",
+    "destination": "IAH",
+    "flight_number": "UA492"
+  },
+  "UAL505": {
+    "origin": "SFO",
+    "destination": "IAH",
+    "flight_number": "UA505"
+  },
+  "UAL519": {
+    "origin": "DEN",
+    "destination": "SFO",
+    "flight_number": "UA519"
+  },
+  "UAL537": {
+    "origin": "IAH",
+    "destination": "YYC",
+    "flight_number": "UA537"
+  },
+  "UAL63": {
+    "origin": "GRU",
+    "destination": "IAH",
+    "flight_number": "UA63"
+  },
+  "UAL645": {
+    "origin": "LAX",
+    "destination": "EWR",
+    "flight_number": "UA645"
+  },
+  "UAL748": {
+    "origin": "PHL",
+    "destination": "ORD",
+    "flight_number": "UA748"
+  },
+  "UAL761": {
+    "origin": "MUC",
+    "destination": "DEN",
+    "flight_number": "UA761"
+  },
+  "UAL846": {
+    "origin": "SCL",
+    "destination": "IAH",
+    "flight_number": "UA846"
+  },
+  "UAL955": {
+    "origin": "TLV",
+    "destination": "SFO",
+    "flight_number": "UA955"
+  },
+  "UPS1038": {
+    "origin": "BDL",
+    "destination": "PVD",
+    "flight_number": "5X1038"
+  },
+  "UPS104": {
+    "origin": "RFD",
+    "destination": "KIX",
+    "flight_number": "5X104"
+  },
+  "UPS1122": {
+    "origin": "BDL",
+    "destination": "ALB",
+    "flight_number": "5X1122"
+  },
+  "UPS1234": {
+    "origin": "PHL",
+    "destination": "ORF",
+    "flight_number": "5X1234"
+  },
+  "UPS1326": {
+    "origin": "SDF",
+    "destination": "MCO",
+    "flight_number": "5X1326"
+  },
+  "UPS1366": {
+    "origin": "ABY",
+    "destination": "PNS",
+    "flight_number": "5X1366"
+  },
+  "UPS2047": {
+    "origin": "MHT",
+    "destination": "SDF",
+    "flight_number": "5X2047"
+  },
+  "UPS213": {
+    "origin": "SDF",
+    "destination": "CGN",
+    "flight_number": "5X213"
+  },
+  "UPS219": {
+    "origin": "PHL",
+    "destination": "CDG",
+    "flight_number": "5X219"
+  },
+  "UPS300": {
+    "origin": "SDF",
+    "destination": "AUS",
+    "flight_number": "5X300"
+  },
+  "UPS312": {
+    "origin": "SAT",
+    "destination": "GDL",
+    "flight_number": "5X312"
+  },
+  "UPS32": {
+    "origin": "SDF",
+    "destination": "HNL",
+    "flight_number": "5X32"
+  },
+  "UPS320": {
+    "origin": "SDF",
+    "destination": "MEX",
+    "flight_number": "5X320"
+  },
+  "UPS441": {
+    "origin": "BOG",
+    "destination": "MIA",
+    "flight_number": "5X441"
+  },
+  "UPS490": {
+    "origin": "SDF",
+    "destination": "YVR",
+    "flight_number": "5X490"
+  },
+  "UPS514": {
+    "origin": "CID",
+    "destination": "DSM",
+    "flight_number": "5X514"
+  },
+  "UPS56": {
+    "origin": "SDF",
+    "destination": "ANC",
+    "flight_number": "5X56"
+  },
+  "UPS61": {
+    "origin": "TPE",
+    "destination": "ANC",
+    "flight_number": "5X61"
+  },
+  "UPS64": {
+    "origin": "SDF",
+    "destination": "ANC",
+    "flight_number": "5X64"
+  },
+  "UPS712": {
+    "origin": "SDF",
+    "destination": "LIT",
+    "flight_number": "5X712"
+  },
+  "UPS76": {
+    "origin": "SDF",
+    "destination": "DWC",
+    "flight_number": "5X76"
+  },
+  "UPS796": {
+    "origin": "SDF",
+    "destination": "MEM",
+    "flight_number": "5X796"
+  },
+  "UPS798": {
+    "origin": "SDF",
+    "destination": "LIT",
+    "flight_number": "5X798"
+  },
+  "UPS836": {
+    "origin": "SDF",
+    "destination": "BOI",
+    "flight_number": "5X836"
+  },
+  "UPS844": {
+    "origin": "SDF",
+    "destination": "SLC",
+    "flight_number": "5X844"
+  },
+  "UPS858": {
+    "origin": "SDF",
+    "destination": "PHX",
+    "flight_number": "5X858"
+  },
+  "UPS860": {
+    "origin": "SDF",
+    "destination": "PHX",
+    "flight_number": "5X860"
+  },
+  "UPS888": {
+    "origin": "ONT",
+    "destination": "ABQ",
+    "flight_number": "5X888"
+  },
+  "UPS892": {
+    "origin": "SDF",
+    "destination": "LAS",
+    "flight_number": "5X892"
+  },
+  "UPS896": {
+    "origin": "SDF",
+    "destination": "RNO",
+    "flight_number": "5X896"
+  },
+  "UPS904": {
+    "origin": "SDF",
+    "destination": "LAX",
+    "flight_number": "5X904"
+  },
+  "UPS914": {
+    "origin": "SDF",
+    "destination": "BUR",
+    "flight_number": "5X914"
+  },
+  "UPS918": {
+    "origin": "SDF",
+    "destination": "DEN",
+    "flight_number": "5X918"
+  },
+  "UPS920": {
+    "origin": "SDF",
+    "destination": "ONT",
+    "flight_number": "5X920"
+  },
+  "UPS922": {
+    "origin": "SDF",
+    "destination": "SAN",
+    "flight_number": "5X922"
+  },
+  "UPS928": {
+    "origin": "RFD",
+    "destination": "LAX",
+    "flight_number": "5X928"
+  },
+  "UPS938": {
+    "origin": "ONT",
+    "destination": "FAT",
+    "flight_number": "5X938"
+  },
+  "UPS946": {
+    "origin": "SDF",
+    "destination": "OAK",
+    "flight_number": "5X946"
+  },
+  "UPS948": {
+    "origin": "SDF",
+    "destination": "DEN",
+    "flight_number": "5X948"
+  },
+  "UPS950": {
+    "origin": "SDF",
+    "destination": "OAK",
+    "flight_number": "5X950"
+  },
+  "UPS952": {
+    "origin": "SLC",
+    "destination": "SJC",
+    "flight_number": "5X952"
+  },
+  "UPS956": {
+    "origin": "SDF",
+    "destination": "OAK",
+    "flight_number": "5X956"
+  },
+  "UPS960": {
+    "origin": "SDF",
+    "destination": "MHR",
+    "flight_number": "5X960"
+  },
+  "UPS970": {
+    "origin": "RFD",
+    "destination": "PDX",
+    "flight_number": "5X970"
+  },
+  "UPS972": {
+    "origin": "ONT",
+    "destination": "PDX",
+    "flight_number": "5X972"
+  },
+  "UPS974": {
+    "origin": "SDF",
+    "destination": "PDX",
+    "flight_number": "5X974"
+  },
+  "UPS9748": {
+    "origin": "FAT",
+    "destination": "SNA",
+    "flight_number": "5X9748"
+  },
+  "UPS9784": {
+    "origin": "BHM",
+    "destination": "SDF",
+    "flight_number": "5X9784"
+  },
+  "UPS9809": {
+    "origin": "OAK",
+    "destination": "SDF",
+    "flight_number": "5X9809"
+  },
+  "UPS982": {
+    "origin": "SDF",
+    "destination": "BFI",
+    "flight_number": "5X982"
+  },
+  "UPS9823": {
+    "origin": "OMA",
+    "destination": "GYY",
+    "flight_number": "5X9823"
+  },
+  "UPS984": {
+    "origin": "ONT",
+    "destination": "GEG",
+    "flight_number": "5X984"
+  },
+  "UPS9872": {
+    "origin": "EWR",
+    "destination": "PHL",
+    "flight_number": "5X9872"
+  },
+  "UPS988": {
+    "origin": "RFD",
+    "destination": "BFI",
+    "flight_number": "5X988"
+  },
+  "UPS992": {
+    "origin": "SDF",
+    "destination": "PDX",
+    "flight_number": "5X992"
+  },
+  "UPS994": {
+    "origin": "ONT",
+    "destination": "GEG",
+    "flight_number": "5X994"
+  },
+  "VN09M": {
+    "origin": "YWG",
+    "destination": "YWG",
+    "flight_number": "VN09M"
+  },
+  "VOC4083": {
+    "origin": "IAD",
+    "destination": "SAL",
+    "flight_number": "4083"
+  },
+  "VOI253": {
+    "origin": "SMF",
+    "destination": "BJX",
+    "flight_number": "Y4253"
+  },
+  "VOI5470": {
+    "origin": "CUN",
+    "destination": "TIJ",
+    "flight_number": "Y45470"
+  },
+  "VOI951": {
+    "origin": "FAT",
+    "destination": "GDL",
+    "flight_number": "Y4951"
+  },
+  "VTM356": {
+    "origin": "SDF",
+    "destination": "LRD",
+    "flight_number": "VTM356"
+  },
+  "VTM404": null,
+  "WCP249": null,
+  "WEN3218": {
+    "origin": "YQT",
+    "destination": "YYZ",
+    "flight_number": "3218"
+  },
+  "WEN3427": {
+    "origin": "YXS",
+    "destination": "YVR",
+    "flight_number": "3427"
+  },
+  "WEN3504": {
+    "origin": "YXU",
+    "destination": "YYZ",
+    "flight_number": "3504"
+  },
+  "WIG1361": null,
+  "WIG587": null,
+  "WJA243": {
+    "origin": "YHZ",
+    "destination": "YYZ",
+    "flight_number": "WS243"
+  },
+  "WJA329": {
+    "origin": "YYT",
+    "destination": "YYZ",
+    "flight_number": "WS329"
+  },
+  "WJA375": {
+    "origin": "YOW",
+    "destination": "YYZ",
+    "flight_number": "WS375"
+  },
+  "WJA520": {
+    "origin": "YWG",
+    "destination": "YYZ",
+    "flight_number": "WS520"
+  },
+  "WJA611": {
+    "origin": "YOW",
+    "destination": "YYC",
+    "flight_number": "WS611"
+  },
+  "WJA615": {
+    "origin": "YOW",
+    "destination": "YVR",
+    "flight_number": "WS615"
+  },
+  "WJA653": {
+    "origin": "YYZ",
+    "destination": "YYC",
+    "flight_number": "WS653"
+  },
+  "WST703": {
+    "origin": "FPO",
+    "destination": "NAS",
+    "flight_number": "703"
+  },
+  "WSW105": {
+    "origin": "YHM",
+    "destination": "YEG",
+    "flight_number": "105"
+  },
+  "XOJ549": null,
+  "YZR7453": {
+    "origin": "ANC",
+    "destination": "ORD",
+    "flight_number": "Y87453"
+  }
+}
