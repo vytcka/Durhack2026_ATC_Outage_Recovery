@@ -1,19 +1,8 @@
 import { useMemo } from 'react';
-import { useNow } from './useNow.js';
 
 // Collapsible stats panel shown under the title.
-//
-// Everything here is placeholder data until the simulation is wired in:
-//  - simulated time starts at `startedAt` and runs `speed` times faster than real time,
-//  - airborne / disruption values come straight from props.
-export default function AnalyticsPanel({ open, timeZone, startedAt, speed, airborne, disruptionIndex }) {
-  const realNow = useNow();
-
-  // Scale the real time passed since start, then add it back onto the start time.
-  // With speed = 60, every real second moves the simulated clock forward one minute.
-  const elapsed = (realNow - startedAt) * speed;
-  const simNow = new Date(startedAt + elapsed);
-
+// The disruption index is still a placeholder passed in from the parent.
+export default function AnalyticsPanel({ open, timeZone, simTime, elapsed, airborne, disruptionIndex, onReset }) {
   const clockFormat = useMemo(
     () =>
       new Intl.DateTimeFormat('en-US', {
@@ -26,7 +15,7 @@ export default function AnalyticsPanel({ open, timeZone, startedAt, speed, airbo
     [timeZone]
   );
 
-  const clock = formatClock(clockFormat, simNow);
+  const clock = formatClock(clockFormat, simTime);
 
   return (
     <div className={open ? 'analytics-drawer open' : 'analytics-drawer'} aria-hidden={!open}>
@@ -54,6 +43,10 @@ export default function AnalyticsPanel({ open, timeZone, startedAt, speed, airbo
             <dd className="mono">{disruptionIndex.toFixed(2)}</dd>
           </div>
         </dl>
+
+        <button className="reset-button" onClick={onReset}>
+          Reset simulation
+        </button>
       </section>
     </div>
   );
@@ -70,13 +63,12 @@ function formatClock(format, date) {
   };
 }
 
-// 3_725_000 ms -> "01h 02m 05s"
+// 3_725_000 ms -> "01h 02m"
 function formatElapsed(ms) {
-  const totalSeconds = Math.max(0, Math.floor(ms / 1000));
-  const hours = Math.floor(totalSeconds / 3600);
-  const minutes = Math.floor((totalSeconds % 3600) / 60);
-  const seconds = totalSeconds % 60;
+  const totalMinutes = Math.max(0, Math.floor(ms / 60_000));
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
   const pad = (n) => String(n).padStart(2, '0');
 
-  return `${pad(hours)}h ${pad(minutes)}m ${pad(seconds)}s`;
+  return `${pad(hours)}h ${pad(minutes)}m`;
 }

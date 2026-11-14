@@ -115,3 +115,5 @@ export const AIRPORTS = [
   { iata: 'SMF', name: 'Sacramento Intl',                   city: 'Sacramento, CA',        lat: 38.6954, lon: -121.5908, label: 'e' },
   { iata: 'FAT', name: 'Fresno Yosemite Intl',              city: 'Fresno, CA',            lat: 36.7762, lon: -119.7181, label: 'e' },
 ];
+
+export const AIRPORT_BY_IATA = Object.fromEntries(AIRPORTS.map((airport) => [airport.iata, airport]));
