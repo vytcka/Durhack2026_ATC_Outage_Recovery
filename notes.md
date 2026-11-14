@@ -81,3 +81,52 @@ class Result(){
 # Save/replay failures, sample nearby parameters, compare across seeds.
 # Scenario / World / Action are placeholders for later detail, not implementations.
 # Simplified local model: sampled success does not prove safety.
+
+
+distance = sqrt((x2 - x1)^2 + (y2 - y1)^2)
+
+
+seed 010101010
+noise += 50&
+communication stability
+communication 
+rate of blackouts.
+
+the goal is to create a systeamtic approach towrads mitigating a certain blackout within 
+the atf surfaces..
+
+
+const radius = 6371
+model those interactions with a gui...
+class world(){
+    def  _init_(
+        #in km
+        radius= 6371
+
+        
+    )
+}
+
+2^16
+
+
+real world scenerios and apply our protocols...
+
+
+different protocols to check the best protocol to have highest autonomy that can be reflected and used in real airliners.
+
+if blackout...
+continue to recover?
+
+
+run loops?
+
+go back? 
+
+land in nearest landing strip?
+
+30 different ?
+corrupted signal..
+
+
+how does a protocol fail (a.k.a ) conditions of failure.
