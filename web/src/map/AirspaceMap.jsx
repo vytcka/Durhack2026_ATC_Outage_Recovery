@@ -62,7 +62,7 @@ export default function AirspaceMap() {
 
       <header className="panel title">
         <h1>US Airspace</h1>
-        <p>30 busiest airports · contiguous United States</p>
+        <p>{AIRPORTS.length} airports · all 48 contiguous states</p>
       </header>
 
       <div className="zoom-buttons">
@@ -74,7 +74,7 @@ export default function AirspaceMap() {
       {selected && (
         <div className="panel info">
           <div className="info-code">
-            {selected.iata} <span>#{selected.rank}</span>
+            {selected.iata} {selected.rank && <span>#{selected.rank}</span>}
           </div>
           <div>{selected.name}</div>
           <div className="muted">{selected.city}</div>
