@@ -10,6 +10,9 @@
   --muted: #7d93b3;
   --panel: rgba(13, 22, 38, 0.86);
   --panel-border: #24364f;
+  --aircraft: #facc15;
+  --panpan: #f97316;
+  --mayday: #ef4444;
   --mono: ui-monospace, Consolas, monospace;
 }
 
@@ -54,6 +57,23 @@ body {
 .airport:hover .code,
 .airport.selected .code { fill: var(--accent); }
 
+/* ---------- Aircraft ---------- */
+.route-selected { fill: none; stroke: var(--accent); stroke-width: 1.125; opacity: 0.9; }
+
+.aircraft { cursor: pointer; }
+.aircraft-icon { fill: var(--aircraft); transition: filter 0.15s; }
+.aircraft:hover .aircraft-icon,
+.aircraft.selected .aircraft-icon { filter: drop-shadow(0 0 4px var(--accent)) brightness(1.15); }
+
+.aircraft-label {
+  fill: var(--text);
+  font: 700 11px var(--mono);
+  paint-order: stroke;
+  stroke: var(--bg);
+  stroke-width: 3px;
+  stroke-linejoin: round;
+}
+
 /* ---------- Overlays ---------- */
 .panel {
   position: absolute;
@@ -65,11 +85,54 @@ body {
 .muted { color: var(--muted); }
 .mono  { font-family: var(--mono); }
 
-.title { top: 16px; left: 16px; padding: 10px 14px; }
+/* Left column: title + collapsible analytics, both the same width. */
+.sidebar {
+  position: absolute; top: 16px; left: 16px; width: 270px;
+  display: flex; flex-direction: column; gap: 8px;
+}
+.sidebar .panel { position: relative; }
+
+.title { padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
 .title h1 { margin: 0; font-size: 16px; }
 .title p  { margin: 2px 0 0; font-size: 12px; color: var(--muted); }
 
-.zoom-buttons { position: absolute; top: 84px; left: 16px; display: flex; flex-direction: column; gap: 4px; }
+.drawer-toggle {
+  width: 26px; height: 26px; flex-shrink: 0;
+  border: 1px solid var(--panel-border); border-radius: 6px;
+  background: transparent; color: var(--muted);
+  font-size: 14px; line-height: 1; cursor: pointer;
+  transform: rotate(-90deg);
+  transition: transform 0.2s, color 0.15s, border-color 0.15s;
+}
+.drawer-toggle.open { transform: rotate(0deg); }
+.drawer-toggle:hover { border-color: var(--accent); color: var(--accent); }
+
+/*
+ * Animating to/from `height: auto` isn't possible directly, so the drawer is a one-row grid
+ * whose row goes 0fr -> 1fr. The child needs `min-height: 0` + `overflow: hidden` to shrink.
+ */
+.analytics-drawer {
+  display: grid; grid-template-rows: 0fr;
+  opacity: 0; visibility: hidden;
+  transition: grid-template-rows 0.25s ease, opacity 0.2s, visibility 0.25s;
+}
+.analytics-drawer.open { grid-template-rows: 1fr; opacity: 1; visibility: visible; }
+.analytics { min-height: 0; overflow: hidden; }
+
+.stats { margin: 0; padding: 12px 14px; display: flex; flex-direction: column; gap: 10px; }
+.stat dt { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+.stat dd { margin: 2px 0 0; font-size: 18px; font-weight: 700; }
+.stat dd .muted { font-size: 12px; font-weight: 400; }
+
+.reset-button {
+  display: block; width: calc(100% - 28px); margin: 0 14px 12px; padding: 7px 0;
+  border: 1px solid var(--panel-border); border-radius: 6px;
+  background: transparent; color: var(--text);
+  font-size: 12px; letter-spacing: 0.04em; cursor: pointer;
+}
+.reset-button:hover { border-color: var(--accent); color: var(--accent); }
+
+.zoom-buttons { position: absolute; top: 16px; right: 16px; display: flex; flex-direction: column; gap: 4px; }
 .zoom-buttons button {
   width: 34px; height: 34px;
   border: 1px solid var(--panel-border); border-radius: 6px;
@@ -81,6 +144,21 @@ body {
 .info { left: 16px; bottom: 60px; padding: 12px 14px; min-width: 240px; font-size: 13px; line-height: 1.5; }
 .info-code { font: 700 20px var(--mono); color: var(--accent); }
 .info-code span { font-size: 12px; color: var(--muted); font-weight: 400; }
+.info-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+
+.info-grid { display: grid; grid-template-columns: auto 1fr; gap: 2px 14px; margin: 8px 0 0; font-size: 12px; }
+.info-grid dt { color: var(--muted); }
+.info-grid dd { margin: 0; }
+
+.status-badge {
+  padding: 2px 8px; border-radius: 4px;
+  font: 700 11px var(--mono); letter-spacing: 0.05em;
+  color: var(--bg); background: #22c55e;
+}
+.status-badge.status-panpan { background: var(--panpan); }
+.status-badge.status-mayday { background: var(--mayday); color: #fff; }
+
+.error { color: var(--mayday); }
 
 .status {
   left: 16px; right: 16px; bottom: 16px; height: 34px; padding: 0 14px;
