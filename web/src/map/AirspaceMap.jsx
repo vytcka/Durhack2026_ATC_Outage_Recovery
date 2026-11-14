@@ -11,12 +11,13 @@ import AirportMarker from './AirportMarker.jsx';
 import Aircraft from './Aircraft.jsx';
 import AircraftInfo from './AircraftInfo.jsx';
 import AnalyticsPanel from './AnalyticsPanel.jsx';
+import SimulationControls from './SimulationControls.jsx';
 
 const MAX_ZOOM = 60;
 const SHOW_NAMES_AT_ZOOM = 6;
 const SHOW_AIRCRAFT_LABELS_AT_ZOOM = 3;
 const FOCUS_ZOOM = 14;
-const SIM_SPEED = 60; // simulated seconds per real second (1 real second = 1 simulated minute)
+const SIM_SPEED = 60; // simulated seconds per real second at ×1 (1 real second = 1 simulated minute)
 
 export default function AirspaceMap() {
   const svgRef = useRef(null);
@@ -140,6 +141,13 @@ export default function AirspaceMap() {
           onReset={clock.reset}
         />
       </aside>
+
+      <SimulationControls
+        multiplier={clock.multiplier}
+        paused={clock.paused}
+        onMultiplierChange={clock.setMultiplier}
+        onTogglePause={clock.togglePause}
+      />
 
       <div className="zoom-buttons">
         <button onClick={zoomIn} aria-label="Zoom in">+</button>

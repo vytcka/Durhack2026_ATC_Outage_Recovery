@@ -132,6 +132,38 @@ body {
 }
 .reset-button:hover { border-color: var(--accent); color: var(--accent); }
 
+/* ---------- Simulation controls (top centre) ---------- */
+.sim-controls {
+  top: 16px; left: 50%; transform: translateX(-50%);
+  display: flex; align-items: center; gap: 14px;
+  padding: 8px 14px;
+}
+
+.play-pause {
+  width: 34px; height: 34px; flex-shrink: 0;
+  border: 1px solid var(--panel-border); border-radius: 50%;
+  background: transparent; cursor: pointer;
+  display: grid; place-items: center; padding: 0;
+}
+.play-pause img { width: 16px; height: 16px; }
+.play-pause:hover { border-color: var(--accent); }
+
+.speed-slider { width: 180px; }
+.speed-slider input {
+  width: 100%; margin: 0;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+/* Labels sit under the slider stops; the side padding roughly matches half the thumb width. */
+.speed-labels { display: flex; justify-content: space-between; padding: 0 2px; }
+.speed-labels button {
+  padding: 0; border: none; background: none;
+  font: 11px var(--mono); color: var(--muted); cursor: pointer;
+}
+.speed-labels button:hover,
+.speed-labels button.active { color: var(--accent); }
+
 .zoom-buttons { position: absolute; top: 16px; right: 16px; display: flex; flex-direction: column; gap: 4px; }
 .zoom-buttons button {
   width: 34px; height: 34px;

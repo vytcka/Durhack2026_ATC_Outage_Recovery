@@ -1,23 +1,48 @@
 import { useState } from 'react';
 import { useNow } from './useNow.js';
 
-// Simulated clock that runs `speed` times faster than real time and can be restarted.
+// Simulated clock that runs `baseSpeed × multiplier` times faster than real time and can be
+// paused, sped up and restarted.
 //
-// Returns:
-//  - elapsed: simulated milliseconds since the (last) start
-//  - simTime: the simulated current time as a Date
-//  - reset:   restarts the simulation from "now"
-export function useSimulationClock(speed, tickMs = 1) {
-  const [startedAt, setStartedAt] = useState(() => Date.now());
+// Because the speed can change mid-run, elapsed time can't just be (now - start) × speed.
+// Instead the clock keeps:
+//  - banked:       simulated ms accumulated before the current speed/pause setting
+//  - segmentStart: real time when the current setting began
+// Every change first "banks" the time run so far, then starts a new segment.
+//
+// Returns elapsed (simulated ms), simTime (Date), the current multiplier/paused state and controls.
+export function useSimulationClock(baseSpeed, tickMs = 1) {
+  const [clock, setClock] = useState(() => {
+    const now = Date.now();
+    return { startedAt: now, segmentStart: now, banked: 0, multiplier: 1, paused: false };
+  });
   const now = useNow(tickMs);
 
-  // Right after a reset `now` can still hold the previous tick (older than startedAt),
-  // so clamp to 0 instead of showing a negative time for one frame.
-  const elapsed = Math.max(0, (now - startedAt) * speed);
+  const elapsedAt = (state, time) => {
+    if (state.paused) return state.banked;
+    // Right after a change `now` can still be the previous tick (older than segmentStart),
+    // so clamp instead of going backwards for one frame.
+    return state.banked + Math.max(0, time - state.segmentStart) * baseSpeed * state.multiplier;
+  };
+
+  const update = (changes) =>
+    setClock((state) => {
+      const time = Date.now();
+      return { ...state, banked: elapsedAt(state, time), segmentStart: time, ...changes };
+    });
+
+  const elapsed = elapsedAt(clock, now);
 
   return {
     elapsed,
-    simTime: new Date(startedAt + elapsed),
-    reset: () => setStartedAt(Date.now()),
+    simTime: new Date(clock.startedAt + elapsed),
+    multiplier: clock.multiplier,
+    paused: clock.paused,
+    setMultiplier: (multiplier) => update({ multiplier }),
+    togglePause: () => update({ paused: !clock.paused }),
+    reset: () => {
+      const time = Date.now();
+      setClock((state) => ({ ...state, startedAt: time, segmentStart: time, banked: 0 }));
+    },
   };
 }
