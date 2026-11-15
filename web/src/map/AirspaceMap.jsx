@@ -41,7 +41,7 @@ export default function AirspaceMap() {
   const clock = useSimulationClock(SIM_SPEED, 100);
   const { flights: loadedFlights, error: aircraftError } = useAircraft();
   const [settings, setSettings] = useState({ aircraftLimit: 100, outage: false, packetLoss: 0, delaySeconds: 0, travelSpeedPercent: 100,
-    diversionPolicy: 'LANDNEARESTAIRPORT' });
+    diversionPolicy: 'LANDNEARESTAIRPORT', aircraftRangeNm: 100, towerRangeNm: 100 });
   const [scenarioEvents, setScenarioEvents] = useState([]);
   const aircraftEventCounter = useRef(0);
   const flights = useMemo(() => loadedFlights.slice(0, settings.aircraftLimit)
@@ -49,7 +49,8 @@ export default function AirspaceMap() {
   const options = useMemo(() => ({
     seed: 42,
     airports: SIM_AIRPORTS,
-    radio: true, // 100 nm aircraft / 150 nm tower coverage, see simulation/radio.js
+    // Radio coverage in nautical miles, set from the analytics panel. See simulation/radio.js.
+    radio: { aircraftRangeNm: settings.aircraftRangeNm, towerRangeNm: settings.towerRangeNm },
     rulebook: `DESTCLOSED: ${settings.diversionPolicy}`,
     disruptions: [
       ...(settings.outage ? [{ factor: 'ATC_LINK_OUTAGE', startMs: 0, endMs: 30 * 60_000 }] : []),

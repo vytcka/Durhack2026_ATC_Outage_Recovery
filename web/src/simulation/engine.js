@@ -6,7 +6,7 @@ import { SIMULATION_MS, flightTiming } from './timing.js';
 import { transportEffects } from './transport.js';
 import { nodeEffects } from './nodeEffects.js';
 import { aircraftPosition, diversionFraction } from './navigation.js';
-import { AIRCRAFT_RANGE_NM, buildRadioNetwork, createTowers, radioHops } from './radio.js';
+import { buildRadioNetwork, createRadio, radioHops } from './radio.js';
 import { parseRulebook } from './rulebook.js';
 
 const RUN_END = SIMULATION_MS - 1;
@@ -24,9 +24,9 @@ export class Simulation {
   #queue = [];
   #events = [];
   #signals = [];
-  // Radio coverage (options.radio). Off by default so abstract tests without coordinates
-  // keep "everyone can reach everyone".
-  #towers = null;
+  // Radio coverage. options.radio is `true` (default ranges) or { aircraftRangeNm, towerRangeNm }.
+  // Off by default so abstract tests without coordinates keep "everyone can reach everyone".
+  #radioSetup = null;
   #radio = null;
   #flights;
   #options;
@@ -111,18 +111,19 @@ export class Simulation {
         || peer.flight.airport_dest === agent.flight.airport_dest)).slice(0, 4).map(peer => peer.id));
 
     if (this.#options.radio) {
-      this.#towers = createTowers([...this.#airportPositions].map(([id, position]) => ({ id, position })));
+      const towers = [...this.#airportPositions].map(([id, position]) => ({ id, position }));
+      this.#radioSetup = createRadio(towers, this.#options.radio === true ? {} : this.#options.radio);
       this.#updateRadio();
     }
   }
 
   // Rebuild who-can-hear-whom from the current aircraft positions (once per step).
   #updateRadio() {
-    if (!this.#towers) return;
+    if (!this.#radioSetup) return;
     const aircraft = [...this.#agents.values()].filter(agent => agent.kind === 'aircraft').map(agent => ({
       id: agent.id, position: aircraftPosition(agent), airborne: AIRBORNE_PHASES.includes(agent.phase),
     }));
-    this.#radio = buildRadioNetwork(aircraft, this.#towers, this.#radio);
+    this.#radio = buildRadioNetwork(aircraft, this.#radioSetup, this.#radio);
   }
 
   // Radio hops for a message, [] for ground-only, null when there is no radio path.
@@ -143,7 +144,7 @@ export class Simulation {
 
   // How far an aircraft looks for peers to report to. With radio on, only planes it can hear.
   #peerRangeKm() {
-    return this.#options.radio ? AIRCRAFT_RANGE_NM * KM_PER_NM : 500;
+    return this.#radioSetup ? this.#radioSetup.aircraftRangeNm * KM_PER_NM : 500;
   }
 
   #outOfRange(message) {

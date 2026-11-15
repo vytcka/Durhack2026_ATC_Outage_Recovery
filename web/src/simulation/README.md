@@ -156,8 +156,11 @@ not an assumption that the other agent has failed. The default timeout is 60 sec
 
 ## Radio coverage (`radio.js`, `options.radio`)
 
-The app runs with `radio: true`. Towers (ATC at every map airport) reach aircraft within
-150 nm; aircraft reach each other within 100 nm; towers are joined by ground lines. Each step,
+`options.radio` is `true` (defaults: towers 150 nm, aircraft 100 nm) or
+`{ aircraftRangeNm, towerRangeNm }`. The app passes the two Scenario-control sliders
+(10–100 nm each, both 100 nm by default). Towers (ATC at every map airport) reach aircraft
+within the tower range; aircraft reach each other within the aircraft range; towers are joined
+by ground lines. The grid cell size follows the range, so shorter ranges search less. Each step,
 every aircraft picks one uplink: its current tower while still in range, else the nearest tower
 in range, else the nearest airborne aircraft that has an uplink (relays chain). Messages to or
 from an aircraft without an uplink are dropped and counted as `noCoverage`, both when sent and
