@@ -1,6 +1,6 @@
-# Agent simulation and disruption scenarios
+# ATC Outage Recovery Sim
 
-This is an experimental coordination model, not an aviation procedure or safety system.
+What happens when the tower goes quiet?
 
 ## Run
 
