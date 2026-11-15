@@ -2,6 +2,7 @@ import { formatDelay, formatSimulationTime } from '../simulation/timing.js';
 import { AIRPORT_BY_IATA } from '../data/airports.js';
 import { FLIGHT_STATUS_BY_ID, flightStatus, isAirborne } from './flightStatus.js';
 import { diversionActionLabel, diversionReason, policyLabel } from './flightText.js';
+import { formatAltitude } from './physics.js';
 
 const INPUT_STATUS_LABELS = { OK: 'OK', PANPAN: 'PAN-PAN', MAYDAY: 'MAYDAY' };
 
@@ -9,7 +10,8 @@ const INPUT_STATUS_LABELS = { OK: 'OK', PANPAN: 'PAN-PAN', MAYDAY: 'MAYDAY' };
 const clockTime = ms => (ms === null || ms === undefined ? '—' : formatSimulationTime(ms).slice(0, 5));
 
 // Compact details card for the selected aircraft: key facts up front, the rest folded away.
-export default function AircraftInfo({ flight, progress, agent, onDisrupt, canDisrupt, diversionPolicy, onClose }) {
+// `physics` is flightPhysics() for this flight: live phase, altitude, speed, vertical rate, fuel.
+export default function AircraftInfo({ flight, progress, agent, physics, onDisrupt, canDisrupt, diversionPolicy, onClose }) {
   const status = flightStatus(agent);
   const statusInfo = FLIGHT_STATUS_BY_ID[status];
   const landed = agent?.phase === 'ARRIVED';
@@ -23,6 +25,8 @@ export default function AircraftInfo({ flight, progress, agent, onDisrupt, canDi
   const action = diverted ? diversionActionLabel(diversion?.action) : null;
   const percent = Math.round(Math.min(1, Math.max(0, progress)) * 100);
   const totalDelayMs = agent?.totalDelayMs ?? 0;
+  const verticalRate = physics?.verticalRate ?? 0;
+  const climbArrow = verticalRate > 50 ? ' ↑' : verticalRate < -50 ? ' ↓' : '';
 
   const badge = awaitingLanding ? `${statusInfo.short} · landing` : statusInfo.short;
 
@@ -75,6 +79,8 @@ export default function AircraftInfo({ flight, progress, agent, onDisrupt, canDi
         <div><dt>Progress</dt><dd>{progressLabel}</dd></div>
         <div><dt>Due</dt><dd data-info="expected-arrival">{clockTime(agent?.expectedArrivalAt)}</dd></div>
         <div><dt>Arrived</dt><dd data-info="actual-arrival">{agent?.arrivedAt == null ? 'Pending' : clockTime(agent.arrivedAt)}</dd></div>
+        <div><dt>Altitude</dt><dd data-info="altitude">{formatAltitude(physics?.altitudeFt ?? 0)}{climbArrow}</dd></div>
+        <div><dt>Speed</dt><dd data-info="ground-speed">{physics?.groundSpeedKt ?? 0} kt</dd></div>
       </dl>
 
       {onDisrupt && (
@@ -91,6 +97,12 @@ export default function AircraftInfo({ flight, progress, agent, onDisrupt, canDi
         <dl className="info-grid mono">
           <dt>Agent state</dt>
           <dd>{agent?.phase.toLowerCase().replaceAll('_', ' ') ?? 'initialising'}</dd>
+
+          <dt>Flight phase</dt>
+          <dd>{physics ? physics.phase.toLowerCase() : 'ground'}</dd>
+
+          <dt>Scheduled dep.</dt>
+          <dd>{flight.departure_time ?? '00:00'} UTC</dd>
 
           <dt>Original dest.</dt>
           <dd data-info="original-airport">{flight.to.iata}{diverted ? ' (abandoned)' : ''}</dd>
@@ -115,6 +127,12 @@ export default function AircraftInfo({ flight, progress, agent, onDisrupt, canDi
           <dt>Arrival wait</dt>
           <dd>{formatDelay(agent?.arrivalDelayMs)}</dd>
 
+          <dt>Vertical rate</dt>
+          <dd>{formatVerticalRate(verticalRate)}</dd>
+
+          <dt>Fuel</dt>
+          <dd>{(physics?.fuelKg ?? flight.fuel_remaining).toLocaleString('en-US')} kg</dd>
+
           <dt>Known peers</dt>
           <dd>{agent?.knownPeers ?? 0}</dd>
 
@@ -127,16 +145,21 @@ export default function AircraftInfo({ flight, progress, agent, onDisrupt, canDi
           <dt>Timeouts</dt>
           <dd>{agent?.timeouts ?? 0}</dd>
 
-          <dt>Altitude / speed</dt>
+          <dt>Input alt / speed</dt>
           <dd>FL{flight.altitude} · {flight.airspeed} kt</dd>
 
           <dt>Squawk</dt>
           <dd>{flight.squawk} · {INPUT_STATUS_LABELS[flight.status] ?? flight.status}</dd>
-
-          <dt>Input fuel</dt>
-          <dd>{flight.fuel_remaining.toLocaleString('en-US')} kg</dd>
         </dl>
       </details>
     </section>
   );
+}
+
+// 1834 -> "↑ 1,800 ft/min", 0 -> "level"
+function formatVerticalRate(feetPerMinute) {
+  const rounded = Math.round(feetPerMinute / 100) * 100;
+  if (rounded === 0) return 'level';
+  const arrow = rounded > 0 ? '↑' : '↓';
+  return `${arrow} ${Math.abs(rounded).toLocaleString('en-US')} ft/min`;
 }

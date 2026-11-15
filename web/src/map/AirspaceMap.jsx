@@ -9,6 +9,8 @@ import { useAircraft } from './useAircraft.js';
 import { agentPose, flownPath } from './flights.js';
 import { isAirborne } from './flightStatus.js';
 import { useAgentSimulation } from '../simulation/useAgentSimulation.js';
+import { flightPhysics } from './physics.js';
+import { SIMULATION_MS, scheduledDepartureMs } from '../simulation/timing.js';
 import AirportMarker from './AirportMarker.jsx';
 import Aircraft from './Aircraft.jsx';
 import AircraftInfo from './AircraftInfo.jsx';
@@ -25,6 +27,8 @@ const TRACK_ZOOM = 4; // minimum zoom when jumping to a plane picked in the flig
 const SIM_SPEED = 60; // simulated seconds per real second at ×1 (1 real second = 1 simulated minute)
 // Every catalogue airport is a candidate alternate (and gets an ATC agent) in the simulation.
 const SIM_AIRPORTS = AIRPORTS.map(({ iata, lon, lat }) => ({ iata, lon, lat }));
+// Plane-card disruptions start on the next 10 s tick, so the last tick of the run is too late.
+const LAST_ACTION_MS = SIMULATION_MS - 10_000;
 
 export default function AirspaceMap() {
   const svgRef = useRef(null);
@@ -43,9 +47,9 @@ export default function AirspaceMap() {
     rulebook: `DESTCLOSED: ${settings.diversionPolicy}`,
     disruptions: [
       ...(settings.outage ? [{ factor: 'ATC_LINK_OUTAGE', startMs: 0, endMs: 30 * 60_000 }] : []),
-      { factor: 'PACKET_LOSS', startMs: 0, endMs: 86_400_000, value: settings.packetLoss / 100 },
-      { factor: 'DELIVERY_DELAY', startMs: 0, endMs: 86_400_000, value: settings.delaySeconds * 1000 },
-      { factor: 'REDUCED_SPEED', startMs: 0, endMs: 86_400_000, value: settings.travelSpeedPercent / 100 },
+      { factor: 'PACKET_LOSS', startMs: 0, endMs: SIMULATION_MS, value: settings.packetLoss / 100 },
+      { factor: 'DELIVERY_DELAY', startMs: 0, endMs: SIMULATION_MS, value: settings.delaySeconds * 1000 },
+      { factor: 'REDUCED_SPEED', startMs: 0, endMs: SIMULATION_MS, value: settings.travelSpeedPercent / 100 },
       ...scenarioEvents,
     ],
   }), [settings, scenarioEvents]);
@@ -57,9 +61,16 @@ export default function AirspaceMap() {
   const [analyticsOpen, setAnalyticsOpen] = useState(true);
 
   const agentsById = Object.fromEntries((simulation.snapshot?.aircraft ?? []).map(agent => [agent.id, agent]));
-  const visibleFlights = flights.filter(flight => agentsById[flight.agentId]);
+  const completedElapsed = simulation.snapshot?.time ?? 0;
+  // A flight appears once its scheduled departure time is reached. If ATC then holds it,
+  // it stays visible at the airport so the delay can be seen.
+  const visibleFlights = flights.filter(flight => agentsById[flight.agentId]
+    && completedElapsed >= scheduledDepartureMs(flight));
   const selectedFlight = flights.find(flight => flight.agentId === selectedId);
   const selectedAgent = selectedFlight ? agentsById[selectedFlight.agentId] : undefined;
+  // Live altitude, speed and fuel for the info card. (Map positions apply the same speed
+  // profile inside agentPose, so planes never need this per frame.)
+  const selectedPhysics = selectedAgent ? flightPhysics(selectedFlight, selectedAgent) : undefined;
   const selectedTrack = selectedAgent ? flownPath(selectedFlight, selectedAgent) : null;
   // Airborne planes whose route or destination changed; the selected one also after landing.
   const routeChangeFlights = visibleFlights.filter(flight => {
@@ -67,7 +78,6 @@ export default function AirspaceMap() {
     return (agent.diverted || agent.reroute)
       && (isAirborne(agent) || (flight === selectedFlight && agent.phase === 'ARRIVED'));
   });
-  const completedElapsed = simulation.snapshot?.time ?? 0;
   const completedSimTime = new Date(clock.simTime.getTime() - clock.elapsed + completedElapsed);
   const stats = simulation.snapshot?.stats;
   const disruptionIndex = stats?.sent ? stats.dropped / stats.sent : 0;
@@ -85,12 +95,12 @@ export default function AirspaceMap() {
   const disruptSelected = factor => {
     const agent = agentsById[selectedId];
     if (!selectedFlight || !agent || !['EN_ROUTE', 'AWAITING_ARRIVAL'].includes(agent.phase)
-      || agent.diverted || completedElapsed >= 86_390_000) return;
+      || agent.diverted || completedElapsed >= LAST_ACTION_MS) return;
     const startMs = completedElapsed + 10_000;
     let id;
     do { id = `aircraft-action-${++aircraftEventCounter.current}`; } while (scenarioEvents.some(event => event.id === id));
     changeEvents([...scenarioEvents, { id, factor, startMs,
-      endMs: Math.min(86_400_000, startMs + 30 * 60_000),
+      endMs: Math.min(SIMULATION_MS, startMs + 30 * 60_000),
       agentId: factor === 'AIRPORT_CLOSURE' ? `atc:${selectedFlight.airport_dest}` : selectedId,
       value: factor === 'AIRPORT_CLOSURE' ? 1 : Math.min(0.8, Math.max(0.1, agent.progress + 0.1)),
     }], startMs);
@@ -275,9 +285,10 @@ export default function AirspaceMap() {
             flight={selectedFlight}
             progress={agentsById[selectedFlight.agentId]?.progress ?? 0}
             agent={agentsById[selectedFlight.agentId]}
+            physics={selectedPhysics}
             onDisrupt={disruptSelected}
             diversionPolicy={settings.diversionPolicy}
-            canDisrupt={!simulation.busy && completedElapsed < 86_390_000}
+            canDisrupt={!simulation.busy && completedElapsed < LAST_ACTION_MS}
             onClose={() => setSelectedId(null)}
           />
         )}

@@ -1,9 +1,30 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { displayPose, diversionLeg, flownTrackPath } from './flightGeometry.js';
+import { arcLengthTable, curveParam, displayPose, diversionLeg, flownTrackPath } from './flightGeometry.js';
 import { routePose } from '../simulation/routeGeometry.js';
 
 const flight = { curve: [[0, 0], [50, -40], [100, 0]] };
+// A prepared flight: arc-length table plus the record fields the physics speed profile reads.
+const eased = { ...flight, arcLengths: arcLengthTable(flight.curve), est_flight_dur: 120, altitude: 350, airspeed: 480 };
+
+test('with the physics speed profile, planes move by distance and a detour still starts at the plane', () => {
+  // Climbing out, the plane has covered less of the route than of the flight time.
+  assert.ok(curveParam(eased, 0.1) < 0.1);
+  assert.equal(curveParam(eased, 0), 0);
+  assert.equal(curveParam(eased, 1), 1);
+  // The detour window is mapped into the same space, so approval causes no sideways jump...
+  const reroute = { startProgress: 0.3, endProgress: 0.98, offset: 0.2 };
+  assert.deepEqual(displayPose(eased, { progress: 0.3, reroute }).position, displayPose(eased, { progress: 0.3 }).position);
+  // ...and the bypass is visible once the plane is under way on it.
+  assert.notDeepEqual(displayPose(eased, { progress: 0.6, reroute }).position, displayPose(eased, { progress: 0.6 }).position);
+});
+
+test('a diversion from an eased route turns exactly where the plane was drawn', () => {
+  const agent = { progress: 0.45 };
+  const before = displayPose(eased, agent, project).position;
+  const atTurn = displayPose(eased, { diverted: true, progress: 0, diversion: { ...diversion, startProgress: 0.45 } }, project).position;
+  assert.deepEqual(atTurn, before);
+});
 const project = ([lon, lat]) => [lon, lat];
 const diversion = { mode: 'direct', airport: 'CCC', previousAirport: 'BBB', startProgress: 0.4,
   startedAt: 1000, reroute: null, destination: [0, 50] };

@@ -1,5 +1,4 @@
-import { routePose } from '../simulation/routeGeometry.js';
-import { diversionLeg, displayPose, isPoint, pathOf, sampleRange } from './flightGeometry.js';
+import { diversionLeg, displayPose, isPoint, pathOf, routePoint, sampleRoute } from './flightGeometry.js';
 
 // Explanatory guides drawn from the plane's CURRENT position:
 // - diversion: dashed straight line to the abandoned destination, solid straight line to the new airport;
@@ -33,9 +32,9 @@ export function routeChangeGeometry(flight, agent, { project, samples = 40 } = {
   const progress = Math.min(1, Math.max(start, Number.isFinite(agent.progress) ? agent.progress : start));
   // Both guides hang off the plane: the solid detour runs on from its position, and the dashed
   // original plan joins it with a short step back to the original route at the same progress.
-  const detour = sampleRange(flight.curve, progress, 1, reroute, samples);
-  const original = [detour[0], ...sampleRange(flight.curve, progress, 1, undefined, samples)];
-  const turn = routePose(flight.curve, start).position;
+  const detour = sampleRoute(flight, progress, 1, reroute, samples);
+  const original = [detour[0], ...sampleRoute(flight, progress, 1, undefined, samples)];
+  const turn = routePoint(flight, start).position;
   if (!original.every(isPoint) || !detour.every(isPoint) || !isPoint(turn)) return null;
   return {
     type: 'reroute',

@@ -1,8 +1,7 @@
 // Turning raw aircraft records into something we can draw.
 import { AIRPORT_BY_IATA } from '../data/airports.js';
 import { projection } from './geography.js';
-import { routePose } from '../simulation/routeGeometry.js';
-import { displayPose, flownTrackPath } from './flightGeometry.js';
+import { arcLengthTable, displayPose, flownTrackPath } from './flightGeometry.js';
 
 const MS_PER_MINUTE = 60_000;
 
@@ -25,12 +24,14 @@ export function prepareFlights(records) {
     const start = projection([from.lon, from.lat]);
     const end = projection([to.lon, to.lat]);
     const control = controlPoint(start, end);
+    const curve = [start, control, end];
 
     return [{
       ...record,
       from,
       to,
-      curve: [start, control, end],
+      curve,
+      arcLengths: arcLengthTable(curve),
       routePath: `M${start} Q${control} ${end}`, // arrays stringify as "x,y"
     }];
   });
@@ -60,12 +61,8 @@ export function minutesRemaining(flight, progress) {
   return Math.round(flight.est_flight_dur * (1 - progress));
 }
 
-// Position on the curve at progress t, and the heading (0° = up, clockwise) the nose points.
-export function aircraftPose(flight, t, reroute) {
-  return routePose(flight.curve, t, reroute);
-}
-
-// Pose of a simulated aircraft, including a straight diversion leg to a new airport.
+// Pose of a simulated aircraft (0° = up, clockwise): along its route, eased by the physics
+// speed profile and including any detour, or on its straight diversion leg to a new airport.
 export function agentPose(flight, agent) {
   return displayPose(flight, agent, projection);
 }

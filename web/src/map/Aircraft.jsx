@@ -18,6 +18,7 @@ const B737_PATH = [
 
 // One aircraft on the map. `agent` is its snapshot entry; `scale` is 1/zoom so the icon keeps
 // the same size on screen. Colour comes from CSS via data-status (see flightStatus.js).
+// agentPose places it by share of route DISTANCE (physics.js speed profile), not of time.
 export default function Aircraft({ flight, agent, scale, showLabel, selected, onClick }) {
   const { position: [x, y], heading } = agentPose(flight, agent);
   const status = flightStatus(agent);
