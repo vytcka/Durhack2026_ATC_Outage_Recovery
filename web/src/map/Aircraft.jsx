@@ -15,7 +15,7 @@ const B737_PATH = [
 ].join(' ');
 
 // One aircraft on the map. `scale` is 1/zoom so the icon keeps the same size on screen.
-export default function Aircraft({ flight, progress, phase, delayed, scale, showLabel, selected, onClick }) {
+export default function Aircraft({ flight, progress, phase, delayed, diverted, scale, showLabel, selected, onClick }) {
   const { position: [x, y], heading } = aircraftPose(flight, progress);
 
   return (
@@ -24,6 +24,7 @@ export default function Aircraft({ flight, progress, phase, delayed, scale, show
       data-agent-id={flight.agentId}
       data-phase={phase}
       data-delayed={String(Boolean(delayed))}
+      data-diverted={String(Boolean(diverted))}
       transform={`translate(${x},${y}) scale(${scale})`}
       onClick={onClick}
     >
@@ -32,7 +33,7 @@ export default function Aircraft({ flight, progress, phase, delayed, scale, show
       <path
         className="aircraft-icon"
         d={B737_PATH}
-        transform={`rotate(${heading}) scale(${ICON_SIZE / ICON_BOX}) translate(${-ICON_BOX / 2},${-ICON_BOX / 2})`}
+        transform={`rotate(${heading + (diverted ? 180 : 0)}) scale(${ICON_SIZE / ICON_BOX}) translate(${-ICON_BOX / 2},${-ICON_BOX / 2})`}
       />
       {(showLabel || selected) && (
         <text className="aircraft-label" x={20} y={-12}>

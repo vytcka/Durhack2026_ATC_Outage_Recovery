@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "test": "node --test src/map/simulationClock.test.js src/simulation/engine.test.js",
+    "test": "node --test src/map/simulationClock.test.js src/simulation/engine.test.js src/simulation/factorMechanisms.test.js",
     "benchmark": "node src/simulation/benchmark.js"
   },
   "dependencies": {

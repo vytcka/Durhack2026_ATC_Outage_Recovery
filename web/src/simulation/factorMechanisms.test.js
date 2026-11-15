@@ -1,6 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { Simulation } from './engine.js';
+import { createAtc } from './agents.js';
+import { decideAtc } from './atcPolicy.js';
+import { nodeEffects } from './nodeEffects.js';
 
 const flights = [0, 1].map(index => ({
   aircraft_reg: `N${index}`, flight_number: `F${index}`, airport_dep: 'AAA', airport_dest: 'BBB',
@@ -120,4 +123,43 @@ test('out-of-order jitter is seeded, changes delivery order and replays identica
   assert.ok(ids.some((id, index) => index > 0 && id < ids[index - 1]));
   sim.advanceTo(0);
   assert.deepEqual(sim.advanceTo(400_000), state);
+});
+
+test('completed aircraft stay frozen while future controller events still execute', () => {
+  const sim = new Simulation(flights, { disruptions: [event('ATC_RESTART', 60_000,
+    { agentId: 'atc:AAA', startMs: 600_000, endMs: 900_000 })] });
+  const landed = sim.advanceTo(400_000).aircraft;
+  const future = sim.advanceTo(1_200_000);
+  assert.deepEqual(future.aircraft, landed);
+  assert.equal(future.stats.restarts, 1);
+  assert.equal(future.time, 1_200_000);
+});
+
+test('invalid targets, duplicate IDs, fractional budgets and out-of-day windows are rejected', () => {
+  assert.throws(() => new Simulation(flights, { disruptions: [event('RUNWAY_CLOSURE', 1, { agentId: 'aircraft:0' })] }), /target/);
+  assert.throws(() => new Simulation(flights, { disruptions: [event('PACKET_LOSS', 1, { agentId: 'aircraft:99' })] }), /target/);
+  assert.throws(() => new Simulation(flights, { disruptions: [event('BANDWIDTH_LIMIT', 1.5)] }), /integer/);
+  assert.throws(() => new Simulation(flights, { disruptions: [event('HEADWIND', 0.5, { endMs: 86_400_001 })] }), /window/);
+  assert.throws(() => new Simulation(flights, { disruptions: [
+    event('HEADWIND', 0.5, { id: 'duplicate' }), event('REDUCED_SPEED', 0.5, { id: 'duplicate' }),
+  ] }), /unique/);
+});
+
+test('retrying an approved arrival does not consume a second airport slot', () => {
+  const atc = createAtc('BBB');
+  const request = { id: 'request:1', from: 'aircraft:0', to: atc.id, type: 'ARRIVAL_REQUEST', sentAt: 170_000,
+    payload: { planId: 'plan:1', report: { progress: 0.98, observedAt: 170_000 } } };
+  atc.inbox = [request];
+  const environment = nodeEffects([event('ARRIVAL_CAPACITY', 1)], atc, 180_000);
+  const approved = decideAtc(atc, 180_000, 10_000, 60_000, environment);
+  const retry = decideAtc({ ...approved.next, inbox: [{ ...request, id: 'request:2' }] }, 190_000, 10_000, 60_000, environment);
+  assert.equal(retry.outgoing[0]?.type, 'ARRIVAL_APPROVED');
+  assert.equal(retry.next.nextArrivalAt, approved.next.nextArrivalAt);
+});
+
+test('low virtual reserve can request an alternate when destination ATC stays unreachable', () => {
+  const state = new Simulation(flights, { disruptions: [event('FUEL_CONSUMPTION', 5),
+    event('ATC_LINK_OUTAGE', 1, { agentId: 'atc:BBB', startMs: 60_000 })] }).advanceTo(590_000);
+  assert.ok(state.aircraft.some(agent => agent.diverted));
+  assert.ok(state.aircraft.some(agent => agent.arrivalAirport === 'AAA'));
 });

@@ -1,4 +1,8 @@
 // Explicit schematic effects, not operational aviation parameters.
+const AIRPORT_FACTORS = new Set(['RUNWAY_CLOSURE', 'ARRIVAL_CAPACITY', 'ATC_BACKLOG', 'ATC_RESTART',
+  'AIRPORT_CLOSURE', 'CROSSWIND', 'DEMAND_SURGE', 'ALTERNATE_CAPACITY']);
+const AIRCRAFT_FACTORS = new Set(['AIRCRAFT_LINK_OUTAGE', 'STALE_POSITION', 'CLOCK_OFFSET', 'REDUCED_SPEED',
+  'REDUCED_CLIMB', 'FUEL_CONSUMPTION', 'POSITION_BIAS', 'HEADWIND', 'NO_GO_REGION', 'EMERGENCY_PRIORITY']);
 export const DISRUPTION_FACTORS = [
   ['ATC_LINK_OUTAGE', 'Aircraft ATC link outage', 'Communication', 1, 1, 1, 1, 'enabled', 'Drops ATC links. A targeted aircraft can try a peer relay.'],
   ['AIRCRAFT_LINK_OUTAGE', 'Aircraft aircraft link outage', 'Communication', 1, 1, 1, 1, 'enabled', 'Drops peer reports and relay traffic between aircraft.'],
@@ -32,4 +36,5 @@ export const DISRUPTION_FACTORS = [
   ['ALTERNATE_CAPACITY', 'Alternate airport capacity exhaustion', 'Airport', 1, 1, 10, 1, 'alternate arrivals per minute', 'Limits alternate approvals after diversion; normal arrivals are unaffected.'],
 ].map(([id, label, category, defaultValue, min, max, step, unit, description]) => ({
   id, label, category, defaultValue, min, max, step, unit, description, implemented: true,
+  targetKinds: AIRPORT_FACTORS.has(id) ? ['atc'] : AIRCRAFT_FACTORS.has(id) ? ['aircraft'] : ['aircraft', 'atc'],
 }));

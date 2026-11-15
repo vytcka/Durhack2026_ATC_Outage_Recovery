@@ -70,6 +70,9 @@ export function decideAircraft(agent, time, timeoutMs, tickMs, environment) {
   next.climbProgress = climbProgress;
   next.reserve = Math.max(0, (agent.reserve ?? 1) - (airborne ? tickMs / (originalFlight.est_flight_dur * 120_000) * environment.burnMultiplier : 0));
   next.priority = Boolean(environment.priority || agent.priority || next.reserve < 0.2);
+  next.reserveStressed = Boolean(agent.reserveStressed || environment.burnMultiplier > 1);
+  if (next.reserveStressed && next.phase === 'AWAITING_ARRIVAL' && next.reserve < 0.2
+    && time - next.arrivalRequestedAt >= timeoutMs) next.needAlternate = true;
   if (next.priority && !agent.priority && ready && !['WAITING', 'ARRIVED'].includes(next.phase)) {
     emit(`atc:${next.arrivalAirport ?? originalFlight.airport_dest}`, 'PRIORITY_REQUEST', { planId: next.plan?.id });
   }

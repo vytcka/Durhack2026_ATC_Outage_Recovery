@@ -1,4 +1,4 @@
-# Agent simulation: first working slice
+# Agent simulation and disruption scenarios
 
 This is an experimental coordination model, not an aviation procedure or safety system.
 
@@ -6,7 +6,7 @@ This is an experimental coordination model, not an aviation procedure or safety 
 
 From `web/`:
 
-- `npm run dev`: open Analytics, then Agent network / Scenario controls.
+- `npm run dev`: open Analytics, then Agent network / Scenario controls / Disruptions.
 - `npm test`: clock, protocol, transport, isolation and replay tests.
 - `npm run benchmark`: full-day core runs with 50 and 100 aircraft; no rendering included.
 - `npm run build`: production app and worker bundles.
@@ -56,9 +56,12 @@ are explicit toy fallback policies, not real lost-radio instructions.
 
 ## Files and boundaries
 
-- `agents.js`: factories and independent decision policies.
+- `agents.js`: factories and baseline departure/arrival protocol.
+- `aircraftPolicy.js`, `atcPolicy.js`: local decision policies, relays, priorities and resource queues.
 - `engine.js`: private agent registry, time, message queue, commit phase and snapshots.
-- `disruptions.js`: factor catalogue and implemented transport mechanisms.
+- `factorCatalogue.js`: all thirty factors, value bounds, valid targets and model descriptions.
+- `disruptions.js`, `transport.js`, `nodeEffects.js`: transport and node-capability effects.
+- `DisruptionEditor.jsx`: timed/scoped event creation, activation and removal.
 - `timing.js`: fixed healthy-model timing reference, delay components and display formatting.
 - `simulation.worker.js`: worker request/reply adapter.
 - `useAgentSimulation.js`: React lifecycle, worker cleanup and latest-target coalescing.
@@ -82,22 +85,69 @@ not an assumption that the other agent has failed. The default timeout is 60 sec
 
 ## Disruptions
 
-Thirty factors are catalogued. Four mechanisms are implemented:
+All thirty factors have schematic mechanisms. Each factor's description and strength unit are
+displayed in the editor; these parameters are experimental, not aviation operating limits.
 
-- `ATC_LINK_OUTAGE`: drops traffic to/from ATC at send and delivery time.
-- `PACKET_LOSS`: drops outgoing messages using a deterministic seeded hash draw.
-- `DELIVERY_DELAY`: adds milliseconds to outgoing delivery latency.
-- `REDUCED_SPEED`: multiplies nominal route progress by a factor greater than zero and at most one.
+- Communication: ATC/peer link loss, directional failure, seeded packet loss, added latency,
+  and recipient bandwidth budgets. Peers exchange reports and can relay a retry around a
+  targeted direct ATC-link outage; a network-wide outage cannot be bypassed magically.
+- Message/observation faults: duplicate envelopes, seeded out-of-order jitter, corrupted
+  payloads, stale reports, missing acknowledgements and aircraft clock skew. Recipients
+  validate reports and reject corruption instead of silently trusting damaged data.
+- Aircraft: reduced speed, virtual climb constraints, increased virtual-reserve consumption,
+  biased reported progress, reduced discovery/radio reach and delayed strategic decisions.
+  Movement continues while decision processing is delayed. Low virtual reserve requests
+  priority and, with increased burn and an unresponsive destination, an alternate.
+- Airport coordination: runway closure, shared arrival intervals, inbox-processing budgets,
+  one-shot controller restart/memory loss, required mid-route handover with lost replies,
+  and airport closure/unavailability messages.
+- Environment/demand: headwind progress penalty, crosswind runway restriction, a closed
+  route corridor boundary, virtual background arrival reservations, emergency ordering,
+  and constrained alternate-airport approvals.
+
+Some effects require relevant traffic: peer outages need peer communication; alternate
+capacity needs a diversion; priority changes order only when arrivals compete. A valid active
+event does not guarantee a delayed flight. Counts reflect measured outcomes, not toggles.
 
 Every event specifies `factor`, inclusive `startMs`, exclusive `endMs`, and optionally
 `agentId` to limit it to links involving that node. Loss uses a `value` probability in
 [0, 1]; delay uses `value` milliseconds; speed uses `value` as the remaining fraction of nominal
 speed. Movement advances incrementally and does not jump when a slowdown starts or ends.
-Unsupported factors are rejected, not ignored.
+Unknown factors, invalid node types, unknown targets, duplicate event IDs, invalid strengths
+and out-of-day windows are rejected. Airport-resource factors target controllers; aircraft-only
+factors target aircraft. Target options are restricted accordingly.
 
 The UI exposes a global first-30-minutes outage, all-day packet loss, all-day added message
 delay and travel speed from 25% to 100% of nominal. Changing settings restarts at midnight,
 paused. Speed reduction is a toy progress constraint, not an aerodynamic model.
+
+### Activating a scenario
+
+1. Select a disruption factor and target (all applicable nodes, an aircraft, or airport ATC).
+2. Choose its strength and duration.
+3. Use **Schedule disruption** for a chosen start minute, or **Activate now** for the next
+   10-second simulation tick. Playback pauses at activation so the result can be inspected.
+4. Resume playback or drag the day timeline. The event list shows pending/active/ended state.
+5. Remove an event or clear all to replay the edited counterfactual scenario to the current
+   time. Removing a past event intentionally removes its historical effects, not just future ones.
+
+Reset preserves scheduled events for repeatable runs. Changing the aircraft count clears
+custom events because aircraft IDs and available controllers may change. Quick controls and
+custom events combine; clearing custom events does not reset quick-control sliders.
+
+### Schematic limits
+
+- Climb is a virtual capability proxy; no real altitude/descent or aircraft dynamics are solved.
+- Reserve is a dimensionless coordination signal, not measured fuel. Exhaustion does not
+  manufacture a crash or a terminal stop.
+- Alternate negotiation currently offers the origin airport. The return leg is an explicit
+  fixed two-minute schematic leg retracing the illustrative route, not a real travel-time estimate.
+- Radio distances use approximate nominal coordinates; observations are not a surveillance model.
+- A no-go event is a temporary corridor hold, not a geographic weather rerouter.
+- Background demand consumes virtual slots, not additional hidden aircraft agents.
+- ATC arrival/alternate approvals are cached so retries do not reserve another slot.
+- Restart strength is reboot duration after activation; queued work and boot recovery can
+  outlast an event's active window. Ending a fault does not erase already accrued delay.
 
 ## Time, replay and hardware
 
@@ -116,11 +166,11 @@ process's current JS heap, not isolated worker memory or total system memory.
 
 ## Not implemented yet
 
-- The remaining 26 factors, peer relays and fallback-policy comparisons.
-- Contended runway/arrival slots, separation constraints and conflict detection.
+- Validated aviation behaviour, separation constraints and conflict detection.
+- Comparative policy experiments, realistic alternate selection and geographic rerouting.
 - Real departure timestamps: all aircraft currently request departure at day start.
-- Physical fuel, altitude, weather, radio range and realistic holding trajectories.
+- Physical fuel/altitude/weather models, real radio propagation and realistic holding trajectories.
 - Historical crisis import, checkpoint optimisation and persistent run exports.
 
-Arrival ATC currently approves valid model-generated arrival requests without capacity
-constraints. Do not interpret successful arrivals as evidence of safe coordination.
+Normal arrival service is unconstrained unless a resource, priority or demand event imposes
+a shared budget. Do not interpret successful arrivals as evidence of safe coordination.

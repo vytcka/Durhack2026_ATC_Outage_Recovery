@@ -97,7 +97,7 @@ test('snapshots and caller-owned inputs cannot mutate private agent state', () =
 
 test('unsupported disruptions and invalid timing are rejected rather than silently ignored', () => {
   assert.throws(() => new Simulation(flights, { disruptions: [
-    { factor: 'RUNWAY_CLOSURE', startMs: 0, endMs: 60_000 },
+    { factor: 'UNKNOWN_FACTOR', startMs: 0, endMs: 60_000 },
   ] }), /not implemented/);
   assert.throws(() => new Simulation(flights, { latencyMs: NaN }), /latencyMs/);
   assert.throws(() => new Simulation(flights, { timeoutMs: 0 }), /timeoutMs/);
@@ -106,10 +106,10 @@ test('unsupported disruptions and invalid timing are rejected rather than silent
   ] }), /probability/);
 });
 
-test('the factor catalogue distinguishes implemented mechanisms from planned ones', () => {
+test('all thirty factors have distinct identifiers and implemented mechanisms', () => {
   assert.equal(DISRUPTION_FACTORS.length, 30);
   assert.equal(new Set(DISRUPTION_FACTORS.map(factor => factor.id)).size, 30);
-  assert.equal(DISRUPTION_FACTORS.filter(factor => factor.implemented).length, 4);
+  assert.equal(DISRUPTION_FACTORS.filter(factor => factor.implemented).length, 30);
 });
 
 test('duplicate aircraft registrations remain separate journey agents', () => {

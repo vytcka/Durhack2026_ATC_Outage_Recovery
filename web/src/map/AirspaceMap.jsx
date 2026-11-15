@@ -25,6 +25,7 @@ export default function AirspaceMap() {
   const clock = useSimulationClock(SIM_SPEED, 100);
   const { flights: loadedFlights, error: aircraftError } = useAircraft();
   const [settings, setSettings] = useState({ aircraftLimit: 100, outage: false, packetLoss: 0, delaySeconds: 0, travelSpeedPercent: 100 });
+  const [scenarioEvents, setScenarioEvents] = useState([]);
   const flights = useMemo(() => loadedFlights.slice(0, settings.aircraftLimit)
     .map((flight, index) => ({ ...flight, agentId: `aircraft:${index}` })), [loadedFlights, settings.aircraftLimit]);
   const options = useMemo(() => ({
@@ -34,8 +35,9 @@ export default function AirspaceMap() {
       { factor: 'PACKET_LOSS', startMs: 0, endMs: 86_400_000, value: settings.packetLoss / 100 },
       { factor: 'DELIVERY_DELAY', startMs: 0, endMs: 86_400_000, value: settings.delaySeconds * 1000 },
       { factor: 'REDUCED_SPEED', startMs: 0, endMs: 86_400_000, value: settings.travelSpeedPercent / 100 },
+      ...scenarioEvents,
     ],
-  }), [settings]);
+  }), [settings, scenarioEvents]);
   const simulation = useAgentSimulation(flights, clock.elapsed, options);
 
   const [selectedAirport, setSelectedAirport] = useState(null);
@@ -52,9 +54,15 @@ export default function AirspaceMap() {
   const disruptionIndex = stats?.sent ? stats.dropped / stats.sent : 0;
   const changeSettings = (next) => {
     clock.seek(0);
+    if (next.aircraftLimit !== settings.aircraftLimit) setScenarioEvents([]);
     setSelectedId(null);
     setSettings(next);
   };
+  const changeEvents = (next, seekTo = completedElapsed) => {
+    clock.seek(seekTo);
+    setScenarioEvents(next);
+  };
+  const scenarioAirports = [...new Set(flights.flatMap(flight => [flight.airport_dep, flight.airport_dest]))].sort();
 
   // The clock follows whatever is in the middle of the screen. The viewBox centre is also the
   // screen centre (the SVG scales uniformly), so undo the zoom transform, then the projection,
@@ -124,6 +132,7 @@ export default function AirspaceMap() {
               progress={agentsById[flight.agentId].progress}
               phase={agentsById[flight.agentId].phase}
               delayed={agentsById[flight.agentId].delayed}
+              diverted={agentsById[flight.agentId].diverted}
               scale={1 / transform.k}
               showLabel={transform.k >= SHOW_AIRCRAFT_LABELS_AT_ZOOM}
               selected={flight === selectedFlight}
@@ -162,6 +171,10 @@ export default function AirspaceMap() {
           simulation={simulation}
           settings={settings}
           onSettingsChange={changeSettings}
+          scenarioEvents={scenarioEvents}
+          onEventsChange={changeEvents}
+          scenarioAircraft={flights.map(flight => ({ id: flight.agentId, flightNumber: flight.flight_number }))}
+          scenarioAirports={scenarioAirports}
         />
       </aside>
 

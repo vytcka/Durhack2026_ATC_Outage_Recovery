@@ -4,7 +4,7 @@ import { uniqueInbox } from './transport.js';
 export function decideAtc(agent, time, tickMs, timeoutMs, environment) {
   if (time < (agent.offlineUntil ?? 0) || time < (agent.readyAt ?? 0)) return { next: agent, outgoing: [], events: [] };
   const { messages, events } = uniqueInbox(agent);
-  const next = { ...agent, inbox: [], priorities: { ...agent.priorities }, readyAt: time + environment.decisionDelayMs };
+  const next = { ...agent, inbox: [], priorities: { ...agent.priorities }, approvals: { ...agent.approvals }, readyAt: time + environment.decisionDelayMs };
   const outgoing = [];
   const eligible = [];
   const routes = new Map();
@@ -59,6 +59,9 @@ export function decideAtc(agent, time, tickMs, timeoutMs, environment) {
       }
     }
     if (isArrival) {
+      const approvalKey = `${message.from}:${message.type}:${message.payload.planId}`;
+      const cached = next.approvals[approvalKey];
+      if (cached) { respond(message, cached.type, cached.payload); continue; }
       const priority = Boolean(message.payload.priority || next.priorities[message.from]);
       const alternate = message.type === 'ALTERNATE_REQUEST' || message.payload.diverted;
       const interval = Math.max(environment.arrivalIntervalMs, alternate ? environment.alternateIntervalMs : 0,
@@ -68,10 +71,13 @@ export function decideAtc(agent, time, tickMs, timeoutMs, environment) {
       }
       if (interval > 0) { arrivalServed = true; next.nextArrivalAt = time + interval; }
       if (message.type === 'ALTERNATE_REQUEST') {
-        respond(message, 'ALTERNATE_APPROVED', { planId: message.payload.planId, airport: agent.airport });
+        const payload = { planId: message.payload.planId, airport: agent.airport };
+        next.approvals[approvalKey] = { type: 'ALTERNATE_APPROVED', payload };
+        respond(message, 'ALTERNATE_APPROVED', payload);
         events.push({ type: 'ALTERNATE_RESERVED', agentId: agent.id });
         continue;
       }
+      next.approvals[approvalKey] = { type: 'ARRIVAL_APPROVED', payload: { planId: message.payload.planId } };
     }
     if (message.relayVia) routes.set(message.from, message.relayVia);
     eligible.push(message);

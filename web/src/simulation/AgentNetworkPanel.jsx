@@ -1,7 +1,8 @@
 import { DISRUPTION_FACTORS } from './disruptions.js';
 import { formatDelay } from './timing.js';
+import DisruptionEditor from './DisruptionEditor.jsx';
 
-export default function AgentNetworkPanel({ simulation, settings, onSettingsChange }) {
+export default function AgentNetworkPanel({ simulation, settings, onSettingsChange, scenarioEvents, onEventsChange, scenarioAircraft, scenarioAirports }) {
   const { snapshot, busy, error } = simulation;
   const stats = snapshot?.stats;
   const implemented = DISRUPTION_FACTORS.filter(factor => factor.implemented).length;
@@ -26,6 +27,9 @@ export default function AgentNetworkPanel({ simulation, settings, onSettingsChan
         <div><dt>Messages dropped</dt><dd data-stat="dropped">{stats?.dropped ?? 0}</dd></div>
         <div><dt>Messages queued</dt><dd>{stats?.queued ?? 0}</dd></div>
         <div><dt>Request timeouts</dt><dd>{stats?.timeouts ?? 0}</dd></div>
+        <div><dt>Reports rejected</dt><dd>{stats?.rejected ?? 0}</dd></div>
+        <div><dt>Duplicate envelopes</dt><dd>{stats?.duplicates ?? 0}</dd></div>
+        <div><dt>ATC restarts</dt><dd>{stats?.restarts ?? 0}</dd></div>
       </dl>
       <ul className="aircraft-legend" aria-label="Aircraft colours">
         <li><i className="key-en-route" />En route</li>
@@ -35,7 +39,7 @@ export default function AgentNetworkPanel({ simulation, settings, onSettingsChan
       <p className="muted">Delay is relative to the healthy-model baseline, not an airline schedule. Each affected flight counts once, including after landing.</p>
       <details>
         <summary>Scenario controls</summary>
-        <p className="muted">Changes restart the scenario at midnight, paused.</p>
+        <p className="muted">Quick controls restart at midnight, paused. Changing aircraft count clears custom events.</p>
         <label htmlFor="agent-limit">Aircraft agents</label>
         <select id="agent-limit" value={settings.aircraftLimit} onChange={event => update('aircraftLimit', Number(event.target.value))}>
           {[25, 50, 100].map(limit => <option key={limit} value={limit}>{limit}</option>)}
@@ -56,6 +60,8 @@ export default function AgentNetworkPanel({ simulation, settings, onSettingsChan
         <input id="travel-speed" type="range" min={25} max={100} step={25} value={settings.travelSpeedPercent}
           onChange={event => update('travelSpeedPercent', Number(event.target.value))} />
         <output htmlFor="travel-speed" className="mono">{settings.travelSpeedPercent}% of nominal</output>
+        <DisruptionEditor events={scenarioEvents} onChange={onEventsChange} aircraft={scenarioAircraft}
+          airports={scenarioAirports} currentTime={snapshot?.time ?? 0} />
       </details>
       <details>
         <summary>Recent communication</summary>
@@ -76,7 +82,7 @@ export default function AgentNetworkPanel({ simulation, settings, onSettingsChan
           {DISRUPTION_FACTORS.map(factor => <li key={factor.id}>{factor.label} · {factor.implemented ? 'available' : 'planned'}</li>)}
         </ul>
       </details>
-      <p className="muted model-note">Simplified coordination model. Routes are illustrative; departure schedules, separation and runway capacity are not modelled yet.</p>
+      <p className="muted model-note">Schematic coordination model, not aviation procedures. Airport slots, climb, reserve and alternate legs are simplified; separation and real departure schedules are not modelled.</p>
     </section>
   );
 }

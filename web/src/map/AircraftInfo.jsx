@@ -1,4 +1,5 @@
 import { formatDelay, formatSimulationTime } from '../simulation/timing.js';
+import { AIRPORT_BY_IATA } from '../data/airports.js';
 
 const STATUS_LABELS = {
   OK: 'OK',
@@ -35,10 +36,26 @@ export default function AircraftInfo({ flight, progress, agent }) {
       <div className="muted">
         {flight.from.city} → {flight.to.city}
       </div>
+      {agent?.diverted && <div>Alternate: {AIRPORT_BY_IATA[agent.arrivalAirport]?.name ?? agent.arrivalAirport} (schematic return leg)</div>}
 
       <dl className="info-grid mono">
         <dt>Agent state</dt>
         <dd>{agent?.phase.toLowerCase().replaceAll('_', ' ') ?? 'initialising'}</dd>
+
+        <dt>Current destination</dt>
+        <dd data-info="current-airport">{agent?.arrivalAirport ?? flight.to.iata}</dd>
+
+        <dt>Known peers</dt>
+        <dd>{agent?.knownPeers ?? 0}</dd>
+
+        <dt>Priority request</dt>
+        <dd>{agent?.priority ? 'Yes' : 'No'}</dd>
+
+        <dt>Virtual climb</dt>
+        <dd>{Math.round((agent?.climbProgress ?? 0) * 100)}%</dd>
+
+        <dt>Virtual reserve</dt>
+        <dd>{Math.round((agent?.reserve ?? 1) * 100)}%</dd>
 
         <dt>Request timeouts</dt>
         <dd>{agent?.timeouts ?? 0}</dd>
@@ -70,7 +87,7 @@ export default function AircraftInfo({ flight, progress, agent }) {
         <dt>Squawk</dt>
         <dd>{flight.squawk}</dd>
 
-        <dt>Fuel</dt>
+        <dt>Input fuel</dt>
         <dd>{flight.fuel_remaining.toLocaleString('en-US')} kg</dd>
 
         <dt>Progress</dt>

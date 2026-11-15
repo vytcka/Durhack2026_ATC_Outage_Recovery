@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import AgentNetworkPanel from '../simulation/AgentNetworkPanel.jsx';
 
 // Collapsible stats panel shown under the title.
-export default function AnalyticsPanel({ open, timeZone, simTime, elapsed, airborne, disruptionIndex, onReset, onSeek, simulation, settings, onSettingsChange }) {
+export default function AnalyticsPanel({ open, timeZone, simTime, elapsed, airborne, disruptionIndex, onReset, onSeek, simulation, settings, onSettingsChange, scenarioEvents, onEventsChange, scenarioAircraft, scenarioAirports }) {
   const clockFormat = useMemo(
     () =>
       new Intl.DateTimeFormat('en-US', {
@@ -65,7 +65,8 @@ export default function AnalyticsPanel({ open, timeZone, simTime, elapsed, airbo
           <p className="muted">Drag to seek · pauses playback</p>
         </div>
 
-        <AgentNetworkPanel simulation={simulation} settings={settings} onSettingsChange={onSettingsChange} />
+        <AgentNetworkPanel simulation={simulation} settings={settings} onSettingsChange={onSettingsChange}
+          scenarioEvents={scenarioEvents} onEventsChange={onEventsChange} scenarioAircraft={scenarioAircraft} scenarioAirports={scenarioAirports} />
 
         <button className="reset-button" onClick={onReset}>
           Reset simulation

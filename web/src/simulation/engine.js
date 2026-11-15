@@ -31,11 +31,14 @@ export class Simulation {
       ...event, id: event.id ?? `${event.factor}:${index}`,
       value: event.value ?? DISRUPTION_FACTORS.find(factor => factor.id === event.factor)?.defaultValue,
     }));
+    const eventIds = new Set();
     for (const event of this.#options.disruptions) {
+      if (typeof event.id !== 'string' || !event.id || eventIds.has(event.id)) throw new Error('Disruption IDs must be unique non-empty strings');
+      eventIds.add(event.id);
       if (!DISRUPTION_FACTORS.some(factor => factor.id === event.factor && factor.implemented)) {
         throw new Error(`Disruption ${event.factor} is not implemented`);
       }
-      if (!Number.isFinite(event.startMs) || !Number.isFinite(event.endMs) || event.startMs < 0 || event.endMs <= event.startMs) {
+      if (!Number.isFinite(event.startMs) || !Number.isFinite(event.endMs) || event.startMs < 0 || event.endMs <= event.startMs || event.endMs > DAY_END + 1) {
         throw new Error('Disruption time window is invalid');
       }
       if (event.factor === 'PACKET_LOSS' && (!Number.isFinite(event.value) || event.value < 0 || event.value > 1)) {
@@ -51,6 +54,7 @@ export class Simulation {
       if (!Number.isFinite(event.value) || event.value < definition.min || event.value > definition.max) {
         throw new Error(`Invalid strength for ${event.factor}`);
       }
+      if (definition.step >= 1 && !Number.isInteger(event.value)) throw new Error(`Strength for ${event.factor} must be an integer`);
     }
     this.#flights = structuredClone(flights);
     for (const [index, flight] of this.#flights.entries()) {
@@ -67,6 +71,12 @@ export class Simulation {
       if (flight.destination) this.#airportPositions.set(`atc:${flight.airport_dest}`, flight.destination);
     }
     const aircraft = [...this.#agents.values()].filter(agent => agent.kind === 'aircraft');
+    for (const event of this.#options.disruptions) {
+      if (!event.agentId) continue;
+      const target = this.#agents.get(event.agentId);
+      const definition = DISRUPTION_FACTORS.find(factor => factor.id === event.factor);
+      if (!target || !definition.targetKinds.includes(target.kind)) throw new Error(`Invalid target for ${event.factor}`);
+    }
     for (const agent of aircraft) this.#peerCandidates.set(agent.id, aircraft
       .filter(peer => peer.id !== agent.id && (peer.flight.airport_dep === agent.flight.airport_dep
         || peer.flight.airport_dest === agent.flight.airport_dest)).slice(0, 4).map(peer => peer.id));
@@ -129,8 +139,11 @@ export class Simulation {
 
   #step() {
     this.#time += this.#options.tickMs;
-    for (const event of this.#options.disruptions.filter(item => item.factor === 'ATC_RESTART'
-      && item.startMs <= this.#time && this.#time < item.endMs)) {
+    const active = this.#options.disruptions.filter(event => event.startMs <= this.#time && this.#time < event.endMs);
+    const previous = this.#options.disruptions.filter(event => event.startMs <= this.#time - this.#options.tickMs
+      && this.#time - this.#options.tickMs < event.endMs);
+    const sameEffects = active.length === previous.length && active.every((event, index) => event === previous[index]);
+    for (const event of active.filter(item => item.factor === 'ATC_RESTART')) {
       for (const agent of this.#agents.values()) {
         const key = `${event.id}:${agent.id}`;
         if (agent.kind !== 'atc' || (event.agentId && event.agentId !== agent.id) || this.#applied.has(key)) continue;
@@ -173,9 +186,18 @@ export class Simulation {
 
     // No policy receives the registry. All decisions precede every outgoing delivery.
     const decisions = [...this.#agents.values()].map(agent => {
-      const environment = nodeEffects(this.#options.disruptions, agent, this.#time);
-      if (agent.kind === 'atc') return decideAtc(agent, this.#time, this.#options.tickMs, this.#options.timeoutMs, environment);
-      const movement = nodeEffects(this.#options.disruptions, agent, this.#time - this.#options.tickMs);
+      const idle = () => ({ next: agent, outgoing: [], events: [] });
+      if (agent.kind === 'aircraft' && agent.phase === 'ARRIVED' && agent.inbox.length === 0) return idle();
+      const environment = nodeEffects(active, agent, this.#time);
+      if (agent.kind === 'atc') {
+        if (!agent.inbox.length && !agent.background && !environment.backgroundDemand && !environment.decisionDelayMs) return idle();
+        return decideAtc(agent, this.#time, this.#options.tickMs, this.#options.timeoutMs, environment);
+      }
+      const grounded = ['REQUESTING_DEPARTURE', 'AWAITING_CONFIRMATION'].includes(agent.phase);
+      if (grounded && !agent.inbox.length && !agent.pendingMessages?.length && !environment.priority && !environment.decisionDelayMs
+        && this.#time + environment.clockOffsetMs - agent.lastSentAt < this.#options.timeoutMs
+        && this.#time - (agent.lastPeerReportAt ?? -Infinity) < 60_000) return idle();
+      const movement = sameEffects ? environment : nodeEffects(previous, agent, this.#time - this.#options.tickMs);
       environment.speedFactor = movement.speedFactor;
       environment.climbFactor = movement.climbFactor;
       environment.burnMultiplier = movement.burnMultiplier;

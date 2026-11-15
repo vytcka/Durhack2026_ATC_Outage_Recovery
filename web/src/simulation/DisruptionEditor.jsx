@@ -18,10 +18,16 @@ export default function DisruptionEditor({ events = [], onChange, aircraft = [],
   const min = factor?.min ?? 0;
   const max = factor?.max ?? 1;
   const step = factor?.step ?? 0.1;
+  const allowedTargets = new Set([
+    ...(factor?.targetKinds.includes('aircraft') ? aircraft.map(agent => agent.id) : []),
+    ...(factor?.targetKinds.includes('atc') ? airports.map(iata => `atc:${iata}`) : []),
+  ]);
+  const selectedTarget = allowedTargets.has(target) ? target : '';
   const selectFactor = event => {
     const next = DISRUPTION_FACTORS.find(item => item.id === event.target.value);
     setFactorId(event.target.value);
     setStrength(next?.defaultValue ?? 1);
+    setTarget('');
   };
 
   const now = clamp(currentTime, 0, DAY_MS);
@@ -33,13 +39,14 @@ export default function DisruptionEditor({ events = [], onChange, aircraft = [],
     const occupied = new Set(events.map(event => event.id));
     let id;
     do { id = `disruption-${++counter.current}`; } while (occupied.has(id));
+    const rawStrength = clamp(strength, min, max, factor.defaultValue ?? min);
     const event = {
       id,
       factor: factor.id,
       startMs,
       endMs: Math.min(DAY_MS, startMs + clamp(duration, 1, 1440) * MINUTE_MS),
-      value: clamp(strength, min, max, factor.defaultValue ?? min),
-      ...(target ? { agentId: target } : {}),
+      value: step >= 1 ? Math.round(rawStrength) : rawStrength,
+      ...(selectedTarget ? { agentId: selectedTarget } : {}),
     };
     onChange([...events, event], seekTo);
   };
@@ -63,10 +70,10 @@ export default function DisruptionEditor({ events = [], onChange, aircraft = [],
       </select>
       <p className="muted" id={`${prefix}-description`}>{factor?.description}</p>
       <label htmlFor={`${prefix}-target`}>Disruption target</label>
-      <select id={`${prefix}-target`} value={target} onChange={event => setTarget(event.target.value)}>
-        <option value="">All nodes</option>
-        {aircraft.map(agent => <option key={agent.id} value={agent.id}>{agent.flightNumber || agent.id}</option>)}
-        {airports.map(iata => <option key={`atc:${iata}`} value={`atc:${iata}`}>ATC · {iata}</option>)}
+      <select id={`${prefix}-target`} value={selectedTarget} onChange={event => setTarget(event.target.value)}>
+        <option value="">All applicable nodes</option>
+        {factor?.targetKinds.includes('aircraft') && aircraft.map(agent => <option key={agent.id} value={agent.id}>{agent.flightNumber || agent.id}</option>)}
+        {factor?.targetKinds.includes('atc') && airports.map(iata => <option key={`atc:${iata}`} value={`atc:${iata}`}>ATC · {iata}</option>)}
       </select>
       <label htmlFor={`${prefix}-start`}>Start minute</label>
       <input id={`${prefix}-start`} type="number" min={0} max={1439} step={1} value={startMinute} onChange={event => setStartMinute(clamp(event.target.value, 0, 1439))} />
@@ -79,6 +86,7 @@ export default function DisruptionEditor({ events = [], onChange, aircraft = [],
         <button type="button" disabled={!factor} onClick={() => addEvent(clamp(startMinute, 0, 1439) * MINUTE_MS)}>Schedule disruption</button>
         <button type="button" disabled={!canActivate} onClick={() => { if (canActivate) addEvent(activationStart, activationStart); }}>Activate now</button>
       </div>
+      <p className="muted">Changes pause playback and replay the edited scenario to the selected time. Activate now begins on the next tick.</p>
       {!canActivate && <p className="muted">No activation tick remains today. Schedule a disruption and rewind to an earlier time.</p>}
       <p className="disruption-editor-count" role="status">{activeCount} active · {events.length} scheduled</p>
       {events.length === 0 ? <p className="muted">No disruptions scheduled.</p> : (
