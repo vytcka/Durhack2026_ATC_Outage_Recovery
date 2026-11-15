@@ -6,6 +6,7 @@ import { SIMULATION_MS, flightTiming, scheduledDepartureMs } from './timing.js';
 import { transportEffects } from './transport.js';
 import { nodeEffects } from './nodeEffects.js';
 import { aircraftPosition, diversionFraction } from './navigation.js';
+import { buildRadioNetwork, createRadio, radioHops } from './radio.js';
 import { parseRulebook } from './rulebook.js';
 import { resolveProcedures } from './procedures.js';
 
@@ -16,10 +17,27 @@ const EMPTY_MEASURES = Object.freeze({
   sent: 0, received: 0, dropped: 0, holdMs: 0, groundWaitMs: 0, arrivalWaitMs: 0, lostContactMs: 0, enRouteMs: 0,
 });
 
+// Recent sent messages kept for the map's live-communication overlay. The window only has to
+// cover the gap between two snapshots; the cap keeps snapshots small under message storms.
+const SIGNAL_WINDOW_MS = 60_000;
+const MAX_SIGNALS = 2_000;
+
+const KM_PER_NM = 1.852;
+const AIRBORNE_PHASES = ['EN_ROUTE', 'AWAITING_ARRIVAL'];
+
 export class Simulation {
   #agents = new Map();
   #queue = [];
   #events = [];
+  #tickComms = [];
+  #measures = new Map();
+  #delayCauses = new Map();
+  #lastDelay = new Map();
+  #signals = [];
+  // Radio coverage. options.radio is `true` (default ranges) or { aircraftRangeNm, towerRangeNm }.
+  // Off by default so abstract tests without coordinates keep "everyone can reach everyone".
+  #radioSetup = null;
+  #radio = null;
   #flights;
   #options;
   #time = 0;
@@ -27,12 +45,7 @@ export class Simulation {
   #applied = new Set();
   #peerCandidates = new Map();
   #airportPositions = new Map();
-  #stats = { sent: 0, delivered: 0, dropped: 0, rejected: 0, duplicates: 0, bandwidthDeferred: 0, restarts: 0 };
-  // Observer-side measurement, kept outside agent memory so no policy can read it.
-  #tickComms = [];             // messages delivered or dropped during the latest tick
-  #measures = new Map();       // aircraft id -> counters and durations (EMPTY_MEASURES shape)
-  #delayCauses = new Map();    // aircraft id -> { cause: ms }
-  #lastDelay = new Map();      // aircraft id -> highest totalDelayMs already attributed
+  #stats = { sent: 0, delivered: 0, dropped: 0, rejected: 0, duplicates: 0, bandwidthDeferred: 0, restarts: 0, noCoverage: 0 };
 
   constructor(flights, options = {}) {
     this.#options = structuredClone({ tickMs: 10_000, latencyMs: 10_000, timeoutMs: 60_000, seed: 1, disruptions: [], ...options });
@@ -109,6 +122,27 @@ export class Simulation {
     for (const agent of aircraft) this.#peerCandidates.set(agent.id, aircraft
       .filter(peer => peer.id !== agent.id && (peer.flight.airport_dep === agent.flight.airport_dep
         || peer.flight.airport_dest === agent.flight.airport_dest)).slice(0, 4).map(peer => peer.id));
+
+    if (this.#options.radio) {
+      const towers = [...this.#airportPositions].map(([id, position]) => ({ id, position }));
+      this.#radioSetup = createRadio(towers, this.#options.radio === true ? {} : this.#options.radio);
+      this.#updateRadio();
+    }
+  }
+
+  // Rebuild who-can-hear-whom from the current aircraft positions (once per step).
+  #updateRadio() {
+    if (!this.#radioSetup) return;
+    const aircraft = [...this.#agents.values()].filter(agent => agent.kind === 'aircraft').map(agent => ({
+      id: agent.id, position: aircraftPosition(agent), airborne: AIRBORNE_PHASES.includes(agent.phase),
+    }));
+    this.#radio = buildRadioNetwork(aircraft, this.#radioSetup, this.#radio);
+  }
+
+  // Radio hops for a message, [] for ground-only, null when there is no radio path.
+  // Without the radio model every message is one direct hop.
+  #hops(message) {
+    return this.#radio ? radioHops(this.#radio, message.from, message.to) : [[message.from, message.to]];
   }
 
   #position(id) {
@@ -121,6 +155,11 @@ export class Simulation {
     return 111 * Math.hypot((first[0] - second[0]) * Math.cos(first[1] * Math.PI / 180), first[1] - second[1]);
   }
 
+  // How far an aircraft looks for peers to report to. With radio on, only planes it can hear.
+  #peerRangeKm() {
+    return this.#radioSetup ? this.#radioSetup.aircraftRangeNm * KM_PER_NM : 500;
+  }
+
   #outOfRange(message) {
     const factors = activeDisruptions(this.#options.disruptions, message, this.#time).filter(event => event.factor === 'OBSERVATION_RANGE');
     return factors.length > 0 && this.#distance(message.from, message.to) > 5000 * Math.min(...factors.map(event => event.value));
@@ -129,6 +168,22 @@ export class Simulation {
   #record(event) {
     this.#events.push({ ...event, time: this.#time });
     if (this.#events.length > 100) this.#events.shift();
+  }
+
+  // One entry per radio hop (plane -> tower, plane -> relay plane...), and whether the message
+  // was lost on the way out. Display only: nothing in the model reads this list.
+  #signal(hops, dropped) {
+    hops.forEach(([from, to], index) => {
+      this.#signals.push({ id: `${this.#sequence}:${index}`, time: this.#time, from, to, dropped });
+    });
+  }
+
+  #pruneSignals() {
+    const cutoff = this.#time - SIGNAL_WINDOW_MS;
+    let start = 0;
+    while (start < this.#signals.length && this.#signals[start].time <= cutoff) start += 1;
+    start = Math.max(start, this.#signals.length - MAX_SIGNALS);
+    if (start > 0) this.#signals = this.#signals.slice(start);
   }
 
   // Events affecting an aircraft now: global ones, ones aimed at it, and ones at its controlling
@@ -219,15 +274,27 @@ export class Simulation {
       envelope.payload = null;
     }
     this.#stats.sent += 1;
+    const hops = this.#hops(envelope);
     this.#count(message.from, 'sent');
+    if (!hops) {
+      // Nobody in radio range: the transmission goes nowhere.
+      this.#stats.dropped += 1;
+      this.#stats.noCoverage += 1;
+      this.#count(message.from, 'dropped');
+      this.#tickComms.push({ from: message.from, to: message.to, type: message.type, status: 'dropped' });
+      this.#record({ type: 'MESSAGE_DROPPED', from: message.from, to: message.to, messageType: message.type, reason: 'NO_COVERAGE' });
+      return;
+    }
     if (isLinkDown(this.#options.disruptions, envelope, this.#time)
       || effects.drop || this.#outOfRange(envelope) || packetLost(this.#options.disruptions, envelope, this.#time, this.#options.seed)) {
       this.#stats.dropped += 1;
       this.#count(message.from, 'dropped');
       this.#tickComms.push({ from: message.from, to: message.to, type: message.type, status: 'dropped' });
       this.#record({ type: 'MESSAGE_DROPPED', from: message.from, to: message.to, messageType: message.type });
+      this.#signal(hops, true);
       return;
     }
+    this.#signal(hops, false);
     this.#queue.push(envelope);
     for (let copy = 0; copy < effects.copies; copy += 1) {
       this.#queue.push({ ...structuredClone(envelope), id: `message:${++this.#sequence}` });
@@ -239,6 +306,8 @@ export class Simulation {
 
   #step() {
     this.#time += this.#options.tickMs;
+    this.#pruneSignals();
+    this.#updateRadio();
     this.#tickComms = [];
     const active = this.#options.disruptions.filter(event => event.startMs <= this.#time && this.#time < event.endMs);
     const previous = this.#options.disruptions.filter(event => event.startMs <= this.#time - this.#options.tickMs
@@ -262,6 +331,15 @@ export class Simulation {
         continue;
       }
       const recipient = this.#agents.get(message.to);
+      // The aircraft may have flown out of coverage while the message was in flight.
+      if (!this.#hops(message)) {
+        this.#stats.dropped += 1;
+        this.#stats.noCoverage += 1;
+        this.#count(message.from, 'dropped');
+        this.#tickComms.push({ from: message.from, to: message.to, type: message.type, status: 'dropped' });
+        this.#record({ type: 'MESSAGE_DROPPED', from: message.from, to: message.to, messageType: message.type, reason: 'NO_COVERAGE' });
+        continue;
+      }
       if (isLinkDown(this.#options.disruptions, message, this.#time)
         || this.#outOfRange(message) || transportEffects(this.#options.disruptions, message, this.#time, this.#options.seed).drop) {
         this.#stats.dropped += 1;
@@ -308,7 +386,7 @@ export class Simulation {
       environment.burnMultiplier = movement.burnMultiplier;
       environment.noGoBoundary = movement.noGoBoundary;
       environment.visiblePeers = (this.#peerCandidates.get(agent.id) ?? [])
-        .filter(id => this.#distance(agent.id, id) <= 500 * environment.rangeFactor).slice(0, 2);
+        .filter(id => this.#distance(agent.id, id) <= this.#peerRangeKm() * environment.rangeFactor).slice(0, 2);
       return decideAircraft(agent, this.#time, this.#options.timeoutMs, this.#options.tickMs, environment);
     });
     for (const decision of decisions) {
@@ -331,10 +409,12 @@ export class Simulation {
       this.#agents = fresh.#agents;
       this.#queue = [];
       this.#events = [];
+      this.#signals = [];
       this.#time = 0;
       this.#sequence = 0;
       this.#stats = { ...fresh.#stats };
       this.#applied = fresh.#applied;
+      this.#radio = fresh.#radio;
       this.#tickComms = [];
       this.#measures = new Map();
       this.#delayCauses = new Map();
@@ -369,6 +449,8 @@ export class Simulation {
       arrivalAirport: agent.arrivalAirport ?? agent.flight.airport_dest,
       climbProgress: agent.climbProgress ?? 0, reserve: agent.reserve ?? 1,
       knownPeers: Object.keys(agent.knownPeers ?? {}).length, priority: agent.priority ?? false,
+      // [aircraft, (relays...), tower], null = out of coverage, undefined = radio model off.
+      radioPath: this.#radio ? (this.#radio.paths.get(agent.id) ?? null) : undefined,
       timeouts: agent.timeouts, plan: agent.plan,
       arrivedAt: agent.arrivedAt,
       ...flightTiming(agent, this.#time, this.#options),
@@ -378,7 +460,7 @@ export class Simulation {
       for (const [cause, ms] of Object.entries(agent.delayByCause)) delayByCause[cause] = (delayByCause[cause] ?? 0) + ms;
     }
     return structuredClone({
-      time: this.#time, aircraft, events: this.#events, comms: this.#commsSummary(),
+      time: this.#time, aircraft, events: this.#events, signals: this.#signals, comms: this.#commsSummary(),
       stats: {
         detouredFlights: aircraft.filter(agent => agent.reroute).length,
         divertedFlights: aircraft.filter(agent => agent.diverted).length,

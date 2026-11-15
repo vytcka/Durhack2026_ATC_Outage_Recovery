@@ -27,6 +27,11 @@ import { stormRegions } from './regions.js';
 import FlightTracker from './FlightTracker.jsx';
 import AnalyticsPanel from './AnalyticsPanel.jsx';
 import SimulationControls from './SimulationControls.jsx';
+import SignalLayer from './SignalLayer.jsx';
+
+// Airport (ATC node) positions never change, so project them once.
+const ATC_POSITIONS = Object.fromEntries(AIRPORTS.map(airport =>
+  [`atc:${airport.iata}`, projection([airport.lon, airport.lat])]));
 
 const MAX_ZOOM = 60;
 const SHOW_NAMES_AT_ZOOM = 6;
@@ -58,7 +63,7 @@ export default function AirspaceMap() {
   const clock = useSimulationClock(SIM_SPEED, 100);
   const { flights: loadedFlights, error: aircraftError } = useAircraft();
   const [settings, setSettings] = useState({ aircraftLimit: 100, outage: false, packetLoss: 0, delaySeconds: 0, travelSpeedPercent: 100,
-    diversionPolicy: 'LANDNEARESTAIRPORT', autoDisruptions: 'moderate' });
+    diversionPolicy: 'LANDNEARESTAIRPORT', autoDisruptions: 'moderate', aircraftRangeNm: 100, towerRangeNm: 100 });
   const [scenarioEvents, setScenarioEvents] = useState([]);
   // Applied lost-comms procedures: one for every aircraft plus per-aircraft overrides (text, see procedures.js).
   // The suggested protocol is in effect from the start; clearing it falls back to the rulebook default.
@@ -84,6 +89,8 @@ export default function AirspaceMap() {
   const options = useMemo(() => ({
     seed: SIM_SEED,
     airports: SIM_AIRPORTS,
+    // Radio coverage in nautical miles, set from the analytics panel. See simulation/radio.js.
+    radio: { aircraftRangeNm: settings.aircraftRangeNm, towerRangeNm: settings.towerRangeNm },
     rulebook: `DESTCLOSED: ${settings.diversionPolicy}`,
     ...(engineProcedures ? { procedures: engineProcedures } : {}),
     disruptions: [
@@ -104,6 +111,7 @@ export default function AirspaceMap() {
   const [selectedId, setSelectedId] = useState(null); // journey ID, independent of registration
   const [cursor, setCursor] = useState(null); // [lon, lat] under the mouse
   const [analyticsOpen, setAnalyticsOpen] = useState(true);
+  const [showSignals, setShowSignals] = useState(false); // live communication lines on the map
 
   const agentsById = Object.fromEntries((simulation.snapshot?.aircraft ?? []).map(agent => [agent.id, agent]));
   const completedElapsed = simulation.snapshot?.time ?? 0;
@@ -148,6 +156,13 @@ export default function AirspaceMap() {
   const traffic = trafficByAgent(comms);
 
   const selectedFlight = flights.find(flight => flight.agentId === selectedId);
+  // Map position of any message endpoint: an airport's ATC, or a plane that is on the map.
+  const visibleById = Object.fromEntries(visibleFlights.map(flight => [flight.agentId, flight]));
+  const nodePosition = (id) => {
+    if (id.startsWith('atc:')) return ATC_POSITIONS[id] ?? null;
+    const flight = visibleById[id];
+    return flight ? posesById[id]?.position ?? agentPose(flight, agentsById[id]).position : null;
+  };
   const selectedAgent = selectedFlight ? agentsById[selectedFlight.agentId] : undefined;
   // Live altitude, speed and fuel for the info card.
   const selectedPhysics = selectedAgent
@@ -303,6 +318,15 @@ export default function AirspaceMap() {
             <CloseCallsOverlay calls={closeCalls} scale={scale} showLabels={showLabels} selectedId={selectedId} />
           )}
 
+          {/* Live messages between nodes, under the plane icons. */}
+          {showSignals && (
+            <SignalLayer
+              signals={simulation.snapshot?.signals}
+              time={completedElapsed}
+              positionOf={nodePosition}
+            />
+          )}
+
           {/* Aircraft are drawn last so they sit on top of airports and routes. */}
           {visibleFlights.map((flight) => (
             <Aircraft
@@ -359,6 +383,8 @@ export default function AirspaceMap() {
           commsSummary={commsSummary}
           procedures={procedures}
           onProceduresChange={changeProcedures}
+          showSignals={showSignals}
+          onShowSignalsChange={setShowSignals}
         />
       </aside>
 
@@ -375,7 +401,7 @@ export default function AirspaceMap() {
         <button onClick={resetView} aria-label="Reset view">⟲</button>
       </div>
 
-      {/* Right column: live flight tracker on top, selected airport/aircraft card at the bottom. */}
+      {/* Right column: live flight tracker in the top corner, selected airport/aircraft card at the bottom. */}
       <div className="right-column">
         <FlightTracker
           flights={visibleFlights}

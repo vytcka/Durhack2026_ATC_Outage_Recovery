@@ -37,6 +37,7 @@ export default function Aircraft({ flight, agent, pose, link, scale, showLabel, 
       data-diverted={String(Boolean(agent?.diverted))}
       data-rerouted={String(Boolean(agent?.reroute))}
       data-nordo={String(agent?.phase !== 'ARRIVED' && agent?.squawk === '7600')}
+      data-no-radio={String(agent?.radioPath === null)}
       transform={`translate(${x},${y}) scale(${scale})`}
       onClick={onClick}
     >

@@ -4,7 +4,7 @@ import { SIMULATION_MINUTES } from '../simulation/timing.js';
 
 // Collapsible stats panel shown under the title.
 export default function AnalyticsPanel({ open, timeZone, simTime, elapsed, airborne, disruptionIndex, onReset, onSeek, simulation, settings, onSettingsChange, scenarioEvents, onEventsChange, scenarioAircraft, scenarioAirports,
-  autoEvents, closeCallCount, lossCount, commsSummary, procedures, onProceduresChange }) {
+  autoEvents, closeCallCount, lossCount, commsSummary, procedures, onProceduresChange, showSignals, onShowSignalsChange }) {
   const clockFormat = useMemo(
     () =>
       new Intl.DateTimeFormat('en-US', {
@@ -68,6 +68,19 @@ export default function AnalyticsPanel({ open, timeZone, simTime, elapsed, airbo
           </div>
           <p className="muted">Drag to seek · pauses playback</p>
         </div>
+
+        <label className="signals-toggle">
+          <input
+            type="checkbox"
+            role="switch"
+            checked={showSignals}
+            onChange={(event) => onShowSignalsChange(event.target.checked)}
+          />
+          <span>
+            Live communications
+            <small className="muted">Each line is one message · red dashed = lost</small>
+          </span>
+        </label>
 
         <AgentNetworkPanel simulation={simulation} settings={settings} onSettingsChange={onSettingsChange}
           scenarioEvents={scenarioEvents} onEventsChange={onEventsChange} scenarioAircraft={scenarioAircraft} scenarioAirports={scenarioAirports}

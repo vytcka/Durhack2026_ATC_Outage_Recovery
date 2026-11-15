@@ -155,6 +155,29 @@ body {
 }
 .route-change-pulse { fill: none; stroke: var(--text); stroke-width: 1.5; }
 
+/* ---------- Live communications (SignalLayer) ---------- */
+/* One path per snapshot; the whole batch fades together. Duration matches FADE_MS. */
+.signals { pointer-events: none; }
+.signal-batch { animation: signal-fade 0.8s ease-out forwards; }
+.signal { fill: none; stroke: #7dd3fc; stroke-width: 0.5; stroke-linecap: round; }
+.signal.dropped { stroke: var(--status-delayed); stroke-dasharray: 2 3; }
+
+@keyframes signal-fade {
+  from { opacity: 0.9; }
+  to   { opacity: 0; }
+}
+
+/* Out of radio coverage (no tower or relay in range): the plane fades. */
+.aircraft[data-no-radio="true"] .aircraft-icon { opacity: 0.4; }
+
+/* Analytics panel switch for the overlay. */
+.signals-toggle {
+  display: flex; align-items: flex-start; gap: 8px;
+  margin: 0 14px 12px; font-size: 12px; cursor: pointer;
+}
+.signals-toggle input { margin: 2px 0 0; accent-color: var(--accent); cursor: pointer; }
+.signals-toggle small { display: block; font-size: 10px; }
+
 /* ---------- Overlays ---------- */
 .panel {
   position: absolute;
@@ -335,7 +358,8 @@ body {
 .speed-labels button:hover,
 .speed-labels button.active { color: var(--accent); }
 
-.zoom-buttons { position: absolute; top: 16px; right: 16px; display: flex; flex-direction: column; gap: 4px; }
+/* Bottom-right corner, just above the status bar. */
+.zoom-buttons { position: absolute; right: 16px; bottom: 60px; display: flex; flex-direction: column; gap: 4px; }
 .zoom-buttons button {
   width: 34px; height: 34px;
   border: 1px solid var(--panel-border); border-radius: 6px;
@@ -350,10 +374,11 @@ body {
 .info-code span { font-size: 12px; color: var(--muted); font-weight: 400; }
 .info-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 
-/* Right column, below the zoom buttons: flight tracker on top, info card pinned to the bottom.
+/* Right column: flight tracker in the top corner, info card at the bottom, ending just above
+   the zoom buttons (60px status bar offset + 3 × 34px buttons + gaps).
    Both shrink to share the height and scroll inside; gaps between them stay draggable map. */
 .right-column {
-  position: absolute; top: 136px; right: 16px; bottom: 60px;
+  position: absolute; top: 16px; right: 16px; bottom: 178px;
   display: flex; flex-direction: column; align-items: flex-end; gap: 8px;
   max-width: calc(100vw - 32px); pointer-events: none;
 }

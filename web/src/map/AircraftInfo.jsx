@@ -259,6 +259,13 @@ export default function AircraftInfo({
           <dt>Fuel</dt>
           <dd>{(physics?.fuelKg ?? flight.fuel_remaining).toLocaleString('en-US')} kg</dd>
 
+          {agent?.radioPath !== undefined && (
+            <>
+              <dt>Radio link</dt>
+              <dd data-info="radio-link">{describeRadioLink(agent.radioPath, nameOf)}</dd>
+            </>
+          )}
+
           <dt>Known peers</dt>
           <dd>{agent?.knownPeers ?? 0}</dd>
 
@@ -288,4 +295,14 @@ function formatVerticalRate(feetPerMinute) {
   if (rounded === 0) return 'level';
   const arrow = rounded > 0 ? '↑' : '↓';
   return `${arrow} ${Math.abs(rounded).toLocaleString('en-US')} ft/min`;
+}
+
+// ['aircraft:3', 'atc:ATL'] -> "ATL tower"
+// ['aircraft:3', 'aircraft:7', 'atc:ATL'] -> "ATL tower via DL123"
+// null -> "No coverage"
+function describeRadioLink(path, nameOf) {
+  if (!path) return 'No coverage';
+  const tower = `${path.at(-1).slice(4)} tower`;
+  const relays = path.slice(1, -1).map(nameOf);
+  return relays.length ? `${tower} via ${relays.join(' → ')}` : tower;
 }

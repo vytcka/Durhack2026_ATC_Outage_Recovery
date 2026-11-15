@@ -145,6 +145,14 @@ export default function AgentNetworkPanel({ simulation, settings, onSettingsChan
         <input id="travel-speed" type="range" min={25} max={100} step={25} value={settings.travelSpeedPercent}
           onChange={event => update('travelSpeedPercent', Number(event.target.value))} />
         <output htmlFor="travel-speed" className="mono">{settings.travelSpeedPercent}% of nominal</output>
+        <label htmlFor="aircraft-range">Aircraft radio range (nm)</label>
+        <input id="aircraft-range" type="range" min={10} max={100} step={10} value={settings.aircraftRangeNm}
+          onChange={event => update('aircraftRangeNm', Number(event.target.value))} />
+        <output htmlFor="aircraft-range" className="mono">{settings.aircraftRangeNm} nm · plane to plane</output>
+        <label htmlFor="tower-range">Tower radio range (nm)</label>
+        <input id="tower-range" type="range" min={10} max={100} step={10} value={settings.towerRangeNm}
+          onChange={event => update('towerRangeNm', Number(event.target.value))} />
+        <output htmlFor="tower-range" className="mono">{settings.towerRangeNm} nm · tower to plane</output>
         <DisruptionEditor events={scenarioEvents} onChange={onEventsChange} aircraft={scenarioAircraft}
           airports={scenarioAirports} currentTime={now} />
       </details>
