@@ -2,13 +2,19 @@ import { createAircraft, createAtc } from './agents.js';
 import { decideAircraft } from './aircraftPolicy.js';
 import { decideAtc } from './atcPolicy.js';
 import { DISRUPTION_FACTORS, activeDisruptions, isLinkDown, packetLost } from './disruptions.js';
-import { SIMULATION_MS, flightTiming } from './timing.js';
+import { SIMULATION_MS, flightTiming, scheduledDepartureMs } from './timing.js';
 import { transportEffects } from './transport.js';
 import { nodeEffects } from './nodeEffects.js';
 import { aircraftPosition, diversionFraction } from './navigation.js';
 import { parseRulebook } from './rulebook.js';
+import { resolveProcedures } from './procedures.js';
 
 const RUN_END = SIMULATION_MS - 1;
+// Upper bound on snapshot.comms entries so a congested network cannot bloat every snapshot.
+const MAX_COMMS = 400;
+const EMPTY_MEASURES = Object.freeze({
+  sent: 0, received: 0, dropped: 0, holdMs: 0, groundWaitMs: 0, arrivalWaitMs: 0, lostContactMs: 0, enRouteMs: 0,
+});
 
 export class Simulation {
   #agents = new Map();
@@ -22,6 +28,11 @@ export class Simulation {
   #peerCandidates = new Map();
   #airportPositions = new Map();
   #stats = { sent: 0, delivered: 0, dropped: 0, rejected: 0, duplicates: 0, bandwidthDeferred: 0, restarts: 0 };
+  // Observer-side measurement, kept outside agent memory so no policy can read it.
+  #tickComms = [];             // messages delivered or dropped during the latest tick
+  #measures = new Map();       // aircraft id -> counters and durations (EMPTY_MEASURES shape)
+  #delayCauses = new Map();    // aircraft id -> { cause: ms }
+  #lastDelay = new Map();      // aircraft id -> highest totalDelayMs already attributed
 
   constructor(flights, options = {}) {
     this.#options = structuredClone({ tickMs: 10_000, latencyMs: 10_000, timeoutMs: 60_000, seed: 1, disruptions: [], ...options });
@@ -82,9 +93,12 @@ export class Simulation {
     }
     const knownAirports = [...this.#airportPositions].map(([id, position]) => ({ iata: id.slice(4), lon: position[0], lat: position[1] }));
     const aircraft = [...this.#agents.values()].filter(agent => agent.kind === 'aircraft');
+    // Lost-comms command lists: per aircraft, else the shared default, else derived from COMLOST.
+    const procedures = resolveProcedures(this.#options.procedures, aircraft.map(agent => agent.id), rules.COMLOST);
     for (const agent of aircraft) {
       agent.rules = { ...rules };
       agent.knownAirports = structuredClone(knownAirports);
+      agent.procedure = procedures[agent.id] ?? null;
     }
     for (const event of this.#options.disruptions) {
       if (!event.agentId) continue;
@@ -117,6 +131,78 @@ export class Simulation {
     if (this.#events.length > 100) this.#events.shift();
   }
 
+  // Events affecting an aircraft now: global ones, ones aimed at it, and ones at its controlling
+  // ATC (departure airport before take-off, current arrival airport after). Quick-control
+  // no-ops (0 % loss, 0 ms delay, 100 % speed) are left out.
+  #activeFactorsFor(agent) {
+    const controller = `atc:${agent.departedAt === null ? agent.flight.airport_dep : (agent.arrivalAirport ?? agent.flight.airport_dest)}`;
+    return this.#options.disruptions.filter(event => event.startMs <= this.#time && this.#time < event.endMs
+      && (!event.agentId || event.agentId === agent.id || event.agentId === controller)
+      && !(event.factor === 'PACKET_LOSS' && event.value === 0)
+      && !(event.factor === 'DELIVERY_DELAY' && event.value === 0)
+      && !(event.factor === 'REDUCED_SPEED' && event.value === 1));
+  }
+
+  // What a tick of added delay is blamed on: the active factors plus the aircraft's own route
+  // situation. 'PROTOCOL' when nothing is active (ordinary latency, retries, quantisation).
+  #delayCausesFor(agent) {
+    const causes = new Set(this.#activeFactorsFor(agent).map(event => event.factor));
+    if (agent.diverted) causes.add('DIVERSION');
+    else if (agent.reroute && agent.phase === 'EN_ROUTE' && agent.progress < agent.reroute.endProgress) causes.add('DETOUR');
+    if (agent.procedureState?.active) causes.add('LOST_CONTACT');
+    return causes.size ? [...causes] : ['PROTOCOL'];
+  }
+
+  #measuresFor(id) {
+    let measures = this.#measures.get(id);
+    if (!measures) this.#measures.set(id, measures = { ...EMPTY_MEASURES });
+    return measures;
+  }
+
+  #count(id, key) {
+    if (id?.startsWith('aircraft:')) this.#measuresFor(id)[key] += 1;
+  }
+
+  // Per-tick measurement of one aircraft after its decision is committed.
+  #measure(before, agent) {
+    const tickMs = this.#options.tickMs;
+    const measures = this.#measuresFor(agent.id);
+    if (before.phase === 'EN_ROUTE' && agent.phase === 'EN_ROUTE') {
+      measures.enRouteMs += tickMs;
+      if (agent.travelWorkMs <= before.travelWorkMs) measures.holdMs += tickMs;
+    }
+    if (agent.departedAt === null && this.#time > scheduledDepartureMs(agent.flight)) measures.groundWaitMs += tickMs;
+    if (agent.phase === 'AWAITING_ARRIVAL') measures.arrivalWaitMs += tickMs;
+    if (agent.procedureState?.active) measures.lostContactMs += tickMs;
+
+    // Each tick's growth in total delay is split equally between the causes active for it.
+    const total = flightTiming(agent, this.#time, this.#options).totalDelayMs;
+    const attributed = this.#lastDelay.get(agent.id) ?? 0;
+    if (total > attributed) {
+      const causes = this.#delayCausesFor(agent);
+      const share = (total - attributed) / causes.length;
+      const buckets = this.#delayCauses.get(agent.id) ?? {};
+      for (const cause of causes) buckets[cause] = (buckets[cause] ?? 0) + share;
+      this.#delayCauses.set(agent.id, buckets);
+      this.#lastDelay.set(agent.id, total);
+    }
+  }
+
+  // The latest tick's traffic plus everything still in flight, one entry per link and status.
+  #commsSummary() {
+    const comms = [];
+    const seen = new Set();
+    const add = (from, to, type, status) => {
+      const key = `${from}>${to}>${type}>${status}`;
+      if (comms.length >= MAX_COMMS || seen.has(key)) return;
+      seen.add(key);
+      comms.push({ from, to, type, status });
+    };
+    for (const link of this.#tickComms) add(link.from, link.to, link.type, link.status);
+    for (const message of this.#queue) add(message.from, message.to, message.type, 'in-flight');
+    return comms;
+  }
+
   #send(message) {
     const extraDelay = activeDisruptions(this.#options.disruptions, message, this.#time)
       .filter(event => event.factor === 'DELIVERY_DELAY').reduce((sum, event) => sum + event.value, 0);
@@ -133,9 +219,12 @@ export class Simulation {
       envelope.payload = null;
     }
     this.#stats.sent += 1;
+    this.#count(message.from, 'sent');
     if (isLinkDown(this.#options.disruptions, envelope, this.#time)
       || effects.drop || this.#outOfRange(envelope) || packetLost(this.#options.disruptions, envelope, this.#time, this.#options.seed)) {
       this.#stats.dropped += 1;
+      this.#count(message.from, 'dropped');
+      this.#tickComms.push({ from: message.from, to: message.to, type: message.type, status: 'dropped' });
       this.#record({ type: 'MESSAGE_DROPPED', from: message.from, to: message.to, messageType: message.type });
       return;
     }
@@ -150,6 +239,7 @@ export class Simulation {
 
   #step() {
     this.#time += this.#options.tickMs;
+    this.#tickComms = [];
     const active = this.#options.disruptions.filter(event => event.startMs <= this.#time && this.#time < event.endMs);
     const previous = this.#options.disruptions.filter(event => event.startMs <= this.#time - this.#options.tickMs
       && this.#time - this.#options.tickMs < event.endMs);
@@ -175,6 +265,8 @@ export class Simulation {
       if (isLinkDown(this.#options.disruptions, message, this.#time)
         || this.#outOfRange(message) || transportEffects(this.#options.disruptions, message, this.#time, this.#options.seed).drop) {
         this.#stats.dropped += 1;
+        this.#count(message.from, 'dropped');
+        this.#tickComms.push({ from: message.from, to: message.to, type: message.type, status: 'dropped' });
         this.#record({ type: 'MESSAGE_DROPPED', from: message.from, to: message.to, messageType: message.type });
         continue;
       }
@@ -190,6 +282,8 @@ export class Simulation {
         deliveredByRecipient.set(message.to, delivered + 1);
         recipient.inbox.push(structuredClone(message));
         this.#stats.delivered += 1;
+        this.#count(message.to, 'received');
+        this.#tickComms.push({ from: message.from, to: message.to, type: message.type, status: 'delivered' });
         this.#record({ type: 'MESSAGE_DELIVERED', from: message.from, to: message.to, messageType: message.type, messageId: message.id });
       }
     }
@@ -218,7 +312,9 @@ export class Simulation {
       return decideAircraft(agent, this.#time, this.#options.timeoutMs, this.#options.tickMs, environment);
     });
     for (const decision of decisions) {
+      const before = this.#agents.get(decision.next.id);
       this.#agents.set(decision.next.id, decision.next);
+      if (decision.next.kind === 'aircraft') this.#measure(before, decision.next);
       for (const event of decision.events) {
         if (event.type === 'MESSAGE_REJECTED') this.#stats.rejected += 1;
         this.#record(event);
@@ -239,6 +335,10 @@ export class Simulation {
       this.#sequence = 0;
       this.#stats = { ...fresh.#stats };
       this.#applied = fresh.#applied;
+      this.#tickComms = [];
+      this.#measures = new Map();
+      this.#delayCauses = new Map();
+      this.#lastDelay = new Map();
     }
     while (this.#time < target) this.#step();
     return this.snapshot();
@@ -257,14 +357,15 @@ export class Simulation {
         trigger: agent.alternateTrigger ?? null, action: agent.alternateAction ?? null } : null,
       position: aircraftPosition(agent),
       protocolDecision: agent.protocolDecision ?? null,
-      activeFactors: this.#options.disruptions.filter(event => {
-        const controller = `atc:${agent.departedAt === null ? agent.flight.airport_dep : (agent.arrivalAirport ?? agent.flight.airport_dest)}`;
-        return event.startMs <= this.#time && this.#time < event.endMs
-          && (!event.agentId || event.agentId === agent.id || event.agentId === controller)
-          && !(event.factor === 'PACKET_LOSS' && event.value === 0)
-          && !(event.factor === 'DELIVERY_DELAY' && event.value === 0)
-          && !(event.factor === 'REDUCED_SPEED' && event.value === 1);
-      }).map(({ id, factor, value, agentId }) => ({ id, factor, value, agentId })),
+      activeFactors: this.#activeFactorsFor(agent).map(({ id, factor, value, agentId }) => ({ id, factor, value, agentId })),
+      // Lost-comms protocol and the aircraft's own decision trail (written by its policy).
+      procedure: agent.procedure ?? null,
+      procedureState: agent.procedureState ?? null,
+      squawk: agent.squawk ?? agent.flight.squawk ?? null,
+      reasoning: agent.reasoning ?? [],
+      // Observer measurements (not visible to any agent).
+      delayByCause: { ...(this.#delayCauses.get(agent.id) ?? {}) },
+      measures: { ...(this.#measures.get(agent.id) ?? EMPTY_MEASURES) },
       arrivalAirport: agent.arrivalAirport ?? agent.flight.airport_dest,
       climbProgress: agent.climbProgress ?? 0, reserve: agent.reserve ?? 1,
       knownPeers: Object.keys(agent.knownPeers ?? {}).length, priority: agent.priority ?? false,
@@ -272,9 +373,18 @@ export class Simulation {
       arrivedAt: agent.arrivedAt,
       ...flightTiming(agent, this.#time, this.#options),
     }));
+    const delayByCause = {};
+    for (const agent of aircraft) {
+      for (const [cause, ms] of Object.entries(agent.delayByCause)) delayByCause[cause] = (delayByCause[cause] ?? 0) + ms;
+    }
     return structuredClone({
-      time: this.#time, aircraft, events: this.#events,
+      time: this.#time, aircraft, events: this.#events, comms: this.#commsSummary(),
       stats: {
+        detouredFlights: aircraft.filter(agent => agent.reroute).length,
+        divertedFlights: aircraft.filter(agent => agent.diverted).length,
+        affectedFlights: aircraft.filter(agent => agent.delayed || agent.reroute || agent.diverted).length,
+        lostContactFlights: aircraft.filter(agent => agent.procedureState).length,
+        delayByCause,
         ...this.#stats, queued: this.#queue.length,
         atcAgents: this.#agents.size - aircraft.length,
         airborne: aircraft.filter(agent => ['EN_ROUTE', 'AWAITING_ARRIVAL'].includes(agent.phase)).length,

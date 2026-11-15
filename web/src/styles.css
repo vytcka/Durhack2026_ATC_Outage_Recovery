@@ -20,6 +20,11 @@
   --status-diverting: #38bdf8;
   --status-landed: #22c55e;
   --route-old: #f87171;
+  /* Radio-link symbol above each aircraft (map/commsLinks.js) and separation alerts (map/closeCalls.js). */
+  --link-live: #22c55e;
+  --link-lost: #ef4444;
+  --close-call-loss: #ef4444;
+  --close-call-predicted: #f59e0b;
   --mono: ui-monospace, Consolas, monospace;
 }
 
@@ -73,12 +78,15 @@ body {
 .aircraft[data-status="on-time"] .aircraft-icon { fill: var(--status-on-time); }
 .aircraft[data-status="delayed"] .aircraft-icon,
 .aircraft[data-status="landed-late"] .aircraft-icon { fill: var(--status-delayed); }
-.aircraft[data-status="detouring"] .aircraft-icon { fill: var(--status-detouring); }
+.aircraft[data-status="detouring"] .aircraft-icon,
+.aircraft[data-status="detoured-landed"] .aircraft-icon { fill: var(--status-detouring); }
 .aircraft[data-status="diverting"] .aircraft-icon,
 .aircraft[data-status="diverted-landed"] .aircraft-icon { fill: var(--status-diverting); }
 .aircraft[data-status="landed"] .aircraft-icon { fill: var(--status-landed); }
-/* Landed: dimmed but keeps its hue, so late/diverted landings stay distinguishable. */
-.aircraft:is([data-status="landed"], [data-status="landed-late"], [data-status="diverted-landed"]):not(.selected) { opacity: 0.55; }
+/* Landed: dimmed but keeps its hue, so late/detoured/diverted landings stay distinguishable. */
+.aircraft:is([data-status="landed"], [data-status="landed-late"], [data-status="detoured-landed"], [data-status="diverted-landed"]):not(.selected) { opacity: 0.55; }
+/* Radio failure (squawk 7600): red outline on whatever its status colour is. */
+.aircraft[data-nordo="true"] .aircraft-icon { stroke: var(--close-call-loss); stroke-width: 1.5; }
 .aircraft:hover .aircraft-icon,
 .aircraft.selected .aircraft-icon { filter: drop-shadow(0 0 4px var(--accent)) brightness(1.15); }
 
@@ -89,6 +97,45 @@ body {
   stroke: var(--bg);
   stroke-width: 3px;
   stroke-linejoin: round;
+}
+
+/* ---------- Radio-link symbol above each aircraft ---------- */
+/* Green broadcast symbol = in contact (outer wave pulses while transmitting); red with a slash = lost. */
+.link-symbol { color: var(--link-live); }
+.link-symbol[data-link="lost"] { color: var(--link-lost); }
+.link-badge { fill: rgba(11, 18, 32, 0.85); stroke: currentColor; stroke-width: 1.2; }
+.link-emitter { fill: currentColor; }
+.link-wave, .link-slash { fill: none; stroke: currentColor; stroke-width: 1.4; stroke-linecap: round; }
+.link-slash { stroke-width: 1.8; }
+.link-symbol[data-link="lost"] .link-wave { opacity: 0.45; }
+.link-symbol[data-link="live"][data-transmitting="true"] .link-wave-outer { animation: link-transmit 0.9s ease-in-out infinite; }
+.link-symbol[data-link="lost"] .link-badge { animation: link-lost 1.2s ease-in-out infinite; }
+@keyframes link-transmit { 50% { opacity: 0.2; } }
+@keyframes link-lost { 50% { stroke-opacity: 0.3; } }
+
+/* ---------- Separation alerts ---------- */
+.close-call-ring { fill: none; stroke-width: 1.6; vector-effect: non-scaling-stroke; }
+.close-call-loss .close-call-ring { stroke: var(--close-call-loss); }
+.close-call-loss .close-call-ring { animation: close-call-pulse 1s ease-in-out infinite alternate; }
+.close-call-predicted .close-call-ring { stroke: var(--close-call-predicted); opacity: 0.7; }
+.close-call.is-selected .close-call-ring { stroke-width: 2.6; }
+.close-call-label {
+  font: 700 11px var(--mono);
+  paint-order: stroke; stroke: var(--bg); stroke-width: 3px; stroke-linejoin: round;
+}
+.close-call-loss .close-call-label { fill: var(--close-call-loss); }
+.close-call-predicted .close-call-label { fill: var(--close-call-predicted); }
+@keyframes close-call-pulse { from { opacity: 1; } to { opacity: 0.35; } }
+
+/* Lost-comms holding orbit (CircleAround / Hold block). */
+.holding-orbit {
+  fill: none; stroke: var(--close-call-loss); stroke-width: 1.2; stroke-dasharray: 3 4; opacity: 0.6;
+  vector-effect: non-scaling-stroke;
+}
+.holding-orbit.is-selected { opacity: 1; stroke-width: 1.8; }
+
+@media (prefers-reduced-motion: reduce) {
+  .link-symbol .link-wave-outer, .link-symbol .link-badge, .close-call-loss .close-call-ring { animation: none; }
 }
 
 /* ---------- Route changes ---------- */
@@ -210,10 +257,40 @@ body {
 .key-scheduled { background: var(--status-scheduled); }
 .key-on-time { background: var(--status-on-time); }
 .key-delayed, .key-landed-late { background: var(--status-delayed); }
-.key-detouring { background: var(--status-detouring); }
+.key-detouring, .key-detoured-landed { background: var(--status-detouring); }
 .key-diverting, .key-diverted-landed { background: var(--status-diverting); }
 .key-landed { background: var(--status-landed); }
-.key-landed, .key-landed-late, .key-diverted-landed { opacity: 0.55; }
+.key-landed, .key-landed-late, .key-detoured-landed, .key-diverted-landed { opacity: 0.55; }
+
+/* Section headings, measured delay causes, communication legend and generated events. */
+.agent-network .network-heading { margin: 12px 0 0; font-size: 12px; }
+.network-stats div[data-alert="true"] dd { color: var(--close-call-predicted); }
+.stat-alert { color: var(--close-call-loss); }
+.delay-causes ul, .comms-legend, .auto-events ol { margin: 6px 0 0; padding: 0; list-style: none; }
+.delay-causes li {
+  display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: 8px; row-gap: 2px;
+  margin-bottom: 5px;
+}
+.delay-cause-label { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.delay-cause-bar { grid-column: 1 / span 2; height: 3px; border-radius: 2px; background: var(--status-delayed); opacity: 0.8; }
+.comms-legend { display: grid; gap: 4px; color: var(--muted); font-size: 10px; margin-top: 8px; }
+.comms-legend li { display: flex; align-items: center; gap: 6px; }
+.comms-legend strong { color: var(--text); font-weight: 600; }
+.link-key { flex: none; width: 10px; height: 10px; border: 2px solid var(--link-live); border-radius: 50%; }
+.link-key-lost { border-color: var(--link-lost); background: linear-gradient(135deg, transparent 42%, var(--link-lost) 42% 58%, transparent 58%); }
+.auto-events { margin-top: 6px; }
+.auto-events ol { max-height: 180px; overflow-y: auto; }
+.auto-events li { margin-bottom: 4px; overflow-wrap: anywhere; }
+.auto-events li[data-state="active"] { color: var(--accent); }
+.auto-events li[data-state="ended"] { color: var(--muted); }
+.procedure-settings { margin-top: 4px; padding-top: 2px; }
+.procedure-apply-actions { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+.procedure-apply-actions button {
+  padding: 3px 8px; border: 1px solid var(--panel-border); border-radius: 4px;
+  background: var(--bg); color: var(--text); font-size: 11px; cursor: pointer;
+}
+.procedure-apply-actions button:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+.procedure-apply-actions button:disabled { opacity: 0.45; cursor: not-allowed; }
 
 .agent-network details { border-top: 1px solid var(--panel-border); padding: 8px 0; }
 .agent-network summary { cursor: pointer; }
@@ -296,7 +373,8 @@ body {
 .status-badge[data-status="on-time"] { background: var(--status-on-time); }
 .status-badge[data-status="delayed"],
 .status-badge[data-status="landed-late"] { background: var(--status-delayed); color: #fff; }
-.status-badge[data-status="detouring"] { background: var(--status-detouring); }
+.status-badge[data-status="detouring"],
+.status-badge[data-status="detoured-landed"] { background: var(--status-detouring); }
 .status-badge[data-status="diverting"],
 .status-badge[data-status="diverted-landed"] { background: var(--status-diverting); }
 .status-badge[data-status="landed"] { background: var(--status-landed); }
@@ -338,6 +416,50 @@ body {
 .info-actions button:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
 .info-actions button:disabled { opacity: 0.45; cursor: not-allowed; }
 .info-details { margin-top: 8px; padding-top: 6px; border-top: 1px solid var(--panel-border); }
+
+/* Card alerts: radio failure, close call, running lost-comms block. */
+.nordo-badge {
+  flex: none; margin-left: auto; padding: 1px 5px; border-radius: 3px;
+  background: var(--close-call-loss); color: #fff; font-size: 10px; font-weight: 700;
+}
+.close-call-note, .procedure-note { margin-top: 3px; font-size: 11px; }
+.close-call-note { color: var(--close-call-predicted); }
+.close-call-note[data-kind="loss"] { color: var(--close-call-loss); font-weight: 600; }
+.procedure-note { color: var(--close-call-loss); }
+.procedure-note strong { color: var(--text); }
+
+/* "Why?" and "Lost comms" toggles and their panels. */
+.info-toggles { display: flex; gap: 6px; margin-top: 6px; }
+.info-toggles button {
+  flex: 1; padding: 3px 6px; border: 1px solid var(--panel-border); border-radius: 4px;
+  background: transparent; color: var(--muted); font-size: 11px; cursor: pointer;
+}
+.info-toggles button:hover, .info-toggles button[aria-expanded="true"] { border-color: var(--accent); color: var(--accent); }
+.info-toggles button[data-alert="true"] { color: var(--close-call-loss); border-color: var(--close-call-loss); }
+.info-why, .info-comms { margin-top: 6px; padding-top: 6px; border-top: 1px solid var(--panel-border); font-size: 11px; }
+.info-why h4 { margin: 6px 0 3px; font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+.info-why h4:first-child { margin-top: 0; }
+.info-why h4 .mono { color: var(--status-delayed); text-transform: none; letter-spacing: 0; }
+.why-causes, .why-diversion, .why-timeline, .procedure-running { margin: 0; padding: 0; list-style: none; }
+.why-causes li { display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: 8px; margin-bottom: 4px; }
+.why-causes li > span:first-child { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.why-causes i { grid-column: 1 / span 2; height: 3px; margin-top: 1px; border-radius: 2px; background: var(--status-delayed); }
+.why-diversion li { margin-bottom: 3px; color: var(--status-diverting); }
+.why-measures { display: grid; grid-template-columns: 1fr 1fr; gap: 3px 10px; margin: 0; }
+.why-measures div { min-width: 0; }
+.why-measures dt { color: var(--muted); font: 10px system-ui, sans-serif; }
+.why-measures dd { margin: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.why-timeline { max-height: 160px; overflow-y: auto; }
+.why-timeline li { margin-bottom: 3px; line-height: 1.35; }
+.why-timeline .mono { color: var(--muted); margin-right: 4px; }
+.info-comms p { margin: 0 0 6px; }
+.procedure-running { margin-bottom: 6px; }
+.procedure-running li {
+  margin-bottom: 3px; padding: 2px 6px; border-left: 3px solid var(--block, var(--panel-border));
+  border-radius: 2px; background: rgba(255, 255, 255, 0.03);
+}
+.procedure-running li[data-done="true"] { opacity: 0.5; }
+.procedure-running li[data-active="true"] { background: rgba(239, 68, 68, 0.15); color: var(--text); font-weight: 600; }
 .info-details summary { color: var(--muted); font-size: 11px; cursor: pointer; }
 .info-details summary:hover { color: var(--accent); }
 .aircraft-info .info-grid { gap: 1px 10px; margin-top: 6px; font-size: 11px; }
@@ -349,6 +471,12 @@ body {
   display: flex; align-items: center; gap: 24px;
   font: 11px var(--mono); color: var(--muted); white-space: pre;
 }
+/* Footer layer switches: Comms (messages in flight) and Close calls (live count). */
+.layer-toggles { display: flex; align-items: center; gap: 12px; }
+.layer-toggles label { display: flex; align-items: center; gap: 4px; cursor: pointer; }
+.layer-toggles input { margin: 0; accent-color: var(--accent); }
+.layer-toggles label[data-alert="true"] { color: var(--close-call-predicted); }
+.layer-alert { color: var(--status-delayed); }
 .legend { margin-left: auto; display: flex; align-items: center; gap: 6px; }
 .legend i { width: 18px; border-top: 1px solid var(--ring); margin-left: 8px; }
 .legend .legend-outer { border-top-style: dashed; }

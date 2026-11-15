@@ -139,10 +139,47 @@ test('filters and counts agree with the status table', () => {
   assert.deepEqual(filterRows(rows, 'diverted').map(row => row.flightNumber).sort(), ['D400', 'H800']);
   assert.deepEqual(filterRows(rows, 'detours').map(row => row.flightNumber), ['E500']);
   assert.equal(filterRows(rows, 'unknown').length, rows.length);
-  assert.deepEqual(filterCounts(rows), { disrupted: 6, all: 9, delayed: 4, diverted: 2, detours: 1 });
+  assert.deepEqual(filterCounts(rows), { disrupted: 6, all: 9, delayed: 4, diverted: 2, detours: 1,
+    'close-calls': 0, 'lost-comms': 0 });
   assert.deepEqual(Object.keys(filterCounts(rows)), TRACKER_FILTERS.map(filter => filter.id));
   const counts = summariseStatuses(rows);
   assert.deepEqual(counts, { scheduled: 0, 'on-time': 2, delayed: 2, detouring: 1, diverting: 1,
-    landed: 1, 'landed-late': 1, 'diverted-landed': 1 });
+    landed: 1, 'landed-late': 1, 'detoured-landed': 0, 'diverted-landed': 1 });
   assert.ok(SUMMARY_STATUS_IDS.every(id => FLIGHT_STATUS_BY_ID[id]));
+});
+
+test('a detoured flight is still listed and counted after it lands', () => {
+  const rows = describeFlights([flight('aircraft:0', 'DL9')],
+    { 'aircraft:0': agent({ phase: 'ARRIVED', arrivedAt: 60_000, reroute: { reason: 'NO_GO_REGION' } }) });
+  assert.equal(rows[0].status, 'detoured-landed');
+  assert.equal(rows[0].disrupted, true);
+  assert.deepEqual(filterRows(rows, 'detours').map(row => row.flightNumber), ['DL9']);
+  assert.equal(summariseStatuses(rows)['detoured-landed'], 1);
+  assert.ok(SUMMARY_STATUS_IDS.includes('detoured-landed'));
+});
+
+test('close calls and lost comms are flagged, filtered and sorted to the top', () => {
+  const flights = [flight('aircraft:0', 'AA1'), flight('aircraft:1', 'UA2'), flight('aircraft:2', 'WN3'), flight('aircraft:3', 'DL4')];
+  const agents = {
+    'aircraft:0': agent(), 'aircraft:1': agent(),
+    'aircraft:2': agent({ squawk: '7600', procedureState: { active: true, stepIndex: 1 } }),
+    'aircraft:3': agent({ diverted: true, arrivalAirport: 'IND', diversion }),
+  };
+  const closeCalls = [{ id: 'aircraft:0|aircraft:1', a: 'aircraft:0', b: 'aircraft:1', kind: 'predicted',
+    distanceNm: 20, verticalFt: 0, cpaNm: 2.1, cpaMinutes: 1, verticalAtCpaFt: 0, from: [0, 0], to: [1, 1] }];
+  const rows = describeFlights(flights, agents, { closeCalls });
+  assert.equal(rows[0].closeCall.kind, 'predicted');
+  assert.equal(rows[0].closeCall.text, 'Close call with UA2 · CPA 2.1 NM in 1m 00s');
+  assert.equal(rows[1].closeCall.text, 'Close call with AA1 · CPA 2.1 NM in 1m 00s');
+  assert.equal(rows[0].disrupted, true, 'a close call makes an on-time flight disrupted');
+  assert.equal(rows[2].lostContact, true);
+  assert.equal(rows[2].disrupted, true);
+  assert.equal(rows[3].closeCall, null);
+  assert.deepEqual(filterRows(rows, 'close-calls').map(row => row.flightNumber), ['AA1', 'UA2']);
+  assert.deepEqual(filterRows(rows, 'lost-comms').map(row => row.flightNumber), ['WN3']);
+  assert.deepEqual(sortRows(rows).map(row => row.flightNumber), ['AA1', 'UA2', 'WN3', 'DL4']);
+  const withoutCall = describeFlights(flights, agents);
+  assert.notEqual(withoutCall[0].signature, rows[0].signature);
+  assert.equal(describeFlights(flights, { ...agents, 'aircraft:2': agent({ phase: 'ARRIVED', squawk: '7600' }) })[2].lostContact, false,
+    'a landed plane is no longer lost');
 });

@@ -19,10 +19,13 @@ const B737_PATH = [
 // One aircraft on the map. `agent` is its snapshot entry; `scale` is 1/zoom so the icon keeps
 // the same size on screen. Colour comes from CSS via data-status (see flightStatus.js).
 // agentPose places it by share of route DISTANCE (physics.js speed profile), not of time.
-export default function Aircraft({ flight, agent, scale, showLabel, selected, onClick }) {
-  const { position: [x, y], heading } = agentPose(flight, agent);
+// `pose` (optional) is the pose already computed by the map, e.g. on a lost-comms holding orbit.
+// `link` ({ state: 'live' | 'lost' | null, transmitting }) draws the radio-link symbol above it.
+export default function Aircraft({ flight, agent, pose, link, scale, showLabel, selected, onClick }) {
+  const { position: [x, y], heading } = pose ?? agentPose(flight, agent);
   const status = flightStatus(agent);
   const label = aircraftLabel(flight, agent);
+  const radio = link?.state === 'lost' ? ' · communication lost' : link?.state === 'live' ? ' · in contact' : '';
 
   return (
     <g
@@ -33,21 +36,39 @@ export default function Aircraft({ flight, agent, scale, showLabel, selected, on
       data-delayed={String(Boolean(agent?.delayed))}
       data-diverted={String(Boolean(agent?.diverted))}
       data-rerouted={String(Boolean(agent?.reroute))}
+      data-nordo={String(agent?.phase !== 'ARRIVED' && agent?.squawk === '7600')}
       transform={`translate(${x},${y}) scale(${scale})`}
       onClick={onClick}
     >
-      <title>{label} · {FLIGHT_STATUS_BY_ID[status].label.toLowerCase()}</title>
+      <title>{label} · {FLIGHT_STATUS_BY_ID[status].label.toLowerCase()}{radio}</title>
       {/* Transforms apply right to left: centre the box on the origin, size it, then rotate. */}
       <path
         className="aircraft-icon"
         d={B737_PATH}
         transform={`rotate(${heading}) scale(${ICON_SIZE / ICON_BOX}) translate(${-ICON_BOX / 2},${-ICON_BOX / 2})`}
       />
+      {link?.state && <LinkSymbol state={link.state} transmitting={link.transmitting} />}
       {(showLabel || selected) && (
         <text className="aircraft-label" x={20} y={-12}>
           {label}
         </text>
       )}
+    </g>
+  );
+}
+
+// Radio-link symbol above the plane, in screen pixels (the parent group is scaled by 1/zoom and
+// never rotated): a broadcast emitter with two waves. Green = in contact (outer wave pulses
+// while transmitting), red with a slash = communication lost.
+function LinkSymbol({ state, transmitting }) {
+  return (
+    <g className="link-symbol" data-link={state} data-transmitting={String(Boolean(transmitting))}
+      transform="translate(0,-25)" aria-hidden="true">
+      <circle className="link-badge" r={7.5} />
+      <circle className="link-emitter" r={1.6} />
+      <path className="link-wave" d="M-2.6 -2.6 A3.7 3.7 0 0 0 -2.6 2.6 M2.6 -2.6 A3.7 3.7 0 0 1 2.6 2.6" />
+      <path className="link-wave link-wave-outer" d="M-4.6 -4.6 A6.5 6.5 0 0 0 -4.6 4.6 M4.6 -4.6 A6.5 6.5 0 0 1 4.6 4.6" />
+      {state === 'lost' && <path className="link-slash" d="M-5.3 5.3 L5.3 -5.3" />}
     </g>
   );
 }

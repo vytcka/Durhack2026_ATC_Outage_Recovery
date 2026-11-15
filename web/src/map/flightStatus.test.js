@@ -11,6 +11,14 @@ test('late and diverted landings never share the on-time landed status', () => {
   assert.equal(flightStatus(agent({ phase: 'ARRIVED', diverted: true, delayed: true })), 'diverted-landed');
 });
 
+test('a detour is still counted after landing, ahead of lateness but behind a diversion', () => {
+  const reroute = { startProgress: 0.2, reason: 'NO_GO_REGION' };
+  assert.equal(flightStatus(agent({ phase: 'ARRIVED', reroute })), 'detoured-landed');
+  assert.equal(flightStatus(agent({ phase: 'ARRIVED', reroute, delayed: true })), 'detoured-landed');
+  assert.equal(flightStatus(agent({ phase: 'ARRIVED', reroute, diverted: true })), 'diverted-landed');
+  assert.equal(isDisrupted(agent({ phase: 'ARRIVED', reroute })), true);
+});
+
 test('airborne delayed flights are distinct from on-time flights; route changes take precedence', () => {
   assert.equal(flightStatus(agent()), 'on-time');
   assert.equal(flightStatus(agent({ phase: 'AWAITING_ARRIVAL' })), 'on-time');

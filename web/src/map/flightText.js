@@ -39,7 +39,8 @@ export function aircraftLabel(flight, agent) {
   const status = flightStatus(agent);
   const parts = [flight.flight_number];
   if (status === 'diverting' || status === 'diverted-landed') parts.push(`→ ${agent.arrivalAirport}`);
-  if (['delayed', 'detouring', 'diverting', 'landed-late', 'diverted-landed'].includes(status)) {
+  if (agent?.squawk === '7600') parts.push('7600');
+  if (['delayed', 'detouring', 'diverting', 'landed-late', 'detoured-landed', 'diverted-landed'].includes(status)) {
     const delay = shortDelay(agent?.totalDelayMs);
     if (delay) parts.push(delay);
   }

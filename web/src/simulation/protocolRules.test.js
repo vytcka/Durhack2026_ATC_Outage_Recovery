@@ -58,3 +58,75 @@ test('COMLOST CONTINUE records the decision without diverting', () => {
   assert.equal(state.aircraft[0].protocolDecision.action, 'CONTINUE');
   assert.equal(state.aircraft[0].diverted, false);
 });
+
+// Lost-comms block procedures. The destination ATC goes silent at 60 s; with the 60 s timeout
+// the aircraft (airborne at 50 s) declares lost contact at 170 s.
+test('a per-aircraft block procedure squawks, circles in place, then diverts to its origin', () => {
+  const sim = new Simulation([flight], { airports, disruptions: [event('ATC_LINK_OUTAGE', 'atc:BBB')],
+    procedures: { byAgent: { 'aircraft:0': 'Squawk = 7600\nCircleAround = 2\nDivert = ORIGIN' } } });
+  assert.equal(sim.advanceTo(160_000).aircraft[0].procedureState, null);
+  const circling = sim.advanceTo(200_000).aircraft[0];
+  assert.equal(circling.procedure.source, 'agent');
+  assert.equal(circling.squawk, '7600');
+  assert.equal(circling.procedureState.active, true);
+  assert.equal(circling.procedureState.command, 'CIRCLE');
+  assert.equal(circling.procedureState.stepIndex, 1);
+  assert.equal(circling.procedureState.startedAt, 170_000);
+  assert.equal(circling.protocolDecision.trigger, 'COMLOST');
+  assert.equal(circling.protocolDecision.action, 'PROCEDURE');
+  assert.equal(sim.advanceTo(280_000).aircraft[0].progress, circling.progress, 'no route progress while circling');
+
+  const diverting = sim.advanceTo(400_000).aircraft[0];
+  assert.equal(diverting.diverted, true);
+  assert.equal(diverting.arrivalAirport, 'AAA');
+  assert.equal(diverting.diversion.trigger, 'COMLOST');
+  assert.equal(diverting.diversion.action, 'RETURNTOORIGIN');
+  assert.equal(diverting.procedureState.active, false);
+  assert.equal(diverting.procedureState.outcome, 'diverting');
+  assert.equal(diverting.squawk, null, 'the alternate answered, so the radio-failure code is cleared');
+  const kinds = diverting.reasoning.map(entry => entry.kind);
+  for (const kind of ['DEPARTED', 'CONTACT_LOST', 'PROCEDURE_STEP', 'ALTERNATE_CHOSEN', 'DIVERSION_STARTED']) {
+    assert.ok(kinds.includes(kind), kind);
+  }
+  assert.ok(diverting.reasoning.every(entry => Number.isFinite(entry.at)));
+
+  const landed = sim.advanceTo(600_000);
+  assert.equal(landed.aircraft[0].phase, 'ARRIVED');
+  assert.deepEqual(landed.aircraft[0].position, [0, 0]);
+  sim.advanceTo(0);
+  assert.deepEqual(sim.advanceTo(600_000), landed);
+});
+
+test('hearing the controller again stops the procedure and restores the transponder', () => {
+  const sim = new Simulation([flight], { airports,
+    disruptions: [{ ...event('ATC_LINK_OUTAGE', 'atc:BBB'), endMs: 220_000 }],
+    procedures: { default: 'Squawk = 7600\nContinue = 10\nDivert = NEAREST' } });
+  const lost = sim.advanceTo(200_000).aircraft[0];
+  assert.equal(lost.procedure.source, 'default');
+  assert.equal(lost.squawk, '7600');
+  assert.equal(lost.procedureState.command, 'CONTINUE');
+  const restored = sim.advanceTo(300_000).aircraft[0];
+  assert.equal(restored.procedureState.active, false);
+  assert.equal(restored.procedureState.outcome, 'contact-restored');
+  assert.equal(restored.squawk, null);
+  assert.equal(restored.diverted, false);
+  assert.equal(restored.pendingAlternate, null, 'the Divert block was never reached');
+  assert.ok(restored.reasoning.some(entry => entry.kind === 'CONTACT_RESTORED'));
+});
+
+test('a Hold block stops progress and a global outage still never authorises landing', () => {
+  const state = new Simulation([flight], { airports, disruptions: [event('ATC_LINK_OUTAGE', undefined)],
+    procedures: { default: 'Hold = 1\nDivert = NEAREST' } });
+  const holding = state.advanceTo(200_000).aircraft[0];
+  assert.equal(holding.procedureState.command, 'HOLD');
+  assert.equal(state.advanceTo(220_000).aircraft[0].progress, holding.progress);
+  const later = state.advanceTo(500_000).aircraft[0];
+  assert.equal(later.procedureState.outcome, 'diverting');
+  assert.equal(later.diverted, false, 'no alternate can answer through a network-wide outage');
+  assert.notEqual(later.phase, 'ARRIVED');
+});
+
+test('invalid or misaddressed procedures are rejected when the simulation is built', () => {
+  assert.throws(() => new Simulation([flight], { procedures: { byAgent: { 'aircraft:9': 'Relay' } } }), /unknown aircraft/);
+  assert.throws(() => new Simulation([flight], { procedures: { default: 'Fly = home' } }), /Line 1: unknown block/);
+});

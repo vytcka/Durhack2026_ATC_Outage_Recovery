@@ -1,17 +1,21 @@
 // Pure helpers behind the flight tracker panel: describe, summarise, filter and sort flights.
 // No React and no geography, so everything here runs under `node --test`.
 import { FLIGHT_STATUSES, FLIGHT_STATUS_BY_ID, flightStatus } from './flightStatus.js';
+import { closeCallsByFlight, describeCloseCall } from './closeCalls.js';
 import { formatDelay, formatSimulationTime } from '../simulation/timing.js';
 
 // Header chips, in display order. "Scheduled" is left out: it is only seen in the first minute.
-export const SUMMARY_STATUS_IDS = ['on-time', 'delayed', 'detouring', 'diverting', 'landed', 'landed-late', 'diverted-landed'];
+export const SUMMARY_STATUS_IDS = ['on-time', 'delayed', 'detouring', 'diverting', 'landed', 'landed-late',
+  'detoured-landed', 'diverted-landed'];
 
 export const TRACKER_FILTERS = [
-  { id: 'disrupted', label: 'Disrupted', empty: 'No disrupted flights yet. Schedule a disruption from Scenario controls, or select a plane to block its route or close its destination.' },
+  { id: 'disrupted', label: 'Disrupted', empty: 'No disrupted flights yet. Automatic disruptions start as flights depart; you can also schedule one from Scenario controls, or select a plane to block its route or close its destination.' },
   { id: 'all', label: 'All', empty: 'No flights in the simulation yet.' },
   { id: 'delayed', label: 'Delayed', empty: 'No delayed flights.' },
   { id: 'diverted', label: 'Diverted', empty: 'No flights have changed destination airport.' },
   { id: 'detours', label: 'Detours', empty: 'No detours have been approved.' },
+  { id: 'close-calls', label: 'Close calls', empty: 'No planes are closer than 5 NM / 1,000 ft, or about to be within 3 minutes.' },
+  { id: 'lost-comms', label: 'Lost comms', empty: 'Every airborne plane is in contact with ATC.' },
 ];
 
 const FILTER_TESTS = {
@@ -20,12 +24,21 @@ const FILTER_TESTS = {
   delayed: row => row.delayed,
   diverted: row => row.diverted,
   detours: row => row.rerouted,
+  'close-calls': row => Boolean(row.closeCall),
+  'lost-comms': row => row.lostContact,
 };
 
-// Lower rank sorts first; anything unlisted (on time, scheduled, landed) ranks last.
-const SORT_RANK = { diverting: 0, detouring: 1, delayed: 2, 'landed-late': 3, 'diverted-landed': 3 };
-const SORT_BY_DELAY = new Set([2, 3]);
-const LAST_RANK = 4;
+// Lower rank sorts first: live hazards, then route changes, then delays, then everything else.
+const SORT_RANK = { diverting: 3, detouring: 4, delayed: 5, 'landed-late': 6, 'detoured-landed': 6, 'diverted-landed': 6 };
+const SORT_BY_DELAY = new Set([5, 6]);
+const LAST_RANK = 7;
+
+function sortRank(row) {
+  if (row.closeCall?.kind === 'loss') return 0;
+  if (row.closeCall) return 1;
+  if (row.lostContact) return 2;
+  return SORT_RANK[row.status] ?? LAST_RANK;
+}
 
 const TRIGGER_TEXT = {
   DESTCLOSED: 'Destination closed',
@@ -91,14 +104,20 @@ function detailText(status, agent) {
   return null;
 }
 
+// Radio failure: squawking 7600, or its lost-comms procedure is running.
+export function isLostContact(agent) {
+  return agent?.phase !== 'ARRIVED' && (agent?.squawk === '7600' || Boolean(agent?.procedureState?.active));
+}
+
 function delayTitle(agent) {
   if (!(agent?.totalDelayMs > 0)) return null;
   return `Total delay ${formatDelay(agent.totalDelayMs)} · departure ${formatDelay(agent.departureDelayMs ?? 0)}`
     + ` · en route ${formatDelay(agent.travelDelayMs ?? 0)} · landing wait ${formatDelay(agent.arrivalDelayMs ?? 0)}`;
 }
 
-// One display row. Every field is a primitive so rows can be compared cheaply.
-export function describeFlight(flight, agent) {
+// One display row. Every field is a primitive (or a small frozen summary) so rows compare cheaply.
+// `closeCall` is this flight's worst current close call (closeCalls.js); `nameOf` maps agent id → flight number.
+export function describeFlight(flight, agent, { closeCall = null, nameOf = id => id } = {}) {
   const status = flightStatus(agent);
   const definition = FLIGHT_STATUS_BY_ID[status];
   const diverted = Boolean(agent?.diverted);
@@ -115,8 +134,11 @@ export function describeFlight(flight, agent) {
   const route = previousDestination
     ? `${origin} to ${destination}, diverted from ${previousDestination}`
     : `${origin} to ${destination}`;
+  const lostContact = isLostContact(agent);
+  const callText = describeCloseCall(closeCall, flight.agentId, nameOf);
+  const call = closeCall ? { kind: closeCall.kind, text: callText } : null;
   const ariaLabel = [flight.flight_number, route, definition.label, delay && `${formatDelay(delayMs)} late`,
-    progress, detail, title].filter(Boolean).join(', ');
+    progress, detail, title, callText, lostContact && 'lost contact, squawking 7600'].filter(Boolean).join(', ');
   const row = {
     id: flight.agentId,
     flightNumber: flight.flight_number,
@@ -124,7 +146,9 @@ export function describeFlight(flight, agent) {
     statusLabel: definition.label,
     color: definition.color,
     landed: definition.landed,
-    disrupted: definition.disrupted,
+    disrupted: definition.disrupted || Boolean(call) || lostContact,
+    closeCall: call,
+    lostContact,
     delayed: Boolean(agent?.delayed),
     diverted,
     rerouted: Boolean(agent?.reroute),
@@ -139,12 +163,18 @@ export function describeFlight(flight, agent) {
     delayMs,
     ariaLabel,
   };
-  row.signature = [status, destination, previousDestination, title, detail, progress, delay, row.delayTitle].join('|');
+  row.signature = [status, destination, previousDestination, title, detail, progress, delay, row.delayTitle,
+    callText, lostContact].join('|');
   return row;
 }
 
-export function describeFlights(flights, agentsById) {
-  return flights.map(flight => describeFlight(flight, agentsById?.[flight.agentId]));
+// `closeCalls` is the list from detectCloseCalls (optional).
+export function describeFlights(flights, agentsById, { closeCalls = [] } = {}) {
+  const byFlight = closeCallsByFlight(closeCalls);
+  const names = new Map(flights.map(flight => [flight.agentId, flight.flight_number]));
+  const nameOf = id => names.get(id) ?? id;
+  return flights.map(flight => describeFlight(flight, agentsById?.[flight.agentId],
+    { closeCall: byFlight.get(flight.agentId) ?? null, nameOf }));
 }
 
 export function summariseStatuses(rows) {
@@ -161,11 +191,12 @@ export function filterRows(rows, filterId) {
   return rows.filter(FILTER_TESTS[filterId] ?? FILTER_TESTS.all);
 }
 
-// Diverting, detouring, delayed (worst first), late/diverted landings, then everything else.
+// Losses of separation, close calls, lost comms, diverting, detouring, delayed (worst first),
+// late/detoured/diverted landings, then everything else.
 export function sortRows(rows) {
   return [...rows].sort((a, b) => {
-    const rankA = SORT_RANK[a.status] ?? LAST_RANK;
-    const rankB = SORT_RANK[b.status] ?? LAST_RANK;
+    const rankA = sortRank(a);
+    const rankB = sortRank(b);
     if (rankA !== rankB) return rankA - rankB;
     if (SORT_BY_DELAY.has(rankA) && a.delayMs !== b.delayMs) return b.delayMs - a.delayMs;
     return String(a.flightNumber).localeCompare(String(b.flightNumber)) || String(a.id).localeCompare(String(b.id));

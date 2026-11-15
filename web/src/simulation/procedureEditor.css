@@ -1,0 +1,77 @@
+/* Lost-comms procedure block builder (Scratch-style). Uses the app's dark theme variables. */
+.procedure-editor { display: grid; gap: 6px; min-width: 0; margin-top: 8px; font-size: 11px; }
+.procedure-editor-head { display: flex; align-items: center; justify-content: space-between; gap: 6px; flex-wrap: wrap; }
+.procedure-editor-label { color: var(--muted); }
+.procedure-editor-tools { display: flex; gap: 4px; }
+.procedure-editor-tools button,
+.procedure-block-actions button {
+  padding: 2px 6px; border: 1px solid var(--panel-border); border-radius: 4px;
+  background: var(--bg); color: var(--text); font-size: 10px; cursor: pointer;
+}
+.procedure-editor-tools button:hover:not(:disabled),
+.procedure-block-actions button:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+.procedure-editor-tools button:disabled,
+.procedure-block-actions button:disabled { opacity: 0.4; cursor: not-allowed; }
+.procedure-editor-tools button[aria-pressed="true"] { border-color: var(--accent); }
+
+/* Palette: coloured blocks to click or drag into the stack. */
+.procedure-palette { display: flex; flex-wrap: wrap; gap: 4px; }
+.procedure-palette-block {
+  padding: 3px 7px; border: 1px solid var(--block); border-radius: 10px 4px 4px 10px;
+  background: color-mix(in srgb, var(--block) 18%, var(--bg)); color: var(--text);
+  font-size: 10px; font-weight: 700; cursor: grab;
+}
+.procedure-palette-block:hover:not(:disabled) { background: color-mix(in srgb, var(--block) 32%, var(--bg)); }
+.procedure-palette-block:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* Stack: snapped blocks in execution order. */
+.procedure-stack {
+  display: grid; gap: 2px; margin: 0; padding: 4px; min-height: 28px; list-style: none;
+  border: 1px dashed var(--panel-border); border-radius: 6px; background: var(--bg);
+}
+.procedure-stack.is-drop-end { border-color: var(--accent); }
+.procedure-block {
+  position: relative; padding: 4px 6px; border-left: 4px solid var(--block); border-radius: 4px;
+  background: color-mix(in srgb, var(--block) 16%, var(--bg));
+}
+.procedure-block + .procedure-block::before {
+  /* the "snap" notch joining consecutive blocks */
+  content: ''; position: absolute; top: -3px; left: 14px; width: 12px; height: 3px;
+  background: color-mix(in srgb, var(--block) 45%, var(--bg)); border-radius: 0 0 3px 3px;
+}
+.procedure-block.is-active { outline: 2px solid var(--accent); outline-offset: 1px; }
+.procedure-block.is-drop-target { box-shadow: 0 -2px 0 var(--accent); }
+.procedure-block.is-dragging { opacity: 0.5; }
+.procedure-block-row { display: flex; align-items: center; gap: 5px; min-width: 0; }
+.procedure-block-grip { color: var(--muted); cursor: grab; user-select: none; }
+.procedure-block-index { color: var(--muted); font-size: 9px; }
+.procedure-block-name { font-weight: 700; color: var(--text); white-space: nowrap; }
+.procedure-block-equals { color: var(--muted); }
+.procedure-block-input {
+  width: 4.5em; min-width: 0; padding: 1px 4px; border: 1px solid var(--panel-border); border-radius: 3px;
+  background: var(--bg); color: var(--text); font-size: 11px;
+}
+.procedure-block-input[aria-invalid="true"] { border-color: var(--status-delayed, #f43f5e); }
+.procedure-block-input:focus-visible { outline: 2px solid var(--accent); outline-offset: 0; }
+.procedure-block-unit { color: var(--muted); font-size: 10px; }
+.procedure-block-actions { display: flex; gap: 2px; margin-left: auto; }
+.procedure-block-actions button { padding: 0 5px; line-height: 16px; }
+.procedure-block-help { margin: 2px 0 0 18px; color: var(--muted); font-size: 10px; line-height: 1.35; }
+
+/* Text view of the same procedure. */
+.procedure-editor-input {
+  width: 100%; min-width: 0; resize: vertical; padding: 6px;
+  border: 1px solid var(--panel-border); border-radius: 4px;
+  background: var(--bg); color: var(--text); font: 11px/1.45 var(--mono);
+}
+.procedure-editor-input:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.procedure-editor-input[aria-invalid="true"] { border-color: var(--status-delayed, #f43f5e); }
+
+.procedure-editor-status { margin: 0; color: var(--muted); }
+.procedure-editor-status.is-error { color: var(--status-delayed, #f43f5e); }
+.procedure-command-help ul { margin: 6px 0; padding-left: 16px; }
+.procedure-command-help li { margin: 6px 0; color: var(--muted); overflow-wrap: anywhere; }
+.procedure-command-help code { color: var(--text); font-family: var(--mono); }
+
+.procedure-editor.compact .procedure-palette-block { padding: 2px 6px; }
+.procedure-editor.compact .procedure-block { padding: 3px 5px; }

@@ -3,7 +3,8 @@ import AgentNetworkPanel from '../simulation/AgentNetworkPanel.jsx';
 import { SIMULATION_MINUTES } from '../simulation/timing.js';
 
 // Collapsible stats panel shown under the title.
-export default function AnalyticsPanel({ open, timeZone, simTime, elapsed, airborne, disruptionIndex, onReset, onSeek, simulation, settings, onSettingsChange, scenarioEvents, onEventsChange, scenarioAircraft, scenarioAirports }) {
+export default function AnalyticsPanel({ open, timeZone, simTime, elapsed, airborne, disruptionIndex, onReset, onSeek, simulation, settings, onSettingsChange, scenarioEvents, onEventsChange, scenarioAircraft, scenarioAirports,
+  autoEvents, closeCallCount, lossCount, commsSummary, procedures, onProceduresChange }) {
   const clockFormat = useMemo(
     () =>
       new Intl.DateTimeFormat('en-US', {
@@ -62,12 +63,16 @@ export default function AnalyticsPanel({ open, timeZone, simTime, elapsed, airbo
             onChange={(event) => onSeek(Number(event.target.value) * 60_000)}
             aria-valuetext={`${timelineTime} UTC`}
           />
-          <div className="timeline-labels mono"><span>00:00</span><span>06:00</span><span>11:59</span></div>
+          <div className="timeline-labels mono">
+            <span>00:00</span><span>{minuteLabel(SIMULATION_MINUTES / 2)}</span><span>{minuteLabel(SIMULATION_MINUTES - 1)}</span>
+          </div>
           <p className="muted">Drag to seek · pauses playback</p>
         </div>
 
         <AgentNetworkPanel simulation={simulation} settings={settings} onSettingsChange={onSettingsChange}
-          scenarioEvents={scenarioEvents} onEventsChange={onEventsChange} scenarioAircraft={scenarioAircraft} scenarioAirports={scenarioAirports} />
+          scenarioEvents={scenarioEvents} onEventsChange={onEventsChange} scenarioAircraft={scenarioAircraft} scenarioAirports={scenarioAirports}
+          autoEvents={autoEvents} closeCallCount={closeCallCount} lossCount={lossCount} commsSummary={commsSummary}
+          procedures={procedures} onProceduresChange={onProceduresChange} />
 
         <button className="reset-button" onClick={onReset}>
           Reset simulation
@@ -75,6 +80,12 @@ export default function AnalyticsPanel({ open, timeZone, simTime, elapsed, airbo
       </section>
     </div>
   );
+}
+
+// 255 -> "04:15": timeline labels follow the run length instead of being hard-coded.
+function minuteLabel(totalMinutes) {
+  const minutes = Math.floor(totalMinutes);
+  return `${String(Math.floor(minutes / 60)).padStart(2, '0')}:${String(minutes % 60).padStart(2, '0')}`;
 }
 
 // Splits "14:05 PST" into the time and the zone abbreviation so they can be styled separately.

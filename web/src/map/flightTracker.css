@@ -115,6 +115,18 @@
   color: var(--muted); font-size: 10.5px;
 }
 
+/* Live hazards on a row: close call (amber) / loss of separation (red), and radio failure. */
+.flight-tracker-alert {
+  grid-column: 2 / span 2; grid-row: 3;
+  min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  color: var(--close-call-predicted, #f59e0b); font-size: 10.5px; font-weight: 600;
+}
+.flight-tracker-alert[data-kind="loss"] { color: var(--close-call-loss, #ef4444); }
+.flight-tracker-nordo {
+  display: inline-block; margin-right: 5px; padding: 0 4px; border-radius: 3px;
+  background: var(--close-call-loss, #ef4444); color: #fff; font-size: 9.5px; font-weight: 700; line-height: 1.5;
+}
+
 @media (max-width: 700px) {
   .panel.flight-tracker { max-height: 35vh; }
 }

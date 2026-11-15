@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "test": "node --test src/map/simulationClock.test.js src/map/flightStatus.test.js src/map/flightGeometry.test.js src/map/flightText.test.js src/map/routeChangeOverlay.test.js src/map/flightTracker.test.js src/simulation/engine.test.js src/simulation/factorMechanisms.test.js src/simulation/protocolRules.test.js src/simulation/routeGeometry.test.js src/simulation/rulebook.test.js",
+    "test": "node --test src/map/simulationClock.test.js src/map/flightStatus.test.js src/map/flightGeometry.test.js src/map/flightText.test.js src/map/routeChangeOverlay.test.js src/map/flightTracker.test.js src/map/closeCalls.test.js src/map/commsLinks.test.js src/map/holdingPattern.test.js src/map/regions.test.js src/simulation/engine.test.js src/simulation/factorMechanisms.test.js src/simulation/protocolRules.test.js src/simulation/routeGeometry.test.js src/simulation/rulebook.test.js src/simulation/autoDisruptions.test.js src/simulation/measurement.test.js src/simulation/procedures.test.js src/simulation/reasoning.test.js",
     "benchmark": "node src/simulation/benchmark.js"
   },
   "dependencies": {

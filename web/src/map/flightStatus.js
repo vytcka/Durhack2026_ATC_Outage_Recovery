@@ -13,6 +13,7 @@ export const FLIGHT_STATUSES = [
   { id: 'diverting', label: 'Diverting to new airport', short: 'Diverting', color: 'var(--status-diverting)', disrupted: true, landed: false },
   { id: 'landed', label: 'Landed · on time', short: 'Landed', color: 'var(--status-landed)', disrupted: false, landed: true },
   { id: 'landed-late', label: 'Landed · late', short: 'Landed late', color: 'var(--status-delayed)', disrupted: true, landed: true },
+  { id: 'detoured-landed', label: 'Landed after detour', short: 'Detoured', color: 'var(--status-detouring)', disrupted: true, landed: true },
   { id: 'diverted-landed', label: 'Landed at alternate', short: 'Diverted', color: 'var(--status-diverting)', disrupted: true, landed: true },
 ];
 
@@ -23,7 +24,8 @@ export function flightStatus(agent) {
   if (!agent) return 'scheduled';
   const landed = agent.phase === 'ARRIVED';
   if (agent.diverted) return landed ? 'diverted-landed' : 'diverting';
-  if (landed) return agent.delayed ? 'landed-late' : 'landed';
+  // A detour stays on the record after landing, so it is still counted once the plane is down.
+  if (landed) return agent.reroute ? 'detoured-landed' : agent.delayed ? 'landed-late' : 'landed';
   if (agent.reroute) return 'detouring';
   if (agent.delayed) return 'delayed'; // includes ground delay before departure
   return AIRBORNE.has(agent.phase) ? 'on-time' : 'scheduled';

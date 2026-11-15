@@ -71,3 +71,22 @@ export function agentPose(flight, agent) {
 export function flownPath(flight, agent) {
   return flownTrackPath(flight, agent, projection);
 }
+
+const EARTH_RADIUS_NM = 3440.065;
+const toRadians = degrees => degrees * Math.PI / 180;
+
+function haversineNm([lon1, lat1], [lon2, lat2]) {
+  const dLat = toRadians(lat2 - lat1);
+  const dLon = toRadians(lon2 - lon1);
+  const h = Math.sin(dLat / 2) ** 2 + Math.cos(toRadians(lat1)) * Math.cos(toRadians(lat2)) * Math.sin(dLon / 2) ** 2;
+  return 2 * EARTH_RADIUS_NM * Math.asin(Math.min(1, Math.sqrt(h)));
+}
+
+// Nautical miles covered by one map unit around `position` (the conformal projection's local
+// scale), for turning drawn distances into separation distances. NaN when off the projection.
+export function nmPerMapUnit(position) {
+  const here = projection.invert(position);
+  const east = projection.invert([position[0] + 1, position[1]]);
+  if (!here || !east || ![...here, ...east].every(Number.isFinite)) return NaN;
+  return haversineNm(here, east);
+}

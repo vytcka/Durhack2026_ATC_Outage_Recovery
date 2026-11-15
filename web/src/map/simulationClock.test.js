@@ -36,9 +36,9 @@ test('playback respects speed, pause and stale ticks after seeking', () => {
   assert.equal(elapsedAt(resumed, now + 3000, 60), SIX_HOURS + 60_000);
 });
 
-test('playback stops at the end of the 12-hour run', () => {
+test('playback stops at the end of the 8 h 30 min run', () => {
   const clock = createClock(now);
   const elapsed = elapsedAt(clock, now + 86_400_000, 60);
   assert.equal(elapsed, SIMULATION_MS - 1);
-  assert.equal(new Date(clock.startedAt + elapsed).toISOString(), '2026-11-14T11:59:59.999Z');
+  assert.equal(new Date(clock.startedAt + elapsed).toISOString(), '2026-11-14T08:29:59.999Z');
 });

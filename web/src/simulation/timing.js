@@ -1,5 +1,5 @@
 // Length of one simulation run, from 00:00 UTC. Everything that needs an end time uses this.
-export const SIMULATION_MS = 12 * 60 * 60_000;
+export const SIMULATION_MS = (8 * 60 + 30) * 60_000; // 8 h 30 min
 export const SIMULATION_MINUTES = SIMULATION_MS / 60_000;
 
 // `departure_time` in aircraft_info.json is "HH:MM" UTC on the simulation day, i.e. the same

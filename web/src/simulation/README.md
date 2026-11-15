@@ -8,7 +8,7 @@ From `web/`:
 
 - `npm run dev`: open Analytics, then Agent network / Scenario controls / Disruptions.
 - `npm test`: clock, protocol, transport, isolation and replay tests.
-- `npm run benchmark`: full 12-hour core runs with 50 and 100 aircraft; no rendering included.
+- `npm run benchmark`: full 8 h 30 min core runs with 50 and 100 aircraft; no rendering included.
 - `npm run build`: production app and worker bundles.
 
 ## Current behaviour
@@ -43,7 +43,7 @@ The baseline is anchored to day start, never reset to a delayed departure. Each 
 departure delay, slower-travel delay, excess arrival-approval wait, expected arrival and actual
 simulated arrival. The three delay components sum to the final arrival lateness. Unfinished
 flights show delay accrued so far, not a fabricated final arrival time. A flight unfinished at
-the end of the 12-hour run remains pending, not failed.
+the end of the 8 h 30 min run (`SIMULATION_MS` in `timing.js`) remains pending, not failed.
 
 Analytics counts each flight with positive accrued delay once, including after landing; late
 arrivals are a separate completed-flight count. Total delay includes pending and landed flights.
@@ -115,6 +115,103 @@ The viewer's **Diversion policy** control sets `DESTCLOSED` (nearest open airpor
 and passes the whole airport catalogue, so every catalogue airport gets an ATC agent and can
 be an alternate.
 
+### Automatic disruptions
+
+`autoDisruptions.js` adds seeded background events so a run is never just planes flying.
+**Scenario controls → Automatic disruptions** sets the level (Off / Light / **Moderate**, the
+default / Heavy). Changing the level restarts the run. Events are deterministic for a seed,
+flight list and level, and are validated like any other event:
+
+| Kind | Factor | Effect you see |
+|---|---|---|
+| Storm cell | `NO_GO_REGION` on one aircraft | hold at the edge, negotiated violet detour |
+| Headwind | `HEADWIND` on one aircraft | slower ground speed, en-route delay |
+| Fuel leak | `FUEL_CONSUMPTION` on one aircraft | reserve drains, priority / alternate requests |
+| Runway hold | `RUNWAY_CLOSURE` at an origin | late departures, held arrivals |
+| Airport closure | `AIRPORT_CLOSURE` at a destination | diversions to a new airport |
+| ATC backlog | `ATC_BACKLOG` at a destination | queued requests, landing waits |
+| Radio outage | `ATC_LINK_OUTAGE` at a destination | lost contact, lost-comms procedure |
+| Packet loss burst | `PACKET_LOSS`, network-wide | dropped messages, retries |
+| Demand surge | `DEMAND_SURGE` at a destination | arrival slots taken by background traffic |
+
+Each event carries a `label`, and the panel lists them with their time windows.
+
+### Measurement
+
+The engine measures each aircraft from outside its policy, so no agent can read these values:
+
+- `measures`: messages sent, received and dropped; en-route time; hold time (en-route ticks
+  with no route progress); ground wait after the scheduled departure; landing wait; time with
+  lost contact.
+- `delayByCause`: every tick an aircraft's total delay grows, that growth is split equally
+  between the causes active for it. Causes are the disruption factors in scope (global, on the
+  aircraft, or at its controlling ATC), plus `DETOUR`, `DIVERSION` and `LOST_CONTACT`, or
+  `PROTOCOL` when nothing is active (latency, retries). The shares add up to the total delay.
+  This is attribution by co-occurrence, not a causal model.
+- Fleet stats add `affectedFlights`, `detouredFlights`, `divertedFlights`,
+  `lostContactFlights` and a summed `delayByCause`.
+- `snapshot.comms` lists the latest tick's delivered and dropped messages plus every message
+  still in flight (deduplicated per link and status, at most 400).
+
+### On the map
+
+- **Storm cells:** a grey closed corridor along the original route from the edge of the closure,
+  with a bar across the route at the edge. The bar pulses red while the plane holds there waiting
+  for detour approval, and the corridor fades once the bypass is approved. Zoom in or select the
+  plane for the label, e.g. "Storm · UA12 route closed from 40% · holding … · clears 03:10".
+- **Close calls:** red when two airborne planes are within 5 NM and 1,000 ft now; amber dashed
+  when straight-line extrapolation brings them that close within 3 minutes.
+- **Communication:** dashes flow from sender to recipient. Blue is aircraft → ATC, green is
+  ATC → aircraft, pink is aircraft ↔ aircraft, and a red ✕ is a dropped message. The footer
+  toggles the Comms and Close calls layers.
+- **Map key** (footer): explains every region and line, including the 30 NM / 10 NM airport rings
+  and the lost-comms holding orbit.
+- **Why?** on the aircraft card: the measured delay causes, why it diverted, its measures and its
+  decision timeline.
+
+The run is **8 h 30 min** (`SIMULATION_MS` in `timing.js`). Flights scheduled after that do not depart.
+
+### Lost-comms protocol (block procedures)
+
+Each aircraft carries an ordered list of command blocks, built like Lego or Scratch in the
+**Lost-comms protocol** panel (shared by all aircraft) or per aircraft on its card. Each line is
+tokenised into a command and an optional parameter: `Command = value`, `Command value` or a bare
+`Command`. Names are case-insensitive, and underscores and spaces are ignored. The default for
+every aircraft in the viewer:
+
+```
+Squawk = 7600        set the radio-failure transponder code (instant)
+Continue = 3         keep flying the cleared route for 3 minutes while listening
+Relay                send the next ATC requests through nearby aircraft (instant)
+CircleAround = 5     fly a holding orbit for 5 minutes, with no route progress
+Divert = NEAREST     ask the nearest open airport for an alternate (ends the procedure)
+```
+
+Other blocks: `Hold = N` (stop for N minutes) and `Divert = ORIGIN` or `Divert = <IATA>`.
+
+The shared editor is near the top of Analytics and opens as a text box. Use **Edit as blocks**
+to construct/reorder the same procedure with the Scratch-style palette, or **Edit as text**
+to type commands. **Apply** validates the draft, pauses and replays to the current time without
+clearing disruptions; invalid lines cannot replace the applied procedure. Per-aircraft overrides
+remain on the aircraft card. The map uses radio icons rather than communication connector lines;
+close-call alerts retain rings and counts, but no longer draw lines between aircraft. Route guides,
+airport rings and holding circles remain visible.
+
+- **Trigger:** silence from the controlling ATC for two timeouts (2 minutes). En route that is
+  the destination ATC; while waiting to land it is the arrival ATC. Aircraft keep sending status
+  checks in both phases. A controller that only holds a plane (runway closed, arrival queue) still
+  answers them, so a long landing queue is not mistaken for lost comms.
+- **Execution:** blocks run in order, and instant blocks chain within one tick.
+- **Abort:** any message from the controller aborts the run ("contact restored") and restores the
+  squawk.
+- **Landing:** still requires ATC approval. A plane that cannot reach any ATC never lands on its
+  own.
+- **Engine default:** derived from the rulebook `COMLOST` action, which keeps the protocol tests'
+  timings. The viewer passes the standard text above as `options.procedures.default`; per-aircraft
+  texts go in `byAgent`.
+- **Card:** the running block is highlighted with its time left, the header shows `7600 · NORDO`,
+  and every step is written to the aircraft's decision timeline (see **Why?**).
+
 ## Files and boundaries
 
 - `agents.js`: factories and baseline departure/arrival protocol.
@@ -127,6 +224,11 @@ be an alternate.
 - `routeGeometry.js`: continuous illustrative detour positions and headings.
 - `navigation.js`: engine-side positions (route curve or straight diversion leg) and nearest-alternate choice.
 - `rulebook.js`: rulebook parsing and the supported trigger/action table.
+- `procedures.js`, `ProcedureEditor.jsx`: lost-comms block procedures (tokeniser, parser, palette) and the block builder.
+- `reasoning.js`: plain-English decision timeline, delay-cause labels and breakdowns, diversion explanations.
+- `autoDisruptions.js`: seeded background disruptions per level.
+- `map/closeCalls.js`, `map/commsLinks.js`, `map/holdingPattern.js`, `map/regions.js`: separation monitor,
+  message links, lost-comms orbit and storm corridors, each with a matching overlay component and `MapKey.jsx`.
 - `map/flightStatus.js`: the single status/colour decision shared by map, tracker and card.
 - `map/flightGeometry.js`, `map/routeChangeOverlay.js`: map-space poses, flown track and route-change guides.
   Every route point goes through `curveParam(flight, progress)`: engine time-progress → distance

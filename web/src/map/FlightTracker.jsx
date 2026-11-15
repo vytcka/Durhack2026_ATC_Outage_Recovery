@@ -13,7 +13,8 @@ import './flightTracker.css';
 //   selectedId  agent id of the selected flight, or null
 //   onSelect    called with the clicked flight object
 //   time        completed simulation time (ms since day start, UTC)
-export default function FlightTracker({ flights, agentsById, selectedId, onSelect, time }) {
+//   closeCalls  current close calls from closeCalls.detectCloseCalls (optional)
+export default function FlightTracker({ flights, agentsById, selectedId, onSelect, time, closeCalls }) {
   const [open, setOpen] = useState(true);
   const [filterId, setFilterId] = useState('disrupted');
   const bodyId = useId();
@@ -29,7 +30,8 @@ export default function FlightTracker({ flights, agentsById, selectedId, onSelec
     if (flight) onSelectRef.current?.(flight);
   }, [flightsById]);
 
-  const rows = useMemo(() => describeFlights(flights, agentsById), [flights, agentsById]);
+  const rows = useMemo(() => describeFlights(flights, agentsById, { closeCalls: closeCalls ?? [] }),
+    [flights, agentsById, closeCalls]);
   const statusCounts = useMemo(() => summariseStatuses(rows), [rows]);
   const tabCounts = useMemo(() => filterCounts(rows), [rows]);
   const visibleRows = useMemo(() => sortRows(filterRows(rows, filterId)), [rows, filterId]);
@@ -130,8 +132,14 @@ const TrackerRow = memo(function TrackerRow({ row, selected, onSelect }) {
         </span>
         {row.delay && <span className="flight-tracker-delay mono" title={row.delayTitle}>{row.delay}</span>}
         <span className="flight-tracker-secondary">
+          {row.lostContact && <span className="flight-tracker-nordo mono" title="Lost contact: squawking 7600, following its lost-comms procedure">7600</span>}
           {row.progress}{row.detail && <> · {row.detail}</>}
         </span>
+        {row.closeCall && (
+          <span className="flight-tracker-alert" data-kind={row.closeCall.kind} title={row.closeCall.text}>
+            ⚠ {row.closeCall.text}
+          </span>
+        )}
       </button>
     </li>
   );
