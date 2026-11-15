@@ -1,5 +1,6 @@
 import { formatDelay, formatSimulationTime } from '../simulation/timing.js';
 import { AIRPORT_BY_IATA } from '../data/airports.js';
+import { formatAltitude } from './physics.js';
 
 const STATUS_LABELS = {
   OK: 'OK',
@@ -8,7 +9,7 @@ const STATUS_LABELS = {
 };
 
 // Details card for the selected aircraft.
-export default function AircraftInfo({ flight, progress, agent }) {
+export default function AircraftInfo({ flight, progress, agent, physics }) {
   const landed = agent?.phase === 'ARRIVED';
   const awaitingLanding = agent?.phase === 'AWAITING_ARRIVAL';
   const outcome = landed ? (agent.delayed ? 'Landed · delayed' : 'Landed successfully')
@@ -78,17 +79,23 @@ export default function AircraftInfo({ flight, progress, agent }) {
         <dt>Total accrued delay</dt>
         <dd data-info="total-delay">{formatDelay(agent?.totalDelayMs)}</dd>
 
-        <dt>Altitude</dt>
-        <dd>FL{flight.altitude}</dd>
+        <dt>Flight phase</dt>
+        <dd>{physics ? physics.phase.toLowerCase() : 'ground'}</dd>
 
-        <dt>Input airspeed</dt>
-        <dd>{flight.airspeed} kt</dd>
+        <dt>Altitude</dt>
+        <dd>{formatAltitude(physics?.altitudeFt ?? 0)}</dd>
+
+        <dt>Vertical rate</dt>
+        <dd>{formatVerticalRate(physics?.verticalRate ?? 0)}</dd>
+
+        <dt>Ground speed</dt>
+        <dd>{physics?.groundSpeedKt ?? 0} kt</dd>
 
         <dt>Squawk</dt>
         <dd>{flight.squawk}</dd>
 
-        <dt>Input fuel</dt>
-        <dd>{flight.fuel_remaining.toLocaleString('en-US')} kg</dd>
+        <dt>Fuel</dt>
+        <dd>{(physics?.fuelKg ?? flight.fuel_remaining).toLocaleString('en-US')} kg</dd>
 
         <dt>Progress</dt>
         <dd>{progressLabel}</dd>
@@ -96,4 +103,12 @@ export default function AircraftInfo({ flight, progress, agent }) {
 
     </div>
   );
+}
+
+// 1834 -> "↑ 1,800 ft/min", 0 -> "level"
+function formatVerticalRate(feetPerMinute) {
+  const rounded = Math.round(feetPerMinute / 100) * 100;
+  if (rounded === 0) return 'level';
+  const arrow = rounded > 0 ? '↑' : '↓';
+  return `${arrow} ${Math.abs(rounded).toLocaleString('en-US')} ft/min`;
 }

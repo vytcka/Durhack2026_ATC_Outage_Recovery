@@ -15,8 +15,9 @@ const B737_PATH = [
 ].join(' ');
 
 // One aircraft on the map. `scale` is 1/zoom so the icon keeps the same size on screen.
-export default function Aircraft({ flight, progress, phase, delayed, diverted, scale, showLabel, selected, onClick }) {
-  const { position: [x, y], heading } = aircraftPose(flight, progress);
+// `routeFraction` is the share of the route distance covered (from physics.js), not of the time.
+export default function Aircraft({ flight, routeFraction, phase, delayed, diverted, scale, showLabel, selected, onClick }) {
+  const { position: [x, y], heading } = aircraftPose(flight, routeFraction);
 
   return (
     <g

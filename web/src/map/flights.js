@@ -23,12 +23,14 @@ export function prepareFlights(records) {
     const start = projection([from.lon, from.lat]);
     const end = projection([to.lon, to.lat]);
     const control = controlPoint(start, end);
+    const curve = [start, control, end];
 
     return [{
       ...record,
       from,
       to,
-      curve: [start, control, end],
+      curve,
+      arcLengths: arcLengthTable(curve),
       routePath: `M${start} Q${control} ${end}`, // arrays stringify as "x,y"
     }];
   });
@@ -58,19 +60,54 @@ export function minutesRemaining(flight, progress) {
   return Math.round(flight.est_flight_dur * (1 - progress));
 }
 
-// Position on the curve at progress t, and the heading (0° = up, clockwise) the nose points.
-export function aircraftPose(flight, t) {
+// Standard quadratic Bézier formula: the point at curve parameter t.
+function bezierPoint([[x0, y0], [x1, y1], [x2, y2]], t) {
+  const u = 1 - t;
+  return [
+    u * u * x0 + 2 * u * t * x1 + t * t * x2,
+    u * u * y0 + 2 * u * t * y1 + t * t * y2,
+  ];
+}
+
+// The Bézier parameter t doesn't advance at a constant rate along the curve, so a plane moved by
+// t would speed up and slow down on its own. This table stores the share of the route length
+// reached at evenly spaced t values, so we can go from "fraction of distance" back to t.
+const ARC_SAMPLES = 50;
+
+function arcLengthTable(curve) {
+  const lengths = [0];
+  let previous = bezierPoint(curve, 0);
+
+  for (let i = 1; i <= ARC_SAMPLES; i++) {
+    const point = bezierPoint(curve, i / ARC_SAMPLES);
+    lengths.push(lengths[i - 1] + Math.hypot(point[0] - previous[0], point[1] - previous[1]));
+    previous = point;
+  }
+
+  const total = lengths[ARC_SAMPLES];
+  return lengths.map((length) => length / total);
+}
+
+// Inverse of the table: the t at which the given fraction of the route length is reached.
+function curveParamAt(table, fraction) {
+  const i = table.findIndex((value) => value >= fraction);
+  if (i <= 0) return 0;
+
+  // Interpolate linearly between the two samples around `fraction`.
+  const within = (fraction - table[i - 1]) / (table[i] - table[i - 1]);
+  return (i - 1 + within) / ARC_SAMPLES;
+}
+
+// Position at the given fraction of the route distance, and the heading (0° = up, clockwise).
+export function aircraftPose(flight, routeFraction) {
+  const t = curveParamAt(flight.arcLengths, routeFraction);
   const [[x0, y0], [x1, y1], [x2, y2]] = flight.curve;
   const u = 1 - t;
 
-  // Standard quadratic Bézier formula.
-  const x = u * u * x0 + 2 * u * t * x1 + t * t * x2;
-  const y = u * u * y0 + 2 * u * t * y1 + t * t * y2;
-
-  // Its derivative is the direction of travel. Screen y grows downwards, hence -dy.
+  // The curve's derivative is the direction of travel. Screen y grows downwards, hence -dy.
   const dx = 2 * u * (x1 - x0) + 2 * t * (x2 - x1);
   const dy = 2 * u * (y1 - y0) + 2 * t * (y2 - y1);
   const heading = (Math.atan2(dx, -dy) * 180) / Math.PI;
 
-  return { position: [x, y], heading };
+  return { position: bezierPoint(flight.curve, t), heading };
 }

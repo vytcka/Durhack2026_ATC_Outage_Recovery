@@ -7,6 +7,7 @@ import { useZoom } from './useZoom.js';
 import { useSimulationClock } from './useSimulationClock.js';
 import { useAircraft } from './useAircraft.js';
 import { useAgentSimulation } from '../simulation/useAgentSimulation.js';
+import { flightPhysics } from './physics.js';
 import AirportMarker from './AirportMarker.jsx';
 import Aircraft from './Aircraft.jsx';
 import AircraftInfo from './AircraftInfo.jsx';
@@ -47,6 +48,9 @@ export default function AirspaceMap() {
 
   const agentsById = Object.fromEntries((simulation.snapshot?.aircraft ?? []).map(agent => [agent.id, agent]));
   const visibleFlights = flights.filter(flight => agentsById[flight.agentId]);
+  // Live altitude, speed, fuel and position along the route for every flight on the map.
+  const physicsById = Object.fromEntries(visibleFlights.map(flight =>
+    [flight.agentId, flightPhysics(flight, agentsById[flight.agentId])]));
   const selectedFlight = flights.find(flight => flight.agentId === selectedId);
   const completedElapsed = simulation.snapshot?.time ?? 0;
   const completedSimTime = new Date(clock.simTime.getTime() - clock.elapsed + completedElapsed);
@@ -129,7 +133,7 @@ export default function AirspaceMap() {
             <Aircraft
               key={flight.agentId}
               flight={flight}
-              progress={agentsById[flight.agentId].progress}
+              routeFraction={physicsById[flight.agentId].routeFraction}
               phase={agentsById[flight.agentId].phase}
               delayed={agentsById[flight.agentId].delayed}
               diverted={agentsById[flight.agentId].diverted}
@@ -207,6 +211,7 @@ export default function AirspaceMap() {
           flight={selectedFlight}
           progress={agentsById[selectedFlight.agentId]?.progress ?? 0}
           agent={agentsById[selectedFlight.agentId]}
+          physics={physicsById[selectedFlight.agentId]}
         />
       )}
 
