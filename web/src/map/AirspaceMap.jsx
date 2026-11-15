@@ -8,7 +8,7 @@ import { useSimulationClock } from './useSimulationClock.js';
 import { useAircraft } from './useAircraft.js';
 import { useAgentSimulation } from '../simulation/useAgentSimulation.js';
 import { flightPhysics } from './physics.js';
-import { scheduledDepartureMs } from '../simulation/timing.js';
+import { SIMULATION_MS, scheduledDepartureMs } from '../simulation/timing.js';
 import AirportMarker from './AirportMarker.jsx';
 import Aircraft from './Aircraft.jsx';
 import AircraftInfo from './AircraftInfo.jsx';
@@ -34,9 +34,9 @@ export default function AirspaceMap() {
     seed: 42,
     disruptions: [
       ...(settings.outage ? [{ factor: 'ATC_LINK_OUTAGE', startMs: 0, endMs: 30 * 60_000 }] : []),
-      { factor: 'PACKET_LOSS', startMs: 0, endMs: 86_400_000, value: settings.packetLoss / 100 },
-      { factor: 'DELIVERY_DELAY', startMs: 0, endMs: 86_400_000, value: settings.delaySeconds * 1000 },
-      { factor: 'REDUCED_SPEED', startMs: 0, endMs: 86_400_000, value: settings.travelSpeedPercent / 100 },
+      { factor: 'PACKET_LOSS', startMs: 0, endMs: SIMULATION_MS, value: settings.packetLoss / 100 },
+      { factor: 'DELIVERY_DELAY', startMs: 0, endMs: SIMULATION_MS, value: settings.delaySeconds * 1000 },
+      { factor: 'REDUCED_SPEED', startMs: 0, endMs: SIMULATION_MS, value: settings.travelSpeedPercent / 100 },
       ...scenarioEvents,
     ],
   }), [settings, scenarioEvents]);

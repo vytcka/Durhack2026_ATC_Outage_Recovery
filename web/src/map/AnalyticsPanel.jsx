@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import AgentNetworkPanel from '../simulation/AgentNetworkPanel.jsx';
+import { SIMULATION_MINUTES } from '../simulation/timing.js';
 
 // Collapsible stats panel shown under the title.
 export default function AnalyticsPanel({ open, timeZone, simTime, elapsed, airborne, disruptionIndex, onReset, onSeek, simulation, settings, onSettingsChange, scenarioEvents, onEventsChange, scenarioAircraft, scenarioAirports }) {
@@ -55,13 +56,13 @@ export default function AnalyticsPanel({ open, timeZone, simTime, elapsed, airbo
             id="simulation-time"
             type="range"
             min={0}
-            max={1439}
+            max={SIMULATION_MINUTES - 1}
             step={1}
             value={minuteOfDay}
             onChange={(event) => onSeek(Number(event.target.value) * 60_000)}
             aria-valuetext={`${timelineTime} UTC`}
           />
-          <div className="timeline-labels mono"><span>00:00</span><span>12:00</span><span>23:59</span></div>
+          <div className="timeline-labels mono"><span>00:00</span><span>06:00</span><span>11:59</span></div>
           <p className="muted">Drag to seek · pauses playback</p>
         </div>
 

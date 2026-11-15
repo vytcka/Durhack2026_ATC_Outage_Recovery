@@ -8,7 +8,7 @@ From `web/`:
 
 - `npm run dev`: open Analytics, then Agent network / Scenario controls / Disruptions.
 - `npm test`: clock, protocol, transport, isolation and replay tests.
-- `npm run benchmark`: full-day core runs with 50 and 100 aircraft; no rendering included.
+- `npm run benchmark`: full 12-hour core runs with 50 and 100 aircraft; no rendering included.
 - `npm run build`: production app and worker bundles.
 
 ## Current behaviour
@@ -39,7 +39,7 @@ The baseline is anchored to day start, never reset to a delayed departure. Each 
 departure delay, slower-travel delay, excess arrival-approval wait, expected arrival and actual
 simulated arrival. The three delay components sum to the final arrival lateness. Unfinished
 flights show delay accrued so far, not a fabricated final arrival time. A flight unfinished at
-day end remains pending, not failed.
+the end of the 12-hour run remains pending, not failed.
 
 Analytics counts each flight with positive accrued delay once, including after landing; late
 arrivals are a separate completed-flight count. Total delay includes pending and landed flights.
@@ -117,7 +117,7 @@ Unknown factors, invalid node types, unknown targets, duplicate event IDs, inval
 and out-of-day windows are rejected. Airport-resource factors target controllers; aircraft-only
 factors target aircraft. Target options are restricted accordingly.
 
-The UI exposes a global first-30-minutes outage, all-day packet loss, all-day added message
+The UI exposes a global first-30-minutes outage, whole-run packet loss, whole-run added message
 delay and travel speed from 25% to 100% of nominal. Changing settings restarts at midnight,
 paused. Speed reduction is a toy progress constraint, not an aerodynamic model.
 

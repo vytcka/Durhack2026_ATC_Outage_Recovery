@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { Simulation } from './engine.js';
 import { DISRUPTION_FACTORS } from './disruptions.js';
 import * as timing from './timing.js';
+import { SIMULATION_MS } from './timing.js';
 
 const flights = [
   { aircraft_reg: 'N1', flight_number: 'F1', airport_dep: 'AAA', airport_dest: 'BBB', est_flight_dur: 2 },
@@ -240,16 +241,16 @@ test('a scoped temporary slowdown preserves movement continuity and replays the 
 
 test('unfinished flights remain pending and accumulate delay without inventing arrivals', () => {
   const sim = new Simulation([flights[0]], { disruptions: [
-    { factor: 'PACKET_LOSS', startMs: 0, endMs: 86_400_000, value: 1 },
+    { factor: 'PACKET_LOSS', startMs: 0, endMs: SIMULATION_MS, value: 1 },
   ] });
-  const state = sim.advanceTo(86_399_999);
+  const state = sim.advanceTo(SIMULATION_MS - 1);
   assert.equal(state.stats.disruptedFlights, 1);
   assert.equal(state.stats.delayedArrivals, 0);
   assert.equal(state.aircraft[0].arrivedAt, null);
   assert.equal(state.aircraft[0].phase, 'REQUESTING_DEPARTURE');
   assert.ok(state.aircraft[0].totalDelayMs > 0);
   assert.equal(state.stats.meanArrivalDelayMs, null);
-  assert.deepEqual(sim.advanceTo(86_399_999), state, 'no elapsed simulation time means no added delay');
+  assert.deepEqual(sim.advanceTo(SIMULATION_MS - 1), state, 'no elapsed simulation time means no added delay');
 });
 
 test('zero speed and the old artificial stop mechanism are not valid failure models', () => {

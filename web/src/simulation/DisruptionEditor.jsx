@@ -1,8 +1,8 @@
 import { useId, useRef, useState } from 'react';
 import { DISRUPTION_FACTORS } from './disruptions.js';
+import { SIMULATION_MS, SIMULATION_MINUTES } from './timing.js';
 import './disruptionEditor.css';
 
-const DAY_MS = 86_400_000;
 const MINUTE_MS = 60_000;
 const clamp = (value, min, max, fallback = min) => Math.min(max, Math.max(min, Number.isFinite(Number(value)) ? Number(value) : fallback));
 
@@ -30,8 +30,8 @@ export default function DisruptionEditor({ events = [], onChange, aircraft = [],
     setTarget('');
   };
 
-  const now = clamp(currentTime, 0, DAY_MS);
-  const activationStart = Math.min(now + 10_000, 86_390_000);
+  const now = clamp(currentTime, 0, SIMULATION_MS);
+  const activationStart = Math.min(now + 10_000, SIMULATION_MS - 10_000);
   const canActivate = Boolean(factor) && activationStart > now;
 
   const addEvent = (startMs, seekTo) => {
@@ -44,7 +44,7 @@ export default function DisruptionEditor({ events = [], onChange, aircraft = [],
       id,
       factor: factor.id,
       startMs,
-      endMs: Math.min(DAY_MS, startMs + clamp(duration, 1, 1440) * MINUTE_MS),
+      endMs: Math.min(SIMULATION_MS, startMs + clamp(duration, 1, SIMULATION_MINUTES) * MINUTE_MS),
       value: step >= 1 ? Math.round(rawStrength) : rawStrength,
       ...(selectedTarget ? { agentId: selectedTarget } : {}),
     };
@@ -56,7 +56,7 @@ export default function DisruptionEditor({ events = [], onChange, aircraft = [],
   const targetName = id => !id ? 'All nodes' : id.startsWith('atc:')
     ? `ATC · ${id.slice(4)}` : aircraft.find(agent => agent.id === id)?.flightNumber || id;
   const timeLabel = ms => {
-    const seconds = Math.floor(clamp(ms, 0, DAY_MS) / 1000);
+    const seconds = Math.floor(clamp(ms, 0, SIMULATION_MS) / 1000);
     return [Math.floor(seconds / 3600), Math.floor(seconds / 60) % 60, seconds % 60]
       .map(part => String(part).padStart(2, '0')).join(':');
   };
@@ -76,14 +76,14 @@ export default function DisruptionEditor({ events = [], onChange, aircraft = [],
         {factor?.targetKinds.includes('atc') && airports.map(iata => <option key={`atc:${iata}`} value={`atc:${iata}`}>ATC · {iata}</option>)}
       </select>
       <label htmlFor={`${prefix}-start`}>Start minute</label>
-      <input id={`${prefix}-start`} type="number" min={0} max={1439} step={1} value={startMinute} onChange={event => setStartMinute(clamp(event.target.value, 0, 1439))} />
+      <input id={`${prefix}-start`} type="number" min={0} max={SIMULATION_MINUTES - 1} step={1} value={startMinute} onChange={event => setStartMinute(clamp(event.target.value, 0, SIMULATION_MINUTES - 1))} />
       <label htmlFor={`${prefix}-duration`}>Duration (minutes)</label>
-      <input id={`${prefix}-duration`} type="number" min={1} max={1440} step={1} value={duration} onChange={event => setDuration(clamp(event.target.value, 1, 1440))} />
+      <input id={`${prefix}-duration`} type="number" min={1} max={SIMULATION_MINUTES} step={1} value={duration} onChange={event => setDuration(clamp(event.target.value, 1, SIMULATION_MINUTES))} />
       <label htmlFor={`${prefix}-strength`}>Disruption strength</label>
       <input id={`${prefix}-strength`} type="number" min={min} max={max} step={step} value={strength} onChange={event => setStrength(clamp(event.target.value, min, max))} aria-describedby={`${prefix}-unit`} />
       <span className="muted" id={`${prefix}-unit`}>{factor?.unit ?? 'strength'}</span>
       <div className="disruption-editor-actions">
-        <button type="button" disabled={!factor} onClick={() => addEvent(clamp(startMinute, 0, 1439) * MINUTE_MS)}>Schedule disruption</button>
+        <button type="button" disabled={!factor} onClick={() => addEvent(clamp(startMinute, 0, SIMULATION_MINUTES - 1) * MINUTE_MS)}>Schedule disruption</button>
         <button type="button" disabled={!canActivate} onClick={() => { if (canActivate) addEvent(activationStart, activationStart); }}>Activate now</button>
       </div>
       <p className="muted">Changes pause playback and replay the edited scenario to the selected time. Activate now begins on the next tick.</p>

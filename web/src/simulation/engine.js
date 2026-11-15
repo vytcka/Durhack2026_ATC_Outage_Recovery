@@ -2,11 +2,11 @@ import { createAircraft, createAtc } from './agents.js';
 import { decideAircraft } from './aircraftPolicy.js';
 import { decideAtc } from './atcPolicy.js';
 import { DISRUPTION_FACTORS, activeDisruptions, isLinkDown, packetLost } from './disruptions.js';
-import { flightTiming } from './timing.js';
+import { SIMULATION_MS, flightTiming } from './timing.js';
 import { transportEffects } from './transport.js';
 import { nodeEffects } from './nodeEffects.js';
 
-const DAY_END = 86_399_999;
+const RUN_END = SIMULATION_MS - 1;
 
 export class Simulation {
   #agents = new Map();
@@ -38,7 +38,7 @@ export class Simulation {
       if (!DISRUPTION_FACTORS.some(factor => factor.id === event.factor && factor.implemented)) {
         throw new Error(`Disruption ${event.factor} is not implemented`);
       }
-      if (!Number.isFinite(event.startMs) || !Number.isFinite(event.endMs) || event.startMs < 0 || event.endMs <= event.startMs || event.endMs > DAY_END + 1) {
+      if (!Number.isFinite(event.startMs) || !Number.isFinite(event.endMs) || event.startMs < 0 || event.endMs <= event.startMs || event.endMs > RUN_END + 1) {
         throw new Error('Disruption time window is invalid');
       }
       if (event.factor === 'PACKET_LOSS' && (!Number.isFinite(event.value) || event.value < 0 || event.value > 1)) {
@@ -218,7 +218,7 @@ export class Simulation {
 
   advanceTo(elapsed) {
     if (!Number.isFinite(elapsed)) throw new Error('Simulation time must be finite');
-    const target = Math.floor(Math.min(DAY_END, Math.max(0, elapsed)) / this.#options.tickMs) * this.#options.tickMs;
+    const target = Math.floor(Math.min(RUN_END, Math.max(0, elapsed)) / this.#options.tickMs) * this.#options.tickMs;
     if (target < this.#time) {
       const fresh = new Simulation(this.#flights, this.#options);
       this.#agents = fresh.#agents;
