@@ -10,10 +10,16 @@ import { parseRulebook } from './rulebook.js';
 
 const RUN_END = SIMULATION_MS - 1;
 
+// Recent sent messages kept for the map's live-communication overlay. The window only has to
+// cover the gap between two snapshots; the cap keeps snapshots small under message storms.
+const SIGNAL_WINDOW_MS = 60_000;
+const MAX_SIGNALS = 2_000;
+
 export class Simulation {
   #agents = new Map();
   #queue = [];
   #events = [];
+  #signals = [];
   #flights;
   #options;
   #time = 0;
@@ -117,6 +123,20 @@ export class Simulation {
     if (this.#events.length > 100) this.#events.shift();
   }
 
+  // Who talked to whom, and whether the message was lost on the way out. Display only:
+  // nothing in the model reads this list.
+  #signal(message, dropped) {
+    this.#signals.push({ id: this.#sequence, time: this.#time, from: message.from, to: message.to, dropped });
+  }
+
+  #pruneSignals() {
+    const cutoff = this.#time - SIGNAL_WINDOW_MS;
+    let start = 0;
+    while (start < this.#signals.length && this.#signals[start].time <= cutoff) start += 1;
+    start = Math.max(start, this.#signals.length - MAX_SIGNALS);
+    if (start > 0) this.#signals = this.#signals.slice(start);
+  }
+
   #send(message) {
     const extraDelay = activeDisruptions(this.#options.disruptions, message, this.#time)
       .filter(event => event.factor === 'DELIVERY_DELAY').reduce((sum, event) => sum + event.value, 0);
@@ -137,8 +157,10 @@ export class Simulation {
       || effects.drop || this.#outOfRange(envelope) || packetLost(this.#options.disruptions, envelope, this.#time, this.#options.seed)) {
       this.#stats.dropped += 1;
       this.#record({ type: 'MESSAGE_DROPPED', from: message.from, to: message.to, messageType: message.type });
+      this.#signal(message, true);
       return;
     }
+    this.#signal(message, false);
     this.#queue.push(envelope);
     for (let copy = 0; copy < effects.copies; copy += 1) {
       this.#queue.push({ ...structuredClone(envelope), id: `message:${++this.#sequence}` });
@@ -150,6 +172,7 @@ export class Simulation {
 
   #step() {
     this.#time += this.#options.tickMs;
+    this.#pruneSignals();
     const active = this.#options.disruptions.filter(event => event.startMs <= this.#time && this.#time < event.endMs);
     const previous = this.#options.disruptions.filter(event => event.startMs <= this.#time - this.#options.tickMs
       && this.#time - this.#options.tickMs < event.endMs);
@@ -235,6 +258,7 @@ export class Simulation {
       this.#agents = fresh.#agents;
       this.#queue = [];
       this.#events = [];
+      this.#signals = [];
       this.#time = 0;
       this.#sequence = 0;
       this.#stats = { ...fresh.#stats };
@@ -273,7 +297,7 @@ export class Simulation {
       ...flightTiming(agent, this.#time, this.#options),
     }));
     return structuredClone({
-      time: this.#time, aircraft, events: this.#events,
+      time: this.#time, aircraft, events: this.#events, signals: this.#signals,
       stats: {
         ...this.#stats, queued: this.#queue.length,
         atcAgents: this.#agents.size - aircraft.length,

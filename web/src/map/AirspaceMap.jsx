@@ -18,6 +18,11 @@ import RouteChangeOverlay from './RouteChangeOverlay.jsx';
 import FlightTracker from './FlightTracker.jsx';
 import AnalyticsPanel from './AnalyticsPanel.jsx';
 import SimulationControls from './SimulationControls.jsx';
+import SignalLayer from './SignalLayer.jsx';
+
+// Airport (ATC node) positions never change, so project them once.
+const ATC_POSITIONS = Object.fromEntries(AIRPORTS.map(airport =>
+  [`atc:${airport.iata}`, projection([airport.lon, airport.lat])]));
 
 const MAX_ZOOM = 60;
 const SHOW_NAMES_AT_ZOOM = 6;
@@ -59,6 +64,7 @@ export default function AirspaceMap() {
   const [selectedId, setSelectedId] = useState(null); // journey ID, independent of registration
   const [cursor, setCursor] = useState(null); // [lon, lat] under the mouse
   const [analyticsOpen, setAnalyticsOpen] = useState(true);
+  const [showSignals, setShowSignals] = useState(false); // live communication lines on the map
 
   const agentsById = Object.fromEntries((simulation.snapshot?.aircraft ?? []).map(agent => [agent.id, agent]));
   const completedElapsed = simulation.snapshot?.time ?? 0;
@@ -67,6 +73,13 @@ export default function AirspaceMap() {
   const visibleFlights = flights.filter(flight => agentsById[flight.agentId]
     && completedElapsed >= scheduledDepartureMs(flight));
   const selectedFlight = flights.find(flight => flight.agentId === selectedId);
+  // Map position of any message endpoint: an airport's ATC, or a plane that is on the map.
+  const visibleById = Object.fromEntries(visibleFlights.map(flight => [flight.agentId, flight]));
+  const nodePosition = (id) => {
+    if (id.startsWith('atc:')) return ATC_POSITIONS[id] ?? null;
+    const flight = visibleById[id];
+    return flight ? agentPose(flight, agentsById[id]).position : null;
+  };
   const selectedAgent = selectedFlight ? agentsById[selectedFlight.agentId] : undefined;
   // Live altitude, speed and fuel for the info card. (Map positions apply the same speed
   // profile inside agentPose, so planes never need this per frame.)
@@ -191,6 +204,15 @@ export default function AirspaceMap() {
             />
           ))}
 
+          {/* Live messages between nodes, under the plane icons. */}
+          {showSignals && (
+            <SignalLayer
+              signals={simulation.snapshot?.signals}
+              time={completedElapsed}
+              positionOf={nodePosition}
+            />
+          )}
+
           {/* Aircraft are drawn last so they sit on top of airports and routes. */}
           {visibleFlights.map((flight) => (
             <Aircraft
@@ -239,6 +261,8 @@ export default function AirspaceMap() {
           onEventsChange={changeEvents}
           scenarioAircraft={flights.map(flight => ({ id: flight.agentId, flightNumber: flight.flight_number }))}
           scenarioAirports={scenarioAirports}
+          showSignals={showSignals}
+          onShowSignalsChange={setShowSignals}
         />
       </aside>
 
