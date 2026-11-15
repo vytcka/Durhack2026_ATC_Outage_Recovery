@@ -30,7 +30,7 @@ export const DISRUPTION_FACTORS = [
   ['AIRPORT_CLOSURE', 'Destination airport closure', 'Airport', 1, 1, 1, 1, 'enabled', 'Reports closure; aircraft can negotiate a schematic return-to-origin alternate.'],
   ['HEADWIND', 'Headwind region', 'Environment', 0.5, 0, 0.9, 0.1, 'groundspeed penalty fraction', 'Reduces ground progress separately from the airspeed constraint.'],
   ['CROSSWIND', 'Crosswind related runway restriction', 'Environment', 0.8, 0, 1, 0.1, 'severity (closure at 0.5)', 'Restricts runway use at the toy-model severity threshold.'],
-  ['NO_GO_REGION', 'Storm/no go region', 'Environment', 0.4, 0.1, 0.8, 0.1, 'route entry fraction', 'Holds at a closed route corridor boundary until recovery; no geometric detour.'],
+  ['NO_GO_REGION', 'Storm/no go region', 'Environment', 0.4, 0.1, 0.8, 0.1, 'route entry fraction', 'Holds at the corridor boundary while negotiating a longer, visible detour with ATC. Communication faults can delay approval. Schematic, not weather routing.'],
   ['DEMAND_SURGE', 'Sudden arrival demand surge', 'Airport', 12, 1, 30, 1, 'background reservations per minute', 'Adds virtual background arrivals competing for one service slot per tick.'],
   ['EMERGENCY_PRIORITY', 'Emergency priority arrival', 'Airport', 1, 1, 1, 1, 'enabled', 'Priority-tagged requests take precedence in a shared airport arrival queue.'],
   ['ALTERNATE_CAPACITY', 'Alternate airport capacity exhaustion', 'Airport', 1, 1, 10, 1, 'alternate arrivals per minute', 'Limits alternate approvals after diversion; normal arrivals are unaffected.'],

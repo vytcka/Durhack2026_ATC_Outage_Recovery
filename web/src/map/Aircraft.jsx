@@ -1,4 +1,6 @@
-import { aircraftPose } from './flights.js';
+import { agentPose } from './flights.js';
+import { flightStatus, FLIGHT_STATUS_BY_ID } from './flightStatus.js';
+import { aircraftLabel } from './flightText.js';
 
 const ICON_SIZE = 32.5; // on-screen size in px
 const ICON_BOX = 64;    // size of the coordinate box the path below is drawn in
@@ -14,30 +16,35 @@ const B737_PATH = [
   'M18 25 h4 v8 h-4 Z',
 ].join(' ');
 
-// One aircraft on the map. `scale` is 1/zoom so the icon keeps the same size on screen.
-export default function Aircraft({ flight, progress, phase, delayed, diverted, scale, showLabel, selected, onClick }) {
-  const { position: [x, y], heading } = aircraftPose(flight, progress);
+// One aircraft on the map. `agent` is its snapshot entry; `scale` is 1/zoom so the icon keeps
+// the same size on screen. Colour comes from CSS via data-status (see flightStatus.js).
+export default function Aircraft({ flight, agent, scale, showLabel, selected, onClick }) {
+  const { position: [x, y], heading } = agentPose(flight, agent);
+  const status = flightStatus(agent);
+  const label = aircraftLabel(flight, agent);
 
   return (
     <g
       className={selected ? 'aircraft selected' : 'aircraft'}
       data-agent-id={flight.agentId}
-      data-phase={phase}
-      data-delayed={String(Boolean(delayed))}
-      data-diverted={String(Boolean(diverted))}
+      data-status={status}
+      data-phase={agent?.phase}
+      data-delayed={String(Boolean(agent?.delayed))}
+      data-diverted={String(Boolean(agent?.diverted))}
+      data-rerouted={String(Boolean(agent?.reroute))}
       transform={`translate(${x},${y}) scale(${scale})`}
       onClick={onClick}
     >
-      <title>{flight.flight_number} · {phase?.toLowerCase().replaceAll('_', ' ')}{delayed ? ' · delayed' : ''}</title>
+      <title>{label} · {FLIGHT_STATUS_BY_ID[status].label.toLowerCase()}</title>
       {/* Transforms apply right to left: centre the box on the origin, size it, then rotate. */}
       <path
         className="aircraft-icon"
         d={B737_PATH}
-        transform={`rotate(${heading + (diverted ? 180 : 0)}) scale(${ICON_SIZE / ICON_BOX}) translate(${-ICON_BOX / 2},${-ICON_BOX / 2})`}
+        transform={`rotate(${heading}) scale(${ICON_SIZE / ICON_BOX}) translate(${-ICON_BOX / 2},${-ICON_BOX / 2})`}
       />
       {(showLabel || selected) && (
         <text className="aircraft-label" x={20} y={-12}>
-          {flight.flight_number}
+          {label}
         </text>
       )}
     </g>

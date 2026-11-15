@@ -5,6 +5,8 @@ import { DISRUPTION_FACTORS, activeDisruptions, isLinkDown, packetLost } from '.
 import { flightTiming } from './timing.js';
 import { transportEffects } from './transport.js';
 import { nodeEffects } from './nodeEffects.js';
+import { aircraftPosition, diversionFraction } from './navigation.js';
+import { parseRulebook } from './rulebook.js';
 
 const DAY_END = 86_399_999;
 
@@ -23,6 +25,7 @@ export class Simulation {
 
   constructor(flights, options = {}) {
     this.#options = structuredClone({ tickMs: 10_000, latencyMs: 10_000, timeoutMs: 60_000, seed: 1, disruptions: [], ...options });
+    const rules = Object.fromEntries(parseRulebook(this.#options.rulebook ?? '').map(rule => [rule.trigger, rule.action]));
     if (this.#options.stops?.length) throw new Error('Stop events are not supported; model delays using disruptions');
     if (!Number.isFinite(this.#options.tickMs) || this.#options.tickMs <= 0) throw new Error('tickMs must be positive');
     if (!Number.isFinite(this.#options.latencyMs) || this.#options.latencyMs < 0) throw new Error('latencyMs must be non-negative');
@@ -70,7 +73,19 @@ export class Simulation {
       if (flight.origin) this.#airportPositions.set(`atc:${flight.airport_dep}`, flight.origin);
       if (flight.destination) this.#airportPositions.set(`atc:${flight.airport_dest}`, flight.destination);
     }
+    for (const airport of this.#options.airports ?? []) {
+      if (!airport.iata || !Number.isFinite(airport.lon) || !Number.isFinite(airport.lat)
+        || Math.abs(airport.lon) > 180 || Math.abs(airport.lat) > 90) throw new Error('Invalid airport catalogue entry');
+      const id = `atc:${airport.iata}`;
+      if (!this.#agents.has(id)) this.#agents.set(id, createAtc(airport.iata));
+      this.#airportPositions.set(id, [airport.lon, airport.lat]);
+    }
+    const knownAirports = [...this.#airportPositions].map(([id, position]) => ({ iata: id.slice(4), lon: position[0], lat: position[1] }));
     const aircraft = [...this.#agents.values()].filter(agent => agent.kind === 'aircraft');
+    for (const agent of aircraft) {
+      agent.rules = { ...rules };
+      agent.knownAirports = structuredClone(knownAirports);
+    }
     for (const event of this.#options.disruptions) {
       if (!event.agentId) continue;
       const target = this.#agents.get(event.agentId);
@@ -84,11 +99,7 @@ export class Simulation {
 
   #position(id) {
     if (id.startsWith('atc:')) return this.#airportPositions.get(id) ?? [0, 0];
-    const agent = this.#agents.get(id);
-    const from = agent.flight.origin ?? [0, 0];
-    const to = agent.flight.destination ?? [0, 0];
-    const progress = agent.diverted ? Math.max(0, 0.98 * (1 - (agent.travelWorkMs - agent.flight.est_flight_dur * 60_000) / 120_000)) : agent.progress;
-    return from.map((value, index) => value + (to[index] - value) * progress);
+    return aircraftPosition(this.#agents.get(id));
   }
 
   #distance(a, b) {
@@ -237,8 +248,23 @@ export class Simulation {
     const aircraft = [...this.#agents.values()].filter(agent => agent.kind === 'aircraft').map(agent => ({
       id: agent.id, registration: agent.flight.aircraft_reg, flightNumber: agent.flight.flight_number,
       phase: agent.phase,
-      progress: agent.diverted ? Math.max(0, 0.98 * (1 - (agent.travelWorkMs - agent.flight.est_flight_dur * 60_000) / 120_000)) : agent.progress,
+      // A diverted aircraft reports progress along its straight leg to the alternate.
+      progress: agent.diverted ? diversionFraction(agent) : agent.progress,
       departedAt: agent.departedAt, diverted: agent.diverted ?? false,
+      reroute: agent.reroute ?? null,
+      diversion: agent.diversion ?? null,
+      pendingAlternate: agent.needAlternate && !agent.diverted ? { airport: agent.alternateCandidate ?? null,
+        trigger: agent.alternateTrigger ?? null, action: agent.alternateAction ?? null } : null,
+      position: aircraftPosition(agent),
+      protocolDecision: agent.protocolDecision ?? null,
+      activeFactors: this.#options.disruptions.filter(event => {
+        const controller = `atc:${agent.departedAt === null ? agent.flight.airport_dep : (agent.arrivalAirport ?? agent.flight.airport_dest)}`;
+        return event.startMs <= this.#time && this.#time < event.endMs
+          && (!event.agentId || event.agentId === agent.id || event.agentId === controller)
+          && !(event.factor === 'PACKET_LOSS' && event.value === 0)
+          && !(event.factor === 'DELIVERY_DELAY' && event.value === 0)
+          && !(event.factor === 'REDUCED_SPEED' && event.value === 1);
+      }).map(({ id, factor, value, agentId }) => ({ id, factor, value, agentId })),
       arrivalAirport: agent.arrivalAirport ?? agent.flight.airport_dest,
       climbProgress: agent.climbProgress ?? 0, reserve: agent.reserve ?? 1,
       knownPeers: Object.keys(agent.knownPeers ?? {}).length, priority: agent.priority ?? false,

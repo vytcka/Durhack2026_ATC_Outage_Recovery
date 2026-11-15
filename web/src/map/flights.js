@@ -1,6 +1,8 @@
 // Turning raw aircraft records into something we can draw.
 import { AIRPORT_BY_IATA } from '../data/airports.js';
 import { projection } from './geography.js';
+import { routePose } from '../simulation/routeGeometry.js';
+import { displayPose, flownTrackPath } from './flightGeometry.js';
 
 const MS_PER_MINUTE = 60_000;
 
@@ -59,18 +61,16 @@ export function minutesRemaining(flight, progress) {
 }
 
 // Position on the curve at progress t, and the heading (0° = up, clockwise) the nose points.
-export function aircraftPose(flight, t) {
-  const [[x0, y0], [x1, y1], [x2, y2]] = flight.curve;
-  const u = 1 - t;
+export function aircraftPose(flight, t, reroute) {
+  return routePose(flight.curve, t, reroute);
+}
 
-  // Standard quadratic Bézier formula.
-  const x = u * u * x0 + 2 * u * t * x1 + t * t * x2;
-  const y = u * u * y0 + 2 * u * t * y1 + t * t * y2;
+// Pose of a simulated aircraft, including a straight diversion leg to a new airport.
+export function agentPose(flight, agent) {
+  return displayPose(flight, agent, projection);
+}
 
-  // Its derivative is the direction of travel. Screen y grows downwards, hence -dy.
-  const dx = 2 * u * (x1 - x0) + 2 * t * (x2 - x1);
-  const dy = 2 * u * (y1 - y0) + 2 * t * (y2 - y1);
-  const heading = (Math.atan2(dx, -dy) * 180) / Math.PI;
-
-  return { position: [x, y], heading };
+// Faint trail of where the aircraft has already been (selected aircraft only).
+export function flownPath(flight, agent) {
+  return flownTrackPath(flight, agent, projection);
 }

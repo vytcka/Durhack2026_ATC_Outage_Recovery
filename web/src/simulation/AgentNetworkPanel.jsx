@@ -1,6 +1,8 @@
 import { DISRUPTION_FACTORS } from './disruptions.js';
 import { formatDelay } from './timing.js';
 import DisruptionEditor from './DisruptionEditor.jsx';
+import { FLIGHT_STATUSES } from '../map/flightStatus.js';
+import { DIVERSION_POLICIES } from '../map/flightText.js';
 
 export default function AgentNetworkPanel({ simulation, settings, onSettingsChange, scenarioEvents, onEventsChange, scenarioAircraft, scenarioAirports }) {
   const { snapshot, busy, error } = simulation;
@@ -32,10 +34,11 @@ export default function AgentNetworkPanel({ simulation, settings, onSettingsChan
         <div><dt>ATC restarts</dt><dd>{stats?.restarts ?? 0}</dd></div>
       </dl>
       <ul className="aircraft-legend" aria-label="Aircraft colours">
-        <li><i className="key-en-route" />En route</li>
-        <li><i className="key-landing" />Delayed / landing</li>
-        <li><i className="key-landed" />Landed</li>
+        {FLIGHT_STATUSES.map(status => (
+          <li key={status.id}><i className={`key-${status.id}`} />{status.label}</li>
+        ))}
       </ul>
+      <p className="muted">Colour shows punctuality and route: rose is late, violet follows an approved detour, cyan is diverting to a new airport. Landed aircraft are dimmed but keep that colour, so a late or diverted landing never looks on time. On the map, a dashed line runs from a changed plane to its abandoned airport or route; the solid line is its current path.</p>
       <p className="muted">Delay is relative to the healthy-model baseline, not an airline schedule. Each affected flight counts once, including after landing.</p>
       <details>
         <summary>Scenario controls</summary>
@@ -48,6 +51,10 @@ export default function AgentNetworkPanel({ simulation, settings, onSettingsChan
           <input type="checkbox" checked={settings.outage} onChange={event => update('outage', event.target.checked)} />
           ATC outage, first 30 minutes
         </label>
+        <label htmlFor="diversion-policy">Diversion policy (destination closed)</label>
+        <select id="diversion-policy" value={settings.diversionPolicy} onChange={event => update('diversionPolicy', event.target.value)}>
+          {DIVERSION_POLICIES.map(policy => <option key={policy.id} value={policy.id}>{policy.label}</option>)}
+        </select>
         <label htmlFor="packet-loss">Packet loss (%)</label>
         <input id="packet-loss" type="range" min={0} max={100} step={10} value={settings.packetLoss}
           onChange={event => update('packetLoss', Number(event.target.value))} />

@@ -11,7 +11,7 @@ export function transportEffects(events, message, time, seed) {
   const active = activeDisruptions(events, message, time);
   const atcUp = message.to.startsWith('atc:');
   const atcDown = message.from.startsWith('atc:');
-  const ack = ['PLAN_ACCEPT', 'PLAN_CONFIRMED', 'ARRIVAL_APPROVED', 'ALTERNATE_APPROVED', 'HANDOVER_ACK'].includes(message.type);
+  const ack = ['PLAN_ACCEPT', 'PLAN_CONFIRMED', 'ARRIVAL_APPROVED', 'ALTERNATE_APPROVED', 'REROUTE_APPROVED', 'HANDOVER_ACK'].includes(message.type);
   const has = id => active.some(event => event.factor === id);
   return {
     drop: (!atcUp && !atcDown && has('AIRCRAFT_LINK_OUTAGE'))

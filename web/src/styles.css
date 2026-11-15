@@ -1,4 +1,5 @@
 :root {
+  color-scheme: dark;
   --bg: #0b1220;
   --land: #16243a;
   --state-border: #2c4262;
@@ -10,10 +11,15 @@
   --muted: #7d93b3;
   --panel: rgba(13, 22, 38, 0.86);
   --panel-border: #24364f;
-  --aircraft: #facc15;
-  --panpan: #f97316;
   --mayday: #ef4444;
-  --landed: #22c55e;
+  /* Flight status palette (see map/flightStatus.js). Landed statuses reuse these, dimmed. */
+  --status-scheduled: #7d93b3;
+  --status-on-time: #facc15;
+  --status-delayed: #f43f5e;
+  --status-detouring: #a78bfa;
+  --status-diverting: #38bdf8;
+  --status-landed: #22c55e;
+  --route-old: #f87171;
   --mono: ui-monospace, Consolas, monospace;
 }
 
@@ -62,13 +68,17 @@ body {
 .route-selected { fill: none; stroke: var(--accent); stroke-width: 1.125; opacity: 0.9; }
 
 .aircraft { cursor: pointer; }
-.aircraft-icon { fill: var(--aircraft); transition: filter 0.15s; }
-.aircraft[data-phase="WAITING"] .aircraft-icon,
-.aircraft[data-phase="REQUESTING_DEPARTURE"] .aircraft-icon,
-.aircraft[data-phase="AWAITING_CONFIRMATION"] .aircraft-icon { fill: var(--muted); }
-.aircraft[data-phase="AWAITING_ARRIVAL"] .aircraft-icon { fill: var(--panpan); }
-.aircraft[data-phase="ARRIVED"] .aircraft-icon { fill: var(--landed); }
-.aircraft[data-delayed="true"]:not([data-phase="ARRIVED"]) .aircraft-icon { fill: var(--panpan); }
+.aircraft-icon { fill: var(--status-on-time); transition: filter 0.15s; }
+.aircraft[data-status="scheduled"] .aircraft-icon { fill: var(--status-scheduled); }
+.aircraft[data-status="on-time"] .aircraft-icon { fill: var(--status-on-time); }
+.aircraft[data-status="delayed"] .aircraft-icon,
+.aircraft[data-status="landed-late"] .aircraft-icon { fill: var(--status-delayed); }
+.aircraft[data-status="detouring"] .aircraft-icon { fill: var(--status-detouring); }
+.aircraft[data-status="diverting"] .aircraft-icon,
+.aircraft[data-status="diverted-landed"] .aircraft-icon { fill: var(--status-diverting); }
+.aircraft[data-status="landed"] .aircraft-icon { fill: var(--status-landed); }
+/* Landed: dimmed but keeps its hue, so late/diverted landings stay distinguishable. */
+.aircraft:is([data-status="landed"], [data-status="landed-late"], [data-status="diverted-landed"]):not(.selected) { opacity: 0.55; }
 .aircraft:hover .aircraft-icon,
 .aircraft.selected .aircraft-icon { filter: drop-shadow(0 0 4px var(--accent)) brightness(1.15); }
 
@@ -80,6 +90,23 @@ body {
   stroke-width: 3px;
   stroke-linejoin: round;
 }
+
+/* ---------- Route changes ---------- */
+/* Dashed = abandoned plan (previous airport / original curve); solid = current path. */
+.flown-track { fill: none; stroke: var(--text); stroke-width: 1.4; opacity: 0.35; }
+.route-change-old { fill: none; stroke: var(--route-old); stroke-width: 1.6; stroke-dasharray: 2 5; stroke-linecap: round; }
+.route-change-new { fill: none; stroke-width: 2; stroke-linecap: round; }
+.route-change-diversion .route-change-new { stroke: var(--status-diverting); }
+.route-change-reroute .route-change-new { stroke: var(--status-detouring); }
+.route-change-diversion .route-change-arrow { fill: var(--status-diverting); }
+.route-change-reroute .route-change-arrow { fill: var(--status-detouring); }
+.route-change-abandoned circle { fill: rgba(11, 18, 32, 0.7); stroke: var(--route-old); stroke-width: 1.5; }
+.route-change-abandoned path { fill: none; stroke: var(--route-old); stroke-width: 1.8; stroke-linecap: round; }
+.route-change-label {
+  fill: var(--route-old); font: 700 11px var(--mono);
+  paint-order: stroke; stroke: var(--bg); stroke-width: 3px; stroke-linejoin: round;
+}
+.route-change-pulse { fill: none; stroke: var(--text); stroke-width: 1.5; }
 
 /* ---------- Overlays ---------- */
 .panel {
@@ -96,9 +123,29 @@ body {
 .sidebar {
   position: absolute; top: 16px; left: 16px; width: 270px;
   display: flex; flex-direction: column; gap: 8px;
-  max-height: calc(100vh - 82px); overflow-y: auto;
+  max-height: calc(100vh - 82px); overflow-y: auto; overflow-x: hidden;
+  padding-right: 4px; overscroll-behavior-y: contain;
 }
+.sidebar > * { flex-shrink: 0; }
 .sidebar .panel { position: relative; }
+
+/* Native dark scrollbars, including nested editor and communication lists. */
+:is(.sidebar, .info), :is(.sidebar, .info) * {
+  scrollbar-color: #4d6d96 #0b1220;
+  scrollbar-width: thin;
+}
+:is(.sidebar, .info)::-webkit-scrollbar,
+:is(.sidebar, .info) *::-webkit-scrollbar { width: 8px; height: 8px; }
+:is(.sidebar, .info)::-webkit-scrollbar-track,
+:is(.sidebar, .info) *::-webkit-scrollbar-track { background: var(--bg); }
+:is(.sidebar, .info)::-webkit-scrollbar-thumb,
+:is(.sidebar, .info) *::-webkit-scrollbar-thumb {
+  background: var(--coastline); border: 2px solid var(--bg); border-radius: 8px;
+}
+:is(.sidebar, .info)::-webkit-scrollbar-thumb:hover,
+:is(.sidebar, .info) *::-webkit-scrollbar-thumb:hover { background: var(--muted); }
+:is(.sidebar, .info)::-webkit-scrollbar-corner,
+:is(.sidebar, .info) *::-webkit-scrollbar-corner { background: var(--bg); }
 
 .title { padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
 .title h1 { margin: 0; font-size: 16px; }
@@ -160,9 +207,13 @@ body {
 .aircraft-legend { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin: 10px 0; padding: 0; list-style: none; color: var(--muted); font-size: 10px; }
 .aircraft-legend li { display: flex; align-items: center; gap: 5px; }
 .aircraft-legend i { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-.key-en-route { background: var(--aircraft); }
-.key-landing { background: var(--panpan); }
-.key-landed { background: var(--landed); }
+.key-scheduled { background: var(--status-scheduled); }
+.key-on-time { background: var(--status-on-time); }
+.key-delayed, .key-landed-late { background: var(--status-delayed); }
+.key-detouring { background: var(--status-detouring); }
+.key-diverting, .key-diverted-landed { background: var(--status-diverting); }
+.key-landed { background: var(--status-landed); }
+.key-landed, .key-landed-late, .key-diverted-landed { opacity: 0.55; }
 
 .agent-network details { border-top: 1px solid var(--panel-border); padding: 8px 0; }
 .agent-network summary { cursor: pointer; }
@@ -171,6 +222,7 @@ body {
 .agent-network select { margin-top: 5px; padding: 4px; color: var(--text); background: var(--bg); border: 1px solid var(--panel-border); border-radius: 4px; }
 .agent-network .outage-control { display: flex; align-items: center; gap: 6px; }
 .message-log, .factor-list { padding-left: 16px; margin: 8px 0 0; }
+.message-log, .factor-list { max-height: 220px; overflow-y: auto; }
 .message-log li, .factor-list li { margin-bottom: 6px; overflow-wrap: anywhere; }
 .model-note { font-size: 10px; }
 
@@ -216,9 +268,20 @@ body {
 .zoom-buttons button:hover { border-color: var(--accent); color: var(--accent); }
 
 .info { right: 16px; bottom: 60px; padding: 12px 14px; min-width: 240px; max-width: calc(100vw - 32px); font-size: 13px; line-height: 1.5; }
+.info { max-height: calc(100vh - 132px); overflow-y: auto; overscroll-behavior-y: contain; }
 .info-code { font: 700 20px var(--mono); color: var(--accent); }
 .info-code span { font-size: 12px; color: var(--muted); font-weight: 400; }
 .info-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+
+/* Right column, below the zoom buttons: flight tracker on top, info card pinned to the bottom.
+   Both shrink to share the height and scroll inside; gaps between them stay draggable map. */
+.right-column {
+  position: absolute; top: 136px; right: 16px; bottom: 60px;
+  display: flex; flex-direction: column; align-items: flex-end; gap: 8px;
+  max-width: calc(100vw - 32px); pointer-events: none;
+}
+.right-column > * { pointer-events: auto; flex: 0 1 auto; min-height: 0; }
+.right-column > .info { position: relative; right: auto; bottom: auto; margin-top: auto; max-height: none; }
 
 .info-grid { display: grid; grid-template-columns: auto 1fr; gap: 2px 14px; margin: 8px 0 0; font-size: 12px; }
 .info-grid dt { color: var(--muted); }
@@ -229,11 +292,55 @@ body {
   font: 700 11px var(--mono); letter-spacing: 0.05em;
   color: var(--bg); background: #22c55e;
 }
-.status-badge.status-panpan { background: var(--panpan); }
-.status-badge.status-mayday { background: var(--mayday); color: #fff; }
-.status-badge.phase-awaiting_arrival { background: var(--panpan); color: var(--bg); }
-.status-badge.phase-arrived { background: var(--landed); color: var(--bg); }
-.status-badge.is-delayed:not(.phase-arrived) { background: var(--panpan); color: var(--bg); }
+.status-badge[data-status="scheduled"] { background: var(--status-scheduled); }
+.status-badge[data-status="on-time"] { background: var(--status-on-time); }
+.status-badge[data-status="delayed"],
+.status-badge[data-status="landed-late"] { background: var(--status-delayed); color: #fff; }
+.status-badge[data-status="detouring"] { background: var(--status-detouring); }
+.status-badge[data-status="diverting"],
+.status-badge[data-status="diverted-landed"] { background: var(--status-diverting); }
+.status-badge[data-status="landed"] { background: var(--status-landed); }
+.abandoned-airport { color: var(--route-old); }
+.new-airport { color: var(--status-diverting); }
+.diversion-note { margin-top: 4px; font-size: 12px; color: var(--status-diverting); }
+
+/* Close (✕) button shared by the aircraft and airport cards. */
+.info-close {
+  flex: none; width: 22px; height: 22px; padding: 0;
+  border: 1px solid var(--panel-border); border-radius: 4px;
+  background: transparent; color: var(--muted);
+  font-size: 12px; line-height: 1; cursor: pointer;
+}
+.info-close:hover, .info-close:focus-visible { color: var(--accent); border-color: var(--accent); outline: none; }
+
+/* Compact aircraft card: header, one summary line, progress bar, four facts, folded details. */
+.aircraft-info { width: 264px; min-width: 0; padding: 8px 10px; font-size: 12px; line-height: 1.35; }
+.aircraft-info .info-header { gap: 8px; }
+.aircraft-info .info-code { font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.aircraft-info .info-code span { font-size: 11px; }
+.info-summary { display: flex; align-items: center; gap: 8px; margin-top: 4px; min-width: 0; }
+.aircraft-info .status-badge { flex: none; padding: 1px 6px; font-size: 10px; letter-spacing: 0.03em; }
+.info-route { min-width: 0; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.aircraft-info .diversion-note { margin-top: 3px; font-size: 11px; }
+.aircraft-info .diversion-note::first-letter { text-transform: uppercase; }
+.info-progress { height: 3px; margin: 6px 0 0; border-radius: 2px; background: var(--panel-border); overflow: hidden; }
+.info-progress > span { display: block; height: 100%; }
+.info-facts { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 10px; margin: 6px 0 0; }
+.info-facts div { min-width: 0; }
+.info-facts dt { color: var(--muted); font: 10px system-ui, sans-serif; text-transform: uppercase; letter-spacing: 0.05em; }
+.info-facts dd { margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.info-actions { display: flex; gap: 6px; margin-top: 8px; }
+.info-actions button {
+  flex: 1; min-width: 0; padding: 4px 6px;
+  border: 1px solid var(--panel-border); border-radius: 4px;
+  background: var(--bg); color: var(--text); font-size: 11px; cursor: pointer;
+}
+.info-actions button:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+.info-actions button:disabled { opacity: 0.45; cursor: not-allowed; }
+.info-details { margin-top: 8px; padding-top: 6px; border-top: 1px solid var(--panel-border); }
+.info-details summary { color: var(--muted); font-size: 11px; cursor: pointer; }
+.info-details summary:hover { color: var(--accent); }
+.aircraft-info .info-grid { gap: 1px 10px; margin-top: 6px; font-size: 11px; }
 
 .error { color: var(--mayday); }
 

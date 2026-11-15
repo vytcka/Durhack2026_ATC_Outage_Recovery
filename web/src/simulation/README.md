@@ -20,12 +20,16 @@ origin/destination airport gets an ATC agent. This is not a random or representa
 Aircraft request departure, receive a route offer, accept it, and wait for confirmation
 before moving. ATC caches offers per aircraft, so retries reuse the same plan ID. At the
 end of its nominal journey, an aircraft requests arrival approval. Without a reply it
-waits near the end of its illustrative route and retries. It stays visible in green after approval.
+waits near the end of its illustrative route and retries. It stays visible after approval.
 
-Aircraft are yellow en route, orange when delayed or awaiting landing approval, and green
-after successful arrival. A late landing stays green but retains its delay record. There is
-no terminal stop/failure state or manual stop control: disrupted flights keep attempting
-progress. Pausing the viewer does not add simulated delay.
+One status function (`map/flightStatus.js`) colours the map icon, the tracker row and the
+aircraft card the same way: grey awaiting departure, yellow en route on time, rose delayed
+(including a late departure), violet on an approved detour and cyan diverting to a new airport.
+Diversion takes priority over detour, and detour over delay. Landed planes keep their status
+colour and are dimmed: green only for an on-time landing, rose for a late landing and cyan for
+a landing at an alternate, so a delayed or diverted flight never looks like an on-time one.
+There is no terminal stop/failure state or manual stop control: disrupted flights keep
+attempting progress. Pausing the viewer does not add simulated delay.
 
 ## Delay accounting
 
@@ -47,12 +51,69 @@ Mean arrival delay includes only completed arrivals, including on-time arrivals 
 Elapsed delay freezes once the aircraft lands. Replaying restores the same metrics rather than
 incrementing a global disruption counter on every tick.
 
-The accepted route contains the origin and destination; the existing viewer draws the
-illustrative curved path between them. There is no waypoint planner or altitude controller yet.
+The accepted route contains the origin and destination; the viewer draws an illustrative
+curved path. A closed corridor triggers `REROUTE_REQUEST` / `REROUTE_APPROVED`: the aircraft
+holds at the boundary until a valid reply arrives, then follows a longer visible bypass.
+Wind and speed restrictions still apply on that bypass. The selected route and aircraft
+heading follow the detour, which joins smoothly from the current position and rejoins the
+original path before arrival. There is no real weather-polygon planner or altitude controller.
 
 An outage before departure prevents takeoff. An outage en route does not erase an accepted
 plan; the aircraft continues it, then waits if arrival approval cannot be obtained. These
 are explicit toy fallback policies, not real lost-radio instructions.
+
+En-route aircraft ask their destination ATC for availability at the normal retry interval.
+A communicated closure can trigger an early alternate request; the agent does not know an
+airport is closed before a message arrives. It picks an alternate from the airports it knows
+(the origin, or the nearest airport not known to be closed, depending on the policy), asks
+**that airport's** ATC, and waits for its approval. A refusal marks the airport unavailable
+and the next candidate is asked. On approval the aircraft turns at its current position and
+flies a **straight leg** to the new airport (`diversion.mode: 'direct'`), then requests landing
+there. The leg lasts its distance at the flight's own average ground speed (route length /
+scheduled duration), at least one minute. Ending the closure does not revoke an accepted diversion.
+
+A diverted snapshot reports `progress` as the fraction of that straight leg, plus `diversion`:
+`airport`, `previousAirport`, `trigger`, `action`, `startedAt`, `startProgress` (route progress
+at the turn), `fromPosition`, `destination` and the detour `reroute` active at the turn.
+`pendingAlternate` shows an alternate still being negotiated.
+
+Select an airborne plane for **Block route / detour** or **Close destination / divert**.
+These add real 30-minute scenario events at the next tick and pause, rather than forcing
+agent states. Resume playback to watch negotiation, movement and landing. Closing a shared
+airport affects all flights using that airport, not just the selected plane. The settings sidebar
+and aircraft card have dark, scrollable overflow for access to all controls.
+
+### Route-change guides and the flight tracker
+
+Every airborne diverted or detoured plane carries two guides attached to its current position
+(full strength when selected, faded otherwise). Dashed is the abandoned plan, solid is the
+current one:
+
+- Diversion: a dashed straight line to the previously designated airport (marked ✕, labelled
+  "DEN closed" or "was DEN"), and a solid cyan line with an arrowhead to the new airport.
+- Detour: a dashed line stepping from the plane back to the original route and following it to
+  the destination, and the solid violet detour curve from the plane to the same destination.
+
+The selected plane also shows its flown track. The **Flight tracker** panel (top right) lists
+flights with status counts and the filters Disrupted / All / Delayed / Diverted / Detours.
+Diverted rows read `SDF → ~~DEN~~ → IND` with the reason. Choosing a row selects the plane and
+centres the map on it.
+
+### Rulebook
+
+`options.rulebook` holds `TRIGGER: ACTION` lines (`rulebook.js`); omitted triggers keep the
+defaults shown first:
+
+- `COMLOST` (no reply from destination ATC for two timeouts while en route):
+  `CONTINUE` | `LANDNEARESTAIRPORT` | `RETURNTOORIGIN`.
+- `DESTCLOSED` (closure communicated by destination ATC): `RETURNTOORIGIN` | `LANDNEARESTAIRPORT`.
+  Low virtual reserve while waiting to land uses the same alternate policy.
+- `NOGOREGION` (closed route corridor): `DETOUR` (negotiate a bypass) | `HOLD` (wait at the boundary).
+
+Each trigger fires at most once per flight. It sets `protocolDecision` and logs `RULE_TRIGGERED`.
+The viewer's **Diversion policy** control sets `DESTCLOSED` (nearest open airport by default)
+and passes the whole airport catalogue, so every catalogue airport gets an ATC agent and can
+be an alternate.
 
 ## Files and boundaries
 
@@ -63,6 +124,12 @@ are explicit toy fallback policies, not real lost-radio instructions.
 - `disruptions.js`, `transport.js`, `nodeEffects.js`: transport and node-capability effects.
 - `DisruptionEditor.jsx`: timed/scoped event creation, activation and removal.
 - `timing.js`: fixed healthy-model timing reference, delay components and display formatting.
+- `routeGeometry.js`: continuous illustrative detour positions and headings.
+- `navigation.js`: engine-side positions (route curve or straight diversion leg) and nearest-alternate choice.
+- `rulebook.js`: rulebook parsing and the supported trigger/action table.
+- `map/flightStatus.js`: the single status/colour decision shared by map, tracker and card.
+- `map/flightGeometry.js`, `map/routeChangeOverlay.js`: map-space poses, flown track and route-change guides.
+- `map/FlightTracker.jsx`, `map/flightTracker.js`: the tracker panel and its pure row logic.
 - `simulation.worker.js`: worker request/reply adapter.
 - `useAgentSimulation.js`: React lifecycle, worker cleanup and latest-target coalescing.
 - `AgentNetworkPanel.jsx`: scenario controls, statistics and recent event inspection.
@@ -135,15 +202,33 @@ Reset preserves scheduled events for repeatable runs. Changing the aircraft coun
 custom events because aircraft IDs and available controllers may change. Quick controls and
 custom events combine; clearing custom events does not reset quick-control sliders.
 
+### Combining disruptions
+
+Scheduled events already overlap: adding another does not replace the existing scenario.
+Each retains its target, strength and time window. For example, a speed fraction of 0.8 and
+a headwind penalty of 0.25 multiply to 0.6 of nominal progress, before climb, holds or detour
+effort. Add a no-go corridor to require a route change; add a communication outage to delay
+the approval for that change. A pure radio outage does not invent a geographic obstacle.
+Slower travel also burns virtual reserve for longer and can lead to priority/alternate requests.
+
+The batch editor can stage factors with individual strengths and targets, then schedule or
+activate all staged rows together using the shared start/duration. It appends to existing
+events. Outcomes still count each delayed flight once, not once per active factor.
+
 ### Schematic limits
 
 - Climb is a virtual capability proxy; no real altitude/descent or aircraft dynamics are solved.
 - Reserve is a dimensionless coordination signal, not measured fuel. Exhaustion does not
   manufacture a crash or a terminal stop.
-- Alternate negotiation currently offers the origin airport. The return leg is an explicit
-  fixed two-minute schematic leg retracing the illustrative route, not a real travel-time estimate.
+- Alternate choice is the origin or the nearest catalogue airport by straight-line distance.
+  It ignores runway length, capacity and weather; only communicated closures are avoided.
+  The straight leg uses the flight's average ground speed, not winds or approach procedures.
+  A diverted plane whose alternate later closes keeps retrying that alternate; it does not re-divert.
 - Radio distances use approximate nominal coordinates; observations are not a surveillance model.
-- A no-go event is a temporary corridor hold, not a geographic weather rerouter.
+- A no-go event negotiates a schematic corridor bypass, not a geographic weather rerouter.
+  Its fixed 1.5 effort multiplier slows progress along the remaining route; it is not a
+  measured ratio of real navigable distances. The approved detour remains after the event
+  ends so aircraft do not snap back onto the original route.
 - Background demand consumes virtual slots, not additional hidden aircraft agents.
 - ATC arrival/alternate approvals are cached so retries do not reserve another slot.
 - Restart strength is reboot duration after activation; queued work and boot recovery can
@@ -167,7 +252,7 @@ process's current JS heap, not isolated worker memory or total system memory.
 ## Not implemented yet
 
 - Validated aviation behaviour, separation constraints and conflict detection.
-- Comparative policy experiments, realistic alternate selection and geographic rerouting.
+- Comparative policy experiments, suitability-based alternate selection and geographic rerouting.
 - Real departure timestamps: all aircraft currently request departure at day start.
 - Physical fuel/altitude/weather models, real radio propagation and realistic holding trajectories.
 - Historical crisis import, checkpoint optimisation and persistent run exports.

@@ -1,0 +1,120 @@
+/* Flight tracker panel. A flex child: the parent column decides its position.
+   `.panel` (styles.css, loaded after this file) is absolutely positioned, hence the
+   doubled class selectors below. */
+.panel.flight-tracker {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 300px;
+  max-width: calc(100vw - 32px);
+  max-height: 45vh;
+  min-height: 0;
+  overflow: hidden;
+  font-size: 12px;
+  color: var(--text);
+  scrollbar-color: var(--coastline) var(--bg);
+  scrollbar-width: thin;
+}
+
+.flight-tracker-header { flex: none; padding: 10px 12px 8px; }
+.flight-tracker-title { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+.flight-tracker h2 { margin: 0; font-size: 13px; }
+.flight-tracker-title p { margin: 2px 0 0; font-size: 10px; }
+
+.flight-tracker-toggle {
+  flex: none;
+  width: 26px; height: 26px; padding: 0;
+  border: 1px solid var(--panel-border); border-radius: 6px;
+  background: transparent; color: var(--text);
+  font-size: 13px; line-height: 1; cursor: pointer;
+  transform: rotate(-90deg); transition: transform 0.15s;
+}
+.flight-tracker.open .flight-tracker-toggle { transform: rotate(0deg); }
+.flight-tracker-toggle:hover { border-color: var(--accent); color: var(--accent); }
+.flight-tracker-toggle:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* Status chips. Filled dot = airborne or on the ground before departure; ring = landed. */
+.flight-tracker-counts { display: flex; flex-wrap: wrap; gap: 4px; margin: 8px 0 0; padding: 0; list-style: none; }
+.flight-tracker-count {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 1px 6px;
+  border: 1px solid var(--panel-border); border-radius: 999px;
+  font-size: 10px; color: var(--muted); white-space: nowrap;
+}
+.flight-tracker-count .mono { color: var(--text); font-weight: 700; }
+.flight-tracker-count[data-zero="true"] { opacity: 0.45; }
+
+.flight-tracker-dot {
+  display: inline-block; flex: none;
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--dot, var(--muted));
+}
+.flight-tracker-dot[data-landed="true"] { background: transparent; box-shadow: inset 0 0 0 2px var(--dot, var(--muted)); }
+
+.flight-tracker-body { display: flex; flex-direction: column; flex: 1 1 auto; min-height: 0; }
+.flight-tracker-body[hidden] { display: none; }
+
+.flight-tracker-filters {
+  flex: none; display: flex; flex-wrap: wrap; gap: 4px;
+  padding: 0 12px 8px;
+}
+.flight-tracker-filters button {
+  padding: 3px 7px;
+  border: 1px solid var(--panel-border); border-radius: 4px;
+  background: transparent; color: var(--muted);
+  font: 11px system-ui, -apple-system, 'Segoe UI', sans-serif; cursor: pointer;
+}
+.flight-tracker-filters button .mono { font-size: 10px; }
+.flight-tracker-filters button:hover { border-color: var(--accent); color: var(--text); }
+.flight-tracker-filters button[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); background: rgba(251, 191, 36, 0.08); }
+.flight-tracker-filters button:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+.flight-tracker-list {
+  position: relative; /* offsetTop of rows is measured against the list */
+  flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior-y: contain;
+  margin: 0; padding: 6px; list-style: none;
+  border-top: 1px solid var(--panel-border);
+}
+.flight-tracker-list::-webkit-scrollbar { width: 8px; }
+.flight-tracker-list::-webkit-scrollbar-track { background: var(--bg); }
+.flight-tracker-list::-webkit-scrollbar-thumb { background: var(--coastline); border: 2px solid var(--bg); border-radius: 8px; }
+
+.flight-tracker-empty {
+  margin: 0; padding: 10px 12px 12px;
+  border-top: 1px solid var(--panel-border);
+  font-size: 11px; line-height: 1.4;
+}
+
+.flight-tracker-row {
+  display: grid;
+  grid-template-columns: 8px minmax(0, 1fr) auto;
+  column-gap: 8px; row-gap: 1px; align-items: center;
+  width: 100%; padding: 5px 6px;
+  border: 1px solid transparent; border-radius: 6px;
+  background: none; color: var(--text);
+  font: inherit; text-align: left; cursor: pointer;
+}
+.flight-tracker-row:hover { background: rgba(255, 255, 255, 0.04); border-color: var(--panel-border); }
+.flight-tracker-row:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+.flight-tracker-row[aria-current="true"] { border-color: var(--accent); background: rgba(251, 191, 36, 0.08); }
+
+.flight-tracker-row .flight-tracker-dot { grid-column: 1; grid-row: 1; }
+.flight-tracker-main {
+  grid-column: 2; grid-row: 1;
+  display: flex; align-items: baseline; gap: 8px; min-width: 0;
+  white-space: nowrap; overflow: hidden;
+}
+.flight-tracker-flight { font-weight: 700; }
+.flight-tracker-route { min-width: 0; overflow: hidden; text-overflow: ellipsis; color: var(--muted); font-size: 11px; }
+.flight-tracker-old { color: var(--muted); text-decoration-color: var(--status-delayed, #f43f5e); text-decoration-thickness: 1.5px; }
+.flight-tracker-new { color: var(--status-diverting, #38bdf8); font-weight: 700; }
+.flight-tracker-delay { grid-column: 3; grid-row: 1; color: var(--status-delayed, #f43f5e); font-size: 11px; font-weight: 700; }
+.flight-tracker-secondary {
+  grid-column: 2 / span 2; grid-row: 2;
+  min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  color: var(--muted); font-size: 10.5px;
+}
+
+@media (max-width: 700px) {
+  .panel.flight-tracker { max-height: 35vh; }
+}

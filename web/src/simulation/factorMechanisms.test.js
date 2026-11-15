@@ -66,8 +66,8 @@ test('peer outages affect actual reports and a relay can bypass a targeted ATC l
   assert.ok(relayed.events.some(item => item.messageType === 'RELAY_UP'));
 });
 
-test('handover failure and route exclusion cause recoverable holds rather than failure', () => {
-  for (const [factor, value] of [['HANDOVER_FAILURE', 1], ['NO_GO_REGION', 0.4]]) {
+test('handover failure causes a recoverable hold rather than failure', () => {
+  for (const [factor, value] of [['HANDOVER_FAILURE', 1]]) {
     const sim = new Simulation(flights, { disruptions: [event(factor, value, { endMs: 300_000 })] });
     const held = sim.advanceTo(240_000);
     assert.equal(held.stats.arrived, 0, factor);
@@ -102,7 +102,10 @@ test('airport closure negotiates an alternate and alternate capacity queues that
   assert.equal(normal.stats.arrived, 2);
   assert.equal(normal.aircraft[0].diverted, true);
   assert.equal(normal.aircraft[0].arrivalAirport, 'AAA');
-  assert.equal(normal.aircraft[0].progress, 0);
+  assert.equal(normal.aircraft[0].diversion.mode, 'direct');
+  assert.equal(normal.aircraft[0].diversion.previousAirport, 'BBB');
+  assert.equal(normal.aircraft[0].progress, 1, 'diverted progress is the completed straight leg');
+  assert.deepEqual(normal.aircraft[0].position, [0, 0]);
   const constrained = new Simulation(flights, { disruptions: [closure,
     event('ALTERNATE_CAPACITY', 1, { agentId: 'atc:AAA' })] }).advanceTo(600_000);
   assert.ok(constrained.stats.totalDelayMs > normal.stats.totalDelayMs);
@@ -162,4 +165,124 @@ test('low virtual reserve can request an alternate when destination ATC stays un
     event('ATC_LINK_OUTAGE', 1, { agentId: 'atc:BBB', startMs: 60_000 })] }).advanceTo(590_000);
   assert.ok(state.aircraft.some(agent => agent.diverted));
   assert.ok(state.aircraft.some(agent => agent.arrivalAirport === 'AAA'));
+});
+
+test('landing approval on an alternate retry tick does not reserve a phantom alternate slot', () => {
+  const sim = new Simulation([flights[0]], { disruptions: [
+    event('FUEL_CONSUMPTION', 5),
+    event('ATC_LINK_OUTAGE', 1, { agentId: 'atc:AAA', startMs: 60_000, endMs: 280_000 }),
+    event('RUNWAY_CLOSURE', 1, { agentId: 'atc:BBB', startMs: 60_000, endMs: 280_000 }),
+    event('ALTERNATE_CAPACITY', 1, { agentId: 'atc:AAA' }),
+  ] });
+  const state = sim.advanceTo(310_000);
+  assert.equal(state.aircraft[0].arrivedAt, 290_000);
+  assert.equal(state.events.some(item => item.type === 'MESSAGE_SENT'
+    && item.messageType === 'ALTERNATE_REQUEST' && item.time >= state.aircraft[0].arrivedAt), false);
+  assert.equal(state.events.some(item => item.type === 'ALTERNATE_RESERVED'), false);
+  sim.advanceTo(0);
+  assert.deepEqual(sim.advanceTo(310_000), state);
+});
+
+test('overlapping wind, speed and corridor faults compound and negotiate a delayed detour', () => {
+  const disruptions = [event('NO_GO_REGION', 0.4), event('HEADWIND', 0.25), event('REDUCED_SPEED', 0.8)];
+  const sim = new Simulation([flights[0]], { disruptions });
+  const early = sim.advanceTo(140_000);
+  assert.ok(early.aircraft[0].reroute);
+  assert.equal(early.aircraft[0].reroute.reason, 'NO_GO_REGION');
+  assert.ok(early.events.some(item => item.messageType === 'REROUTE_REQUEST'));
+  assert.ok(early.events.some(item => item.messageType === 'REROUTE_APPROVED'));
+  const state = sim.advanceTo(600_000);
+  const single = new Simulation([flights[0]], { disruptions: [disruptions[0]] }).advanceTo(600_000);
+  assert.equal(state.stats.arrived, 1);
+  assert.ok(state.aircraft[0].arrivedAt > single.aircraft[0].arrivedAt);
+  assert.equal(state.stats.disruptedFlights, 1);
+  sim.advanceTo(0);
+  assert.deepEqual(sim.advanceTo(600_000), state);
+});
+
+test('a corridor hold needs a delivered reroute approval before bypassing the boundary', () => {
+  const sim = new Simulation([flights[0]], { disruptions: [event('NO_GO_REGION', 0.4),
+    event('ATC_LINK_OUTAGE', 1, { agentId: 'atc:BBB', startMs: 60_000, endMs: 300_000 })] });
+  const held = sim.advanceTo(240_000).aircraft[0];
+  assert.equal(held.reroute, null);
+  assert.ok(held.progress <= 0.4);
+  const recovered = sim.advanceTo(600_000);
+  assert.ok(recovered.aircraft[0].reroute);
+  assert.equal(recovered.stats.arrived, 1);
+});
+
+test('lost acknowledgements also block reroute approvals until the link recovers', () => {
+  const sim = new Simulation([flights[0]], { disruptions: [event('NO_GO_REGION', 0.4),
+    event('LOST_ACK', 1, { agentId: 'atc:BBB', startMs: 60_000, endMs: 300_000 })] });
+  const held = sim.advanceTo(240_000).aircraft[0];
+  assert.equal(held.reroute, null);
+  assert.ok(held.progress <= 0.4);
+  assert.equal(sim.advanceTo(600_000).stats.arrived, 1);
+});
+
+test('en-route destination checks negotiate an early diversion and land at the origin', () => {
+  const sim = new Simulation([{ ...flights[0], est_flight_dur: 10 }], { disruptions: [
+    event('AIRPORT_CLOSURE', 1, { agentId: 'atc:BBB', startMs: 60_000 }),
+  ] });
+  const early = sim.advanceTo(140_000);
+  assert.equal(early.aircraft[0].diverted, true);
+  assert.equal(early.aircraft[0].arrivalAirport, 'AAA');
+  assert.ok(early.aircraft[0].diversion.startProgress < 0.5);
+  const arrived = sim.advanceTo(500_000);
+  assert.equal(arrived.aircraft[0].phase, 'ARRIVED');
+  assert.equal(arrived.aircraft[0].progress, 1);
+  assert.deepEqual(arrived.aircraft[0].position, [0, 0]);
+  sim.advanceTo(0);
+  assert.deepEqual(sim.advanceTo(500_000), arrived);
+});
+
+test('an early diversion waits for communicated closure and alternate approval', () => {
+  const sim = new Simulation([{ ...flights[0], est_flight_dur: 10 }], { disruptions: [
+    event('AIRPORT_CLOSURE', 1, { agentId: 'atc:BBB', startMs: 60_000 }),
+    event('ATC_LINK_OUTAGE', 1, { agentId: 'atc:BBB', startMs: 60_000, endMs: 240_000 }),
+  ] });
+  assert.equal(sim.advanceTo(200_000).aircraft[0].diverted, false);
+  const diverting = sim.advanceTo(400_000).aircraft[0];
+  assert.equal(diverting.diverted, true);
+  // Closure is heard only after the link returns, so the plane is far out and the straight
+  // leg back takes real time at its own ground speed instead of a fixed two minutes.
+  assert.ok(diverting.diversion.durationMs > 120_000);
+  assert.equal(sim.advanceTo(600_000).stats.arrived, 0);
+  assert.equal(sim.advanceTo(700_000).stats.arrived, 1);
+});
+
+test('a diversion leg lasts as long as its distance at the flight\'s own ground speed', () => {
+  // The route lies on the equator (cos 0 = 1): 2 degrees flown in 10 minutes.
+  const sim = new Simulation([{ ...flights[0], est_flight_dur: 10 }], { disruptions: [
+    event('AIRPORT_CLOSURE', 1, { agentId: 'atc:BBB', startMs: 60_000 }),
+    event('ATC_LINK_OUTAGE', 1, { agentId: 'atc:BBB', startMs: 60_000, endMs: 240_000 }),
+  ] });
+  const { diversion } = sim.advanceTo(400_000).aircraft[0];
+  const distance = Math.hypot(diversion.fromPosition[0] - diversion.destination[0], diversion.fromPosition[1] - diversion.destination[1]);
+  const legMs = distance / 2 * 10 * 60_000;
+  assert.equal(diversion.durationMs, Math.max(60_000, Math.ceil(legMs / 10_000) * 10_000));
+});
+
+test('diverting from a detour preserves the turn-around position and the traversed route', () => {
+  const sim = new Simulation([{ ...flights[0], est_flight_dur: 10 }], { disruptions: [
+    event('NO_GO_REGION', 0.4),
+    event('AIRPORT_CLOSURE', 1, { agentId: 'atc:BBB', startMs: 180_000 }),
+  ] });
+  let previous = sim.advanceTo(170_000).aircraft[0];
+  assert.ok(previous.reroute);
+  let turning;
+  for (let time = 180_000; time <= 350_000; time += 10_000) {
+    const current = sim.advanceTo(time).aircraft[0];
+    if (current.diverted) { turning = current; break; }
+    previous = current;
+  }
+  assert.ok(turning);
+  assert.equal(turning.diversion.startProgress, previous.progress);
+  assert.deepEqual(turning.position, previous.position, 'the turn starts exactly where the plane was');
+  assert.equal(turning.progress, 0);
+  assert.deepEqual(turning.diversion.reroute, previous.reroute);
+  const landed = sim.advanceTo(900_000).aircraft[0];
+  assert.equal(landed.phase, 'ARRIVED');
+  assert.equal(landed.progress, 1);
+  assert.deepEqual(landed.position, [0, 0]);
 });

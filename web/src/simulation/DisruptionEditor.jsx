@@ -13,6 +13,7 @@ export default function DisruptionEditor({ events = [], onChange, aircraft = [],
   const [target, setTarget] = useState('');
   const [startMinute, setStartMinute] = useState(0);
   const [duration, setDuration] = useState(30);
+  const [draft, setDraft] = useState([]);
   const factor = DISRUPTION_FACTORS.find(item => item.id === factorId) ?? DISRUPTION_FACTORS[0];
   const [strength, setStrength] = useState(factor?.defaultValue ?? 1);
   const min = factor?.min ?? 0;
@@ -34,21 +35,50 @@ export default function DisruptionEditor({ events = [], onChange, aircraft = [],
   const activationStart = Math.min(now + 10_000, 86_390_000);
   const canActivate = Boolean(factor) && activationStart > now;
 
-  const addEvent = (startMs, seekTo) => {
-    if (!factor) return;
-    const occupied = new Set(events.map(event => event.id));
+  const nextId = occupied => {
     let id;
     do { id = `disruption-${++counter.current}`; } while (occupied.has(id));
+    occupied.add(id);
+    return id;
+  };
+  const currentSelection = () => {
     const rawStrength = clamp(strength, min, max, factor.defaultValue ?? min);
-    const event = {
-      id,
+    return {
       factor: factor.id,
-      startMs,
-      endMs: Math.min(DAY_MS, startMs + clamp(duration, 1, 1440) * MINUTE_MS),
       value: step >= 1 ? Math.round(rawStrength) : rawStrength,
       ...(selectedTarget ? { agentId: selectedTarget } : {}),
     };
-    onChange([...events, event], seekTo);
+  };
+  const appendEvents = (selections, startMs, seekTo) => {
+    const occupied = new Set(events.map(event => event.id));
+    const batch = selections.map(selection => ({
+      ...selection,
+      id: nextId(occupied),
+      startMs,
+      endMs: Math.min(DAY_MS, startMs + clamp(duration, 1, 1440) * MINUTE_MS),
+    }));
+    onChange([...events, ...batch], seekTo);
+  };
+  const addEvent = (startMs, seekTo) => {
+    if (factor) appendEvents([currentSelection()], startMs, seekTo);
+  };
+  const addToBatch = () => {
+    if (!factor) return;
+    const occupied = new Set([...events, ...draft].map(event => event.id));
+    setDraft([...draft, { ...currentSelection(), id: nextId(occupied) }]);
+  };
+  const isValidSelection = selection => {
+    const metadata = DISRUPTION_FACTORS.find(item => item.id === selection.factor);
+    return Boolean(metadata) && (!selection.agentId
+      || (metadata.targetKinds.includes('aircraft') && aircraft.some(agent => agent.id === selection.agentId))
+      || (metadata.targetKinds.includes('atc') && airports.some(iata => `atc:${iata}` === selection.agentId)));
+  };
+  const invalidDraft = draft.some(selection => !isValidSelection(selection));
+  const submitBatch = (startMs, seekTo) => {
+    // Recheck against the latest aircraft/airports; never broaden a removed target to all nodes.
+    if (draft.length === 0 || draft.some(selection => !isValidSelection(selection))) return;
+    appendEvents(draft, startMs, seekTo);
+    setDraft([]);
   };
 
   const statusOf = event => now < event.startMs ? 'pending' : now >= event.endMs ? 'ended' : 'active';
@@ -87,6 +117,31 @@ export default function DisruptionEditor({ events = [], onChange, aircraft = [],
         <button type="button" disabled={!canActivate} onClick={() => { if (canActivate) addEvent(activationStart, activationStart); }}>Activate now</button>
       </div>
       <p className="muted">Changes pause playback and replay the edited scenario to the selected time. Activate now begins on the next tick.</p>
+      <p className="muted">Overlapping disruptions combine rather than replace one another. Each batch item keeps its own strength and target; all share the current start and duration.</p>
+      <button type="button" disabled={!factor} onClick={addToBatch}>Add to batch</button>
+      <p className="muted">{draft.length} in batch</p>
+      {draft.length > 0 && (
+        <ul className="disruption-editor-events" aria-label="Batch draft">
+          {draft.map((selection, index) => {
+            const metadata = DISRUPTION_FACTORS.find(item => item.id === selection.factor);
+            return (
+              <li key={selection.id}>
+                <strong>{metadata?.label ?? selection.factor}</strong>
+                <span className="muted">{targetName(selection.agentId)} · {selection.value} {metadata?.unit}</span>
+                {!isValidSelection(selection) && <span>Target no longer available; remove and add this item again.</span>}
+                <button type="button" aria-label={`Remove batch item ${index + 1}: ${metadata?.label ?? selection.factor}`}
+                  onClick={() => setDraft(draft.filter(item => item.id !== selection.id))}>Remove from batch</button>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+      {invalidDraft && <p role="alert">A batch target is no longer available. Remove the affected item and add it again with a current target before submitting.</p>}
+      <div className="disruption-editor-actions">
+        <button type="button" disabled={draft.length === 0 || invalidDraft} onClick={() => submitBatch(clamp(startMinute, 0, 1439) * MINUTE_MS)}>Schedule batch</button>
+        <button type="button" disabled={draft.length === 0 || invalidDraft || !canActivate}
+          onClick={() => { if (canActivate) submitBatch(activationStart, activationStart); }}>Activate batch now</button>
+      </div>
       {!canActivate && <p className="muted">No activation tick remains today. Schedule a disruption and rewind to an earlier time.</p>}
       <p className="disruption-editor-count" role="status">{activeCount} active · {events.length} scheduled</p>
       {events.length === 0 ? <p className="muted">No disruptions scheduled.</p> : (

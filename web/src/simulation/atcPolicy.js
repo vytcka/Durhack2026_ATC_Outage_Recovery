@@ -36,11 +36,24 @@ export function decideAtc(agent, time, tickMs, timeoutMs, environment) {
     const isArrival = ['ARRIVAL_REQUEST', 'ALTERNATE_REQUEST'].includes(message.type);
     const usesRunway = isArrival || ['DEPARTURE_REQUEST', 'PLAN_ACCEPT'].includes(message.type);
     if (environment.closed && usesRunway) {
-      respond(message, 'AIRPORT_UNAVAILABLE', { airport: agent.airport });
+      respond(message, 'AIRPORT_UNAVAILABLE', { airport: agent.airport, planId: message.payload.planId });
       continue;
     }
     if (environment.runwayClosed && usesRunway) { next.inbox.push(message); continue; }
+    if (message.type === 'DESTINATION_STATUS_REQUEST') {
+      respond(message, environment.closed ? 'AIRPORT_UNAVAILABLE' : 'DESTINATION_AVAILABLE',
+        { airport: agent.airport, planId: message.payload.planId });
+      continue;
+    }
     if (message.type === 'HANDOVER_REQUEST') { respond(message, 'HANDOVER_ACK', { planId: message.payload.planId }); continue; }
+    if (message.type === 'REROUTE_REQUEST') {
+      const { planId, boundary, report } = message.payload;
+      if (!planId || !Number.isFinite(boundary) || boundary < 0.1 || boundary > 0.8
+        || !report || Math.abs(time - report.observedAt) > timeoutMs || report.progress < 0 || report.progress >= 0.98) {
+        events.push({ type: 'MESSAGE_REJECTED', reason: 'invalid reroute request', agentId: agent.id });
+      } else respond(message, 'REROUTE_APPROVED', { planId, boundary });
+      continue;
+    }
     if (message.type === 'PRIORITY_REQUEST') {
       next.priorities[message.from] = true;
       respond(message, 'PRIORITY_ACK', { planId: message.payload.planId });
@@ -53,7 +66,9 @@ export function decideAtc(agent, time, tickMs, timeoutMs, environment) {
     if (message.type === 'DEPARTURE_REQUEST' || isArrival) {
       const report = message.payload.report;
       const expected = message.type === 'DEPARTURE_REQUEST' ? 0 : 0.98;
-      if (!report || Math.abs(time - report.observedAt) > timeoutMs || Math.abs(report.progress - expected) > 0.12) {
+      const invalidProgress = !report || (message.type === 'ALTERNATE_REQUEST'
+        ? report.progress < 0 || report.progress > 1 : Math.abs(report.progress - expected) > 0.12);
+      if (!report || !Number.isFinite(report.progress) || Math.abs(time - report.observedAt) > timeoutMs || invalidProgress) {
         events.push({ type: 'MESSAGE_REJECTED', reason: 'invalid position report', agentId: agent.id });
         continue;
       }
