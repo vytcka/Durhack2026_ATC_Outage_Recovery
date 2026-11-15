@@ -6,7 +6,7 @@ import { WIDTH, HEIGHT, projection, paths } from './geography.js';
 import { useZoom } from './useZoom.js';
 import { useSimulationClock } from './useSimulationClock.js';
 import { useAircraft } from './useAircraft.js';
-import { flightProgress } from './flights.js';
+import { useAgentSimulation } from '../simulation/useAgentSimulation.js';
 import AirportMarker from './AirportMarker.jsx';
 import Aircraft from './Aircraft.jsx';
 import AircraftInfo from './AircraftInfo.jsx';
@@ -22,22 +22,39 @@ const SIM_SPEED = 60; // simulated seconds per real second at ×1 (1 real second
 export default function AirspaceMap() {
   const svgRef = useRef(null);
   const { transform, zoomIn, zoomOut, reset, focus } = useZoom(svgRef, MAX_ZOOM);
-  const clock = useSimulationClock(SIM_SPEED);
-  const { flights, error: aircraftError } = useAircraft();
+  const clock = useSimulationClock(SIM_SPEED, 100);
+  const { flights: loadedFlights, error: aircraftError } = useAircraft();
+  const [settings, setSettings] = useState({ aircraftLimit: 100, outage: false, packetLoss: 0, delaySeconds: 0, travelSpeedPercent: 100 });
+  const flights = useMemo(() => loadedFlights.slice(0, settings.aircraftLimit)
+    .map((flight, index) => ({ ...flight, agentId: `aircraft:${index}` })), [loadedFlights, settings.aircraftLimit]);
+  const options = useMemo(() => ({
+    seed: 42,
+    disruptions: [
+      ...(settings.outage ? [{ factor: 'ATC_LINK_OUTAGE', startMs: 0, endMs: 30 * 60_000 }] : []),
+      { factor: 'PACKET_LOSS', startMs: 0, endMs: 86_400_000, value: settings.packetLoss / 100 },
+      { factor: 'DELIVERY_DELAY', startMs: 0, endMs: 86_400_000, value: settings.delaySeconds * 1000 },
+      { factor: 'REDUCED_SPEED', startMs: 0, endMs: 86_400_000, value: settings.travelSpeedPercent / 100 },
+    ],
+  }), [settings]);
+  const simulation = useAgentSimulation(flights, clock.elapsed, options);
 
   const [selectedAirport, setSelectedAirport] = useState(null);
-  const [selectedReg, setSelectedReg] = useState(null); // aircraft_reg of the selected aircraft
+  const [selectedId, setSelectedId] = useState(null); // journey ID, independent of registration
   const [cursor, setCursor] = useState(null); // [lon, lat] under the mouse
   const [analyticsOpen, setAnalyticsOpen] = useState(true);
 
-  const progressByReg = Object.fromEntries(
-    flights.map((flight) => [flight.aircraft_reg, flightProgress(flight, clock.elapsed)])
-  );
-  const airborneFlights = flights.filter((flight) => progressByReg[flight.aircraft_reg] < 1);
-  const selectedFlight = flights.find((flight) => flight.aircraft_reg === selectedReg);
-
-  // TODO: replace with the real value once the simulation is connected.
-  const disruptionIndex = 0;
+  const agentsById = Object.fromEntries((simulation.snapshot?.aircraft ?? []).map(agent => [agent.id, agent]));
+  const visibleFlights = flights.filter(flight => agentsById[flight.agentId]);
+  const selectedFlight = flights.find(flight => flight.agentId === selectedId);
+  const completedElapsed = simulation.snapshot?.time ?? 0;
+  const completedSimTime = new Date(clock.simTime.getTime() - clock.elapsed + completedElapsed);
+  const stats = simulation.snapshot?.stats;
+  const disruptionIndex = stats?.sent ? stats.dropped / stats.sent : 0;
+  const changeSettings = (next) => {
+    clock.seek(0);
+    setSelectedId(null);
+    setSettings(next);
+  };
 
   // The clock follows whatever is in the middle of the screen. The viewBox centre is also the
   // screen centre (the SVG scales uniformly), so undo the zoom transform, then the projection,
@@ -48,19 +65,19 @@ export default function AirspaceMap() {
   }, [transform]);
 
   const selectAirport = (airport) => {
-    setSelectedReg(null);
+    setSelectedId(null);
     setSelectedAirport(airport);
     focus(projection([airport.lon, airport.lat]), FOCUS_ZOOM);
   };
 
   const selectAircraft = (flight) => {
     setSelectedAirport(null);
-    setSelectedReg(flight.aircraft_reg);
+    setSelectedId(flight.agentId);
   };
 
   const resetView = () => {
     setSelectedAirport(null);
-    setSelectedReg(null);
+    setSelectedId(null);
     reset();
   };
 
@@ -100,11 +117,13 @@ export default function AirspaceMap() {
           ))}
 
           {/* Aircraft are drawn last so they sit on top of airports and routes. */}
-          {airborneFlights.map((flight) => (
+          {visibleFlights.map((flight) => (
             <Aircraft
-              key={flight.aircraft_reg}
+              key={flight.agentId}
               flight={flight}
-              progress={progressByReg[flight.aircraft_reg]}
+              progress={agentsById[flight.agentId].progress}
+              phase={agentsById[flight.agentId].phase}
+              delayed={agentsById[flight.agentId].delayed}
               scale={1 / transform.k}
               showLabel={transform.k >= SHOW_AIRCRAFT_LABELS_AT_ZOOM}
               selected={flight === selectedFlight}
@@ -134,11 +153,15 @@ export default function AirspaceMap() {
         <AnalyticsPanel
           open={analyticsOpen}
           timeZone={timeZone}
-          simTime={clock.simTime}
-          elapsed={clock.elapsed}
-          airborne={airborneFlights.length}
+          simTime={completedSimTime}
+          elapsed={completedElapsed}
+          airborne={stats?.airborne ?? 0}
           disruptionIndex={disruptionIndex}
           onReset={clock.reset}
+          onSeek={clock.seek}
+          simulation={simulation}
+          settings={settings}
+          onSettingsChange={changeSettings}
         />
       </aside>
 
@@ -167,7 +190,11 @@ export default function AirspaceMap() {
       )}
 
       {selectedFlight && (
-        <AircraftInfo flight={selectedFlight} progress={progressByReg[selectedFlight.aircraft_reg]} />
+        <AircraftInfo
+          flight={selectedFlight}
+          progress={agentsById[selectedFlight.agentId]?.progress ?? 0}
+          agent={agentsById[selectedFlight.agentId]}
+        />
       )}
 
       <footer className="panel status">

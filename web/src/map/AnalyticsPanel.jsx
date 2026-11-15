@@ -1,8 +1,8 @@
 import { useMemo } from 'react';
+import AgentNetworkPanel from '../simulation/AgentNetworkPanel.jsx';
 
 // Collapsible stats panel shown under the title.
-// The disruption index is still a placeholder passed in from the parent.
-export default function AnalyticsPanel({ open, timeZone, simTime, elapsed, airborne, disruptionIndex, onReset }) {
+export default function AnalyticsPanel({ open, timeZone, simTime, elapsed, airborne, disruptionIndex, onReset, onSeek, simulation, settings, onSettingsChange }) {
   const clockFormat = useMemo(
     () =>
       new Intl.DateTimeFormat('en-US', {
@@ -16,6 +16,8 @@ export default function AnalyticsPanel({ open, timeZone, simTime, elapsed, airbo
   );
 
   const clock = formatClock(clockFormat, simTime);
+  const minuteOfDay = Math.floor(elapsed / 60_000);
+  const timelineTime = `${String(Math.floor(minuteOfDay / 60)).padStart(2, '0')}:${String(minuteOfDay % 60).padStart(2, '0')}`;
 
   return (
     <div className={open ? 'analytics-drawer open' : 'analytics-drawer'} aria-hidden={!open}>
@@ -29,7 +31,7 @@ export default function AnalyticsPanel({ open, timeZone, simTime, elapsed, airbo
           </div>
 
           <div className="stat">
-            <dt>Simulation running</dt>
+            <dt>Time since day start</dt>
             <dd className="mono">{formatElapsed(elapsed)}</dd>
           </div>
 
@@ -39,10 +41,31 @@ export default function AnalyticsPanel({ open, timeZone, simTime, elapsed, airbo
           </div>
 
           <div className="stat">
-            <dt>Disruption index</dt>
-            <dd className="mono">{disruptionIndex.toFixed(2)}</dd>
+            <dt>Message loss</dt>
+            <dd className="mono">{(disruptionIndex * 100).toFixed(1)}%</dd>
           </div>
         </dl>
+
+        <div className="day-timeline">
+          <div className="timeline-heading">
+            <label htmlFor="simulation-time">Simulation time (UTC)</label>
+            <output htmlFor="simulation-time" className="mono">{timelineTime}</output>
+          </div>
+          <input
+            id="simulation-time"
+            type="range"
+            min={0}
+            max={1439}
+            step={1}
+            value={minuteOfDay}
+            onChange={(event) => onSeek(Number(event.target.value) * 60_000)}
+            aria-valuetext={`${timelineTime} UTC`}
+          />
+          <div className="timeline-labels mono"><span>00:00</span><span>12:00</span><span>23:59</span></div>
+          <p className="muted">Drag to seek · pauses playback</p>
+        </div>
+
+        <AgentNetworkPanel simulation={simulation} settings={settings} onSettingsChange={onSettingsChange} />
 
         <button className="reset-button" onClick={onReset}>
           Reset simulation

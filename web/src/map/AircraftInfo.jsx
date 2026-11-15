@@ -1,4 +1,4 @@
-import { minutesRemaining } from './flights.js';
+import { formatDelay, formatSimulationTime } from '../simulation/timing.js';
 
 const STATUS_LABELS = {
   OK: 'OK',
@@ -7,8 +7,16 @@ const STATUS_LABELS = {
 };
 
 // Details card for the selected aircraft.
-export default function AircraftInfo({ flight, progress }) {
-  const landed = progress >= 1;
+export default function AircraftInfo({ flight, progress, agent }) {
+  const landed = agent?.phase === 'ARRIVED';
+  const awaitingLanding = agent?.phase === 'AWAITING_ARRIVAL';
+  const outcome = landed ? (agent.delayed ? 'Landed · delayed' : 'Landed successfully')
+    : agent?.delayed ? 'Delayed' : awaitingLanding ? 'Awaiting landing approval' : null;
+  let progressLabel = `${Math.round(progress * 100)}% of route`;
+  if (!agent?.departedAt) progressLabel = 'Awaiting departure';
+  if (awaitingLanding) progressLabel = 'Awaiting landing approval';
+  if (landed) progressLabel = 'Landed successfully';
+
 
   return (
     <div className="panel info">
@@ -16,8 +24,8 @@ export default function AircraftInfo({ flight, progress }) {
         <div className="info-code">
           {flight.flight_number} <span>{flight.aircraft_reg} · {flight.type}</span>
         </div>
-        <span className={`status-badge status-${flight.status.toLowerCase()}`}>
-          {STATUS_LABELS[flight.status] ?? flight.status}
+        <span className={`status-badge status-${flight.status.toLowerCase()} phase-${agent?.phase.toLowerCase()}${agent?.delayed ? ' is-delayed' : ''}`}>
+          {outcome ?? STATUS_LABELS[flight.status] ?? flight.status}
         </span>
       </div>
 
@@ -29,10 +37,34 @@ export default function AircraftInfo({ flight, progress }) {
       </div>
 
       <dl className="info-grid mono">
+        <dt>Agent state</dt>
+        <dd>{agent?.phase.toLowerCase().replaceAll('_', ' ') ?? 'initialising'}</dd>
+
+        <dt>Request timeouts</dt>
+        <dd>{agent?.timeouts ?? 0}</dd>
+
+        <dt>Healthy-model arrival</dt>
+        <dd data-info="expected-arrival">{formatSimulationTime(agent?.expectedArrivalAt)} UTC</dd>
+
+        <dt>Actual arrival</dt>
+        <dd data-info="actual-arrival">{agent?.arrivedAt == null ? 'Pending' : `${formatSimulationTime(agent.arrivedAt)} UTC`}</dd>
+
+        <dt>Departure delay</dt>
+        <dd>{formatDelay(agent?.departureDelayMs)}</dd>
+
+        <dt>Travel delay</dt>
+        <dd data-info="travel-delay">{formatDelay(agent?.travelDelayMs)}</dd>
+
+        <dt>Arrival wait delay</dt>
+        <dd>{formatDelay(agent?.arrivalDelayMs)}</dd>
+
+        <dt>Total accrued delay</dt>
+        <dd data-info="total-delay">{formatDelay(agent?.totalDelayMs)}</dd>
+
         <dt>Altitude</dt>
         <dd>FL{flight.altitude}</dd>
 
-        <dt>Airspeed</dt>
+        <dt>Input airspeed</dt>
         <dd>{flight.airspeed} kt</dd>
 
         <dt>Squawk</dt>
@@ -42,8 +74,9 @@ export default function AircraftInfo({ flight, progress }) {
         <dd>{flight.fuel_remaining.toLocaleString('en-US')} kg</dd>
 
         <dt>Progress</dt>
-        <dd>{landed ? 'Landed' : `${Math.round(progress * 100)}% · ${minutesRemaining(flight, progress)} min left`}</dd>
+        <dd>{progressLabel}</dd>
       </dl>
+
     </div>
   );
 }

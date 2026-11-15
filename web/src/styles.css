@@ -13,6 +13,7 @@
   --aircraft: #facc15;
   --panpan: #f97316;
   --mayday: #ef4444;
+  --landed: #22c55e;
   --mono: ui-monospace, Consolas, monospace;
 }
 
@@ -62,6 +63,12 @@ body {
 
 .aircraft { cursor: pointer; }
 .aircraft-icon { fill: var(--aircraft); transition: filter 0.15s; }
+.aircraft[data-phase="WAITING"] .aircraft-icon,
+.aircraft[data-phase="REQUESTING_DEPARTURE"] .aircraft-icon,
+.aircraft[data-phase="AWAITING_CONFIRMATION"] .aircraft-icon { fill: var(--muted); }
+.aircraft[data-phase="AWAITING_ARRIVAL"] .aircraft-icon { fill: var(--panpan); }
+.aircraft[data-phase="ARRIVED"] .aircraft-icon { fill: var(--landed); }
+.aircraft[data-delayed="true"]:not([data-phase="ARRIVED"]) .aircraft-icon { fill: var(--panpan); }
 .aircraft:hover .aircraft-icon,
 .aircraft.selected .aircraft-icon { filter: drop-shadow(0 0 4px var(--accent)) brightness(1.15); }
 
@@ -89,6 +96,7 @@ body {
 .sidebar {
   position: absolute; top: 16px; left: 16px; width: 270px;
   display: flex; flex-direction: column; gap: 8px;
+  max-height: calc(100vh - 82px); overflow-y: auto;
 }
 .sidebar .panel { position: relative; }
 
@@ -132,6 +140,40 @@ body {
 }
 .reset-button:hover { border-color: var(--accent); color: var(--accent); }
 
+.day-timeline { padding: 0 14px 12px; }
+.timeline-heading { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 11px; }
+.timeline-heading label { color: var(--muted); }
+.timeline-heading output { color: var(--accent); }
+.day-timeline input { display: block; width: 100%; margin: 10px 0 4px; accent-color: var(--accent); cursor: pointer; }
+.day-timeline input:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.timeline-labels { display: flex; justify-content: space-between; color: var(--muted); font-size: 10px; }
+.day-timeline p { margin: 6px 0 0; font-size: 10px; }
+
+.agent-network { padding: 0 14px 12px; font-size: 11px; }
+.agent-network h2 { margin: 0; font-size: 13px; }
+.agent-network h2 span { float: right; font-size: 10px; font-weight: 400; }
+.agent-network p { margin: 6px 0; line-height: 1.4; }
+.network-stats { display: grid; gap: 4px; margin: 10px 0; }
+.network-stats div { display: flex; justify-content: space-between; gap: 8px; }
+.network-stats dt { color: var(--muted); }
+.network-stats dd { margin: 0; font-family: var(--mono); }
+.aircraft-legend { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin: 10px 0; padding: 0; list-style: none; color: var(--muted); font-size: 10px; }
+.aircraft-legend li { display: flex; align-items: center; gap: 5px; }
+.aircraft-legend i { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.key-en-route { background: var(--aircraft); }
+.key-landing { background: var(--panpan); }
+.key-landed { background: var(--landed); }
+
+.agent-network details { border-top: 1px solid var(--panel-border); padding: 8px 0; }
+.agent-network summary { cursor: pointer; }
+.agent-network label { display: block; margin-top: 10px; color: var(--muted); }
+.agent-network input[type="range"] { width: 100%; accent-color: var(--accent); }
+.agent-network select { margin-top: 5px; padding: 4px; color: var(--text); background: var(--bg); border: 1px solid var(--panel-border); border-radius: 4px; }
+.agent-network .outage-control { display: flex; align-items: center; gap: 6px; }
+.message-log, .factor-list { padding-left: 16px; margin: 8px 0 0; }
+.message-log li, .factor-list li { margin-bottom: 6px; overflow-wrap: anywhere; }
+.model-note { font-size: 10px; }
+
 /* ---------- Simulation controls (top centre) ---------- */
 .sim-controls {
   top: 16px; left: 50%; transform: translateX(-50%);
@@ -173,7 +215,7 @@ body {
 }
 .zoom-buttons button:hover { border-color: var(--accent); color: var(--accent); }
 
-.info { left: 16px; bottom: 60px; padding: 12px 14px; min-width: 240px; font-size: 13px; line-height: 1.5; }
+.info { right: 16px; bottom: 60px; padding: 12px 14px; min-width: 240px; max-width: calc(100vw - 32px); font-size: 13px; line-height: 1.5; }
 .info-code { font: 700 20px var(--mono); color: var(--accent); }
 .info-code span { font-size: 12px; color: var(--muted); font-weight: 400; }
 .info-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
@@ -189,6 +231,9 @@ body {
 }
 .status-badge.status-panpan { background: var(--panpan); }
 .status-badge.status-mayday { background: var(--mayday); color: #fff; }
+.status-badge.phase-awaiting_arrival { background: var(--panpan); color: var(--bg); }
+.status-badge.phase-arrived { background: var(--landed); color: var(--bg); }
+.status-badge.is-delayed:not(.phase-arrived) { background: var(--panpan); color: var(--bg); }
 
 .error { color: var(--mayday); }
 
