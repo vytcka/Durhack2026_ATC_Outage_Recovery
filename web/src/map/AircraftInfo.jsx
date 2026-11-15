@@ -11,7 +11,7 @@ const clockTime = ms => (ms === null || ms === undefined ? '—' : formatSimulat
 
 // Compact details card for the selected aircraft: key facts up front, the rest folded away.
 // `physics` is flightPhysics() for this flight: live phase, altitude, speed, vertical rate, fuel.
-export default function AircraftInfo({ flight, progress, agent, physics, onDisrupt, canDisrupt, diversionPolicy, onClose }) {
+export default function AircraftInfo({ flight, progress, agent, physics, nameOf = id => id, onDisrupt, canDisrupt, diversionPolicy, onClose }) {
   const status = flightStatus(agent);
   const statusInfo = FLIGHT_STATUS_BY_ID[status];
   const landed = agent?.phase === 'ARRIVED';
@@ -133,6 +133,13 @@ export default function AircraftInfo({ flight, progress, agent, physics, onDisru
           <dt>Fuel</dt>
           <dd>{(physics?.fuelKg ?? flight.fuel_remaining).toLocaleString('en-US')} kg</dd>
 
+          {agent?.radioPath !== undefined && (
+            <>
+              <dt>Radio link</dt>
+              <dd data-info="radio-link">{describeRadioLink(agent.radioPath, nameOf)}</dd>
+            </>
+          )}
+
           <dt>Known peers</dt>
           <dd>{agent?.knownPeers ?? 0}</dd>
 
@@ -162,4 +169,14 @@ function formatVerticalRate(feetPerMinute) {
   if (rounded === 0) return 'level';
   const arrow = rounded > 0 ? '↑' : '↓';
   return `${arrow} ${Math.abs(rounded).toLocaleString('en-US')} ft/min`;
+}
+
+// ['aircraft:3', 'atc:ATL'] -> "ATL tower"
+// ['aircraft:3', 'aircraft:7', 'atc:ATL'] -> "ATL tower via DL123"
+// null -> "No coverage"
+function describeRadioLink(path, nameOf) {
+  if (!path) return 'No coverage';
+  const tower = `${path.at(-1).slice(4)} tower`;
+  const relays = path.slice(1, -1).map(nameOf);
+  return relays.length ? `${tower} via ${relays.join(' → ')}` : tower;
 }

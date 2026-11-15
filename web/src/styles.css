@@ -120,6 +120,9 @@ body {
   to   { opacity: 0; }
 }
 
+/* Out of radio coverage (no tower or relay in range): the plane fades. */
+.aircraft[data-no-radio="true"] .aircraft-icon { opacity: 0.4; }
+
 /* Analytics panel switch for the overlay. */
 .signals-toggle {
   display: flex; align-items: flex-start; gap: 8px;

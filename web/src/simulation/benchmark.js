@@ -4,8 +4,12 @@ import { AIRPORT_BY_IATA } from '../data/airports.js';
 import { Simulation } from './engine.js';
 import { SIMULATION_MS } from './timing.js';
 
+const position = (iata) => [AIRPORT_BY_IATA[iata].lon, AIRPORT_BY_IATA[iata].lat];
+// Same shape the app sends to the worker: coordinates are needed for the radio model.
 const flights = JSON.parse(readFileSync(new URL('../../public/aircraft_info.json', import.meta.url), 'utf8'))
-  .filter(flight => AIRPORT_BY_IATA[flight.airport_dep] && AIRPORT_BY_IATA[flight.airport_dest]);
+  .filter(flight => AIRPORT_BY_IATA[flight.airport_dep] && AIRPORT_BY_IATA[flight.airport_dest])
+  .map(flight => ({ ...flight, origin: position(flight.airport_dep), destination: position(flight.airport_dest) }));
+const airports = Object.values(AIRPORT_BY_IATA).map(({ iata, lon, lat }) => ({ iata, lon, lat }));
 const scenarios = [
   ['healthy', []],
   ['30-minute ATC outage', [{ factor: 'ATC_LINK_OUTAGE', startMs: 0, endMs: 1_800_000 }]],
@@ -15,7 +19,7 @@ const scenarios = [
 for (const limit of [50, 100]) {
   for (const [name, disruptions] of scenarios) {
     const start = performance.now();
-    const simulation = new Simulation(flights.slice(0, limit), { disruptions, seed: 42 });
+    const simulation = new Simulation(flights.slice(0, limit), { disruptions, seed: 42, airports, radio: true });
     const snapshot = simulation.advanceTo(SIMULATION_MS - 1);
     console.log(JSON.stringify({
       scenario: name, aircraft: snapshot.aircraft.length, atc: snapshot.stats.atcAgents,

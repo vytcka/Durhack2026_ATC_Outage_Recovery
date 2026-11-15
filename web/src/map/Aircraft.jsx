@@ -33,6 +33,7 @@ export default function Aircraft({ flight, agent, scale, showLabel, selected, on
       data-delayed={String(Boolean(agent?.delayed))}
       data-diverted={String(Boolean(agent?.diverted))}
       data-rerouted={String(Boolean(agent?.reroute))}
+      data-no-radio={String(agent?.radioPath === null)}
       transform={`translate(${x},${y}) scale(${scale})`}
       onClick={onClick}
     >

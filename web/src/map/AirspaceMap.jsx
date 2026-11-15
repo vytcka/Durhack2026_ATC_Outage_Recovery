@@ -49,6 +49,7 @@ export default function AirspaceMap() {
   const options = useMemo(() => ({
     seed: 42,
     airports: SIM_AIRPORTS,
+    radio: true, // 100 nm aircraft / 150 nm tower coverage, see simulation/radio.js
     rulebook: `DESTCLOSED: ${settings.diversionPolicy}`,
     disruptions: [
       ...(settings.outage ? [{ factor: 'ATC_LINK_OUTAGE', startMs: 0, endMs: 30 * 60_000 }] : []),
@@ -310,6 +311,7 @@ export default function AirspaceMap() {
             progress={agentsById[selectedFlight.agentId]?.progress ?? 0}
             agent={agentsById[selectedFlight.agentId]}
             physics={selectedPhysics}
+            nameOf={id => agentsById[id]?.flightNumber ?? id}
             onDisrupt={disruptSelected}
             diversionPolicy={settings.diversionPolicy}
             canDisrupt={!simulation.busy && completedElapsed < LAST_ACTION_MS}

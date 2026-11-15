@@ -154,6 +154,19 @@ New messages cannot arrive during the same step that created them. The base deli
 latency is 10 seconds; arrivals are quantised to step boundaries. Timeouts trigger retries,
 not an assumption that the other agent has failed. The default timeout is 60 seconds.
 
+## Radio coverage (`radio.js`, `options.radio`)
+
+The app runs with `radio: true`. Towers (ATC at every map airport) reach aircraft within
+150 nm; aircraft reach each other within 100 nm; towers are joined by ground lines. Each step,
+every aircraft picks one uplink: its current tower while still in range, else the nearest tower
+in range, else the nearest airborne aircraft that has an uplink (relays chain). Messages to or
+from an aircraft without an uplink are dropped and counted as `noCoverage`, both when sent and
+when they would be delivered. Aircraft-to-aircraft messages need direct range. Agent policies
+are unchanged: they still address their departure/destination ATC; radio only decides whether
+and through which hops a message physically travels. A coarse 4° grid keeps the per-step
+nearest-node searches local. Without `radio`, as in the abstract unit tests, every node can
+reach every other node.
+
 ## Disruptions
 
 All thirty factors have schematic mechanisms. Each factor's description and strength unit are
