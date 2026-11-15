@@ -258,3 +258,20 @@ test('zero speed and the old artificial stop mechanism are not valid failure mod
     { factor: 'REDUCED_SPEED', startMs: 0, endMs: 60_000, value: 0 },
   ] }), /Speed factor/);
 });
+
+test('aircraft stay parked until their scheduled departure time and are not counted as delayed', () => {
+  const scheduled = [
+    { ...flights[0], departure_time: '00:00' },
+    { ...flights[1], departure_time: '00:05' },
+  ];
+  const sim = new Simulation(scheduled);
+
+  let state = sim.advanceTo(4 * 60_000);
+  assert.equal(state.aircraft[1].phase, 'WAITING', 'the 00:05 flight must not ask for departure early');
+  assert.equal(state.aircraft[1].totalDelayMs, 0);
+
+  state = sim.advanceTo(6 * 60_000);
+  assert.equal(state.aircraft[1].phase, 'EN_ROUTE');
+  assert.equal(state.aircraft[1].departedAt, state.aircraft[1].expectedDepartureAt);
+  assert.equal(state.aircraft[1].departureDelayMs, 0);
+});

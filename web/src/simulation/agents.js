@@ -1,6 +1,7 @@
 // Toy coordination policies, not operational flight-control procedures.
 // Policies receive only their own memory, their inbox and simulation time.
 import { uniqueInbox } from './transport.js';
+import { scheduledDepartureMs } from './timing.js';
 export function createAircraft(flight, index) {
   return {
     id: `aircraft:${index}`, kind: 'aircraft', flight: { ...flight }, inbox: [],
@@ -58,7 +59,9 @@ export function decideAircraftBase(agent, time, timeoutMs, tickMs, speedFactor) 
   }
 
   const waiting = ['REQUESTING_DEPARTURE', 'AWAITING_CONFIRMATION', 'AWAITING_ARRIVAL'].includes(next.phase);
-  if (next.phase === 'WAITING' || (waiting && time - next.lastSentAt >= timeoutMs)) {
+  // A parked aircraft stays quiet until its scheduled departure time.
+  const departureDue = next.phase === 'WAITING' && time >= scheduledDepartureMs(agent.flight);
+  if (departureDue || (waiting && time - next.lastSentAt >= timeoutMs)) {
     if (waiting) {
       next.timeouts += 1;
       events.push({ type: 'REQUEST_TIMEOUT', agentId: agent.id });

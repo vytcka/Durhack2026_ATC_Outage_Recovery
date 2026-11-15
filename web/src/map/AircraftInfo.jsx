@@ -61,6 +61,9 @@ export default function AircraftInfo({ flight, progress, agent, physics }) {
         <dt>Request timeouts</dt>
         <dd>{agent?.timeouts ?? 0}</dd>
 
+        <dt>Scheduled departure</dt>
+        <dd>{flight.departure_time ?? '00:00'} UTC</dd>
+
         <dt>Healthy-model arrival</dt>
         <dd data-info="expected-arrival">{formatSimulationTime(agent?.expectedArrivalAt)} UTC</dd>
 

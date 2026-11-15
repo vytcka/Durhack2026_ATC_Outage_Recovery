@@ -48,8 +48,8 @@ export function useAgentSimulation(flights, elapsed, options) {
     // Keep projection and presentation data out of the agent engine.
     worker.postMessage({
       type: 'init', options,
-      flights: flights.map(({ aircraft_reg, flight_number, airport_dep, airport_dest, est_flight_dur, from, to }) => ({
-        aircraft_reg, flight_number, airport_dep, airport_dest, est_flight_dur,
+      flights: flights.map(({ aircraft_reg, flight_number, airport_dep, airport_dest, est_flight_dur, departure_time, from, to }) => ({
+        aircraft_reg, flight_number, airport_dep, airport_dest, est_flight_dur, departure_time,
         origin: [from.lon, from.lat], destination: [to.lon, to.lat],
       })),
     });

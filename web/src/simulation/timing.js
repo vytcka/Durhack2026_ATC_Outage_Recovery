@@ -1,8 +1,18 @@
+// `departure_time` in aircraft_info.json is "HH:MM" UTC on the simulation day, i.e. the same
+// clock as the analytics panel. Flights without one leave at midnight.
+export function scheduledDepartureMs(flight) {
+  if (!flight.departure_time) return 0;
+  const [hours, minutes] = flight.departure_time.split(':').map(Number);
+  return (hours * 60 + minutes) * 60_000;
+}
+
 // Synthetic no-disruption reference for the current protocol, not an airline schedule.
-// One initial decision tick, four departure-message hops, then two arrival-message hops.
+// The first decision tick at or after the scheduled departure, four departure-message hops,
+// then two arrival-message hops. The engine's first tick is at tickMs, never at 0.
 export function expectedTiming(flight, { tickMs, latencyMs }) {
   const hopMs = Math.max(1, Math.ceil(latencyMs / tickMs)) * tickMs;
-  const expectedDepartureAt = tickMs + 4 * hopMs;
+  const firstDecisionAt = Math.max(tickMs, Math.ceil(scheduledDepartureMs(flight) / tickMs) * tickMs);
+  const expectedDepartureAt = firstDecisionAt + 4 * hopMs;
   const expectedTravelMs = Math.ceil(flight.est_flight_dur * 60_000 / tickMs) * tickMs;
   return {
     expectedDepartureAt,

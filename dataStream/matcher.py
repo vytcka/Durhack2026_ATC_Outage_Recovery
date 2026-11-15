@@ -10,6 +10,7 @@ Usage:  python matcher.py               # look up missing routes, then build the
 import argparse
 import json
 import math
+import random
 import re
 import time
 from pathlib import Path
@@ -38,6 +39,14 @@ RESERVE_FUEL_HOURS = 0.75    # regulatory-style reserve, roughly 45 minutes
 # in the feed. A1 light, A2 small, A3 large (737/A320), A4 B757, A5 heavy (widebodies).
 FUEL_BURN_KG_PER_HOUR = {"A1": 60, "A2": 800, "A3": 2500, "A4": 3200, "A5": 6500}
 DEFAULT_FUEL_BURN = 2500
+
+# Departure schedule: the snapshot has no timestamps, so flights leave in waves from midnight UTC,
+# a few at a time. The snapshot lists aircraft roughly by operator (all UPS jets together, all
+# FedEx together...), so flights are shuffled first to mix airports within each wave. A fixed
+# seed keeps the order the same on every run.
+DEPARTURES_PER_SLOT = 5
+SLOT_MINUTES = 5
+SHUFFLE_SEED = 2026
 
 EMERGENCY_SQUAWKS = {"7500": "MAYDAY", "7700": "MAYDAY", "7600": "PANPAN"}
 EMERGENCY_FIELD = {"general": "MAYDAY", "unlawful": "MAYDAY", "downed": "MAYDAY",
@@ -165,6 +174,44 @@ def build_record(aircraft, route, airports):
     }
 
 
+def spread_origins(flights):
+    """Reorder flights so each departure wave leaves from different airports.
+
+    Walks the (already shuffled) list and fills each wave with the first flights whose origin
+    isn't in that wave yet. Only if too few distinct airports are left does a wave repeat one.
+    """
+    remaining = list(flights)
+    ordered = []
+
+    while remaining:
+        wave, origins = [], set()
+        for flight in remaining:
+            if flight["airport_dep"] not in origins:
+                wave.append(flight)
+                origins.add(flight["airport_dep"])
+            if len(wave) == DEPARTURES_PER_SLOT:
+                break
+
+        # Not enough different airports left: top the wave up with whatever remains.
+        for flight in remaining:
+            if len(wave) == DEPARTURES_PER_SLOT:
+                break
+            if flight not in wave:
+                wave.append(flight)
+
+        for flight in wave:
+            remaining.remove(flight)
+        ordered.extend(wave)
+
+    return ordered
+
+
+def departure_slot(index):
+    """0-4 -> "00:00", 5-9 -> "00:05", ... (UTC, simulation day)."""
+    minutes = (index // DEPARTURES_PER_SLOT) * SLOT_MINUTES
+    return f"{minutes // 60:02d}:{minutes % 60:02d}"
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--cache-only", action="store_true",
@@ -191,7 +238,13 @@ def main():
 
     # The frontend keys aircraft by registration, so make sure each appears once.
     unique = {record["aircraft_reg"]: record for record in records}
-    OUTPUT_FILE.write_text(json.dumps(list(unique.values()), indent=2) + "\n", encoding="utf-8")
+    flights = list(unique.values())
+    random.Random(SHUFFLE_SEED).shuffle(flights)
+    flights = spread_origins(flights)
+    for index, record in enumerate(flights):
+        record["departure_time"] = departure_slot(index)
+
+    OUTPUT_FILE.write_text(json.dumps(flights, indent=2) + "\n", encoding="utf-8")
     print(f"Kept {len(unique)} of {len(snapshot['aircraft'])} aircraft -> {OUTPUT_FILE}")
 
 

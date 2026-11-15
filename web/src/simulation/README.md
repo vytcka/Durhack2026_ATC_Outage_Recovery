@@ -168,7 +168,7 @@ process's current JS heap, not isolated worker memory or total system memory.
 
 - Validated aviation behaviour, separation constraints and conflict detection.
 - Comparative policy experiments, realistic alternate selection and geographic rerouting.
-- Real departure timestamps: all aircraft currently request departure at day start.
+- Real departure timestamps: `departure_time` (UTC) is a synthetic schedule, five flights every five minutes from midnight.
 - Physical fuel/altitude/weather models, real radio propagation and realistic holding trajectories.
 - Historical crisis import, checkpoint optimisation and persistent run exports.
 

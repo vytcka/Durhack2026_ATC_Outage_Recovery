@@ -8,6 +8,7 @@ import { useSimulationClock } from './useSimulationClock.js';
 import { useAircraft } from './useAircraft.js';
 import { useAgentSimulation } from '../simulation/useAgentSimulation.js';
 import { flightPhysics } from './physics.js';
+import { scheduledDepartureMs } from '../simulation/timing.js';
 import AirportMarker from './AirportMarker.jsx';
 import Aircraft from './Aircraft.jsx';
 import AircraftInfo from './AircraftInfo.jsx';
@@ -47,12 +48,15 @@ export default function AirspaceMap() {
   const [analyticsOpen, setAnalyticsOpen] = useState(true);
 
   const agentsById = Object.fromEntries((simulation.snapshot?.aircraft ?? []).map(agent => [agent.id, agent]));
-  const visibleFlights = flights.filter(flight => agentsById[flight.agentId]);
+  const completedElapsed = simulation.snapshot?.time ?? 0;
+  // A flight appears once its scheduled departure time is reached. If ATC then holds it,
+  // it stays visible at the airport so the delay can be seen.
+  const visibleFlights = flights.filter(flight => agentsById[flight.agentId]
+    && completedElapsed >= scheduledDepartureMs(flight));
   // Live altitude, speed, fuel and position along the route for every flight on the map.
   const physicsById = Object.fromEntries(visibleFlights.map(flight =>
     [flight.agentId, flightPhysics(flight, agentsById[flight.agentId])]));
   const selectedFlight = flights.find(flight => flight.agentId === selectedId);
-  const completedElapsed = simulation.snapshot?.time ?? 0;
   const completedSimTime = new Date(clock.simTime.getTime() - clock.elapsed + completedElapsed);
   const stats = simulation.snapshot?.stats;
   const disruptionIndex = stats?.sent ? stats.dropped / stats.sent : 0;
