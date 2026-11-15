@@ -255,7 +255,7 @@ export default function AirspaceMap() {
         <button onClick={resetView} aria-label="Reset view">⟲</button>
       </div>
 
-      {/* Right column: live flight tracker on top, selected airport/aircraft card at the bottom. */}
+      {/* Right column: live flight tracker in the top corner, selected airport/aircraft card at the bottom. */}
       <div className="right-column">
         <FlightTracker
           flights={visibleFlights}
